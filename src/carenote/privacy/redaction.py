@@ -74,7 +74,10 @@ class PHIRedactionGateway:
     _patterns: ClassVar[dict[str, Pattern[str]]] = {
         "national_id": re.compile(r"\b[STFGM]\d{7}[A-Z]\b", re.IGNORECASE),
         "labelled_id": re.compile(
-            r"\b(?:IC|ID|NRIC|passport)\s*(?:number|no\.?|#)?\s*[:=-]?\s*[A-Z0-9-]{6,20}\b",
+            # The label must be a whole word and the value must contain a digit, so ordinary
+            # words such as "idiopathic" or "ID verified" are not treated as identifiers.
+            r"\b(?:IC|ID|NRIC|passport)\b\s*(?:number\b|no\b\.?|#)?\s*[:=-]?\s*"
+            r"(?=[A-Z-]*\d)[A-Z0-9-]{6,20}\b",
             re.IGNORECASE,
         ),
         "phone": re.compile(

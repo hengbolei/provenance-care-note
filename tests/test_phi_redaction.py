@@ -25,6 +25,37 @@ def test_llm_boundary_returns_only_redacted_text():
     assert safe_text == "Patient [REDACTED_NAME] called [REDACTED_PHONE]."
 
 
+@pytest.mark.parametrize(
+    "text",
+    [
+        "No identifiers here.",
+        "Idiopathic headache, likely benign.",
+        "Icterus noted on examination.",
+        "ID verified at the front desk.",
+        "Passport holder travelling next week.",
+    ],
+)
+def test_labelled_id_ignores_ordinary_words(text):
+    result = PHIRedactionGateway().redact(text)
+    assert result.text == text
+    assert result.counts["labelled_id"] == 0
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "ID 12345678",
+        "IC: A1234567",
+        "NRIC no. 987654321",
+        "passport number E1234567",
+        "ID#ABC-123456",
+    ],
+)
+def test_labelled_id_still_redacts_labelled_identifiers(text):
+    result = PHIRedactionGateway().redact(f"Patient {text} confirmed.")
+    assert result.text == "Patient [REDACTED_LABELLED_ID] confirmed."
+
+
 SOURCE = "Maya Chen reports dizziness after metformin 500 mg; call Maya Chen on 91234567 today."
 
 
