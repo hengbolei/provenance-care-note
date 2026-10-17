@@ -1,6 +1,6 @@
 # Clinical Review Agent — Design
 
-Status: proposed · Owner: Lei Hengbo · Last updated: 2026-10-17
+Status: proposed · Owner: Lei Hengbo · Last updated: 2026-10-17 · Progress: [AGENT_ROADMAP.md](AGENT_ROADMAP.md)
 
 ## 1. Summary
 
