@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import UTC, date, datetime
 from enum import StrEnum
 from typing import Any, Literal
-from uuid import UUID, uuid4
+from uuid import UUID, uuid4, uuid5
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -87,6 +87,33 @@ class Actor(BaseModel):
     clinic_id: UUID
 
 
+AGENT_RUN_NAMESPACE = UUID("8c1f2e4a-5b6d-4e7f-9a0b-1c2d3e4f5a6b")
+
+
+class AgentActor(Actor):
+    """Identity of one agent run, acting for the clinician who started it.
+
+    It carries Role.SYSTEM, so the service's role checks deny it every interactive read and every
+    write. Tools read as `principal`, inheriting exactly that clinician's scope; nothing reaches
+    the record until the clinician commits from their own session.
+    """
+
+    role: Literal[Role.SYSTEM] = Role.SYSTEM
+    run_id: UUID
+    principal: Actor
+
+    @classmethod
+    def for_run(cls, principal: Actor, run_id: UUID) -> AgentActor:
+        if principal.role is not Role.CLINICIAN:
+            raise PermissionError("only a clinician can start an agent run")
+        return cls(
+            id=uuid5(AGENT_RUN_NAMESPACE, str(run_id)),
+            clinic_id=principal.clinic_id,
+            run_id=run_id,
+            principal=principal,
+        )
+
+
 class LoginRequest(BaseModel):
     username: str = Field(min_length=1, max_length=120)
     password: str = Field(min_length=8, max_length=256)
@@ -117,6 +144,23 @@ class ProvenancePointer(BaseModel):
     def validate_span(self) -> ProvenancePointer:
         if self.end <= self.start:
             raise ValueError("provenance end must be greater than start")
+        return self
+
+
+class Span(BaseModel):
+    """An exact, citable range of an entry's content, with the text it covers."""
+
+    entry_id: UUID
+    start: int = Field(ge=0)
+    end: int = Field(gt=0)
+    text: str
+
+    @model_validator(mode="after")
+    def validate_span(self) -> Span:
+        if self.end <= self.start:
+            raise ValueError("span end must be greater than start")
+        if len(self.text) != self.end - self.start:
+            raise ValueError("span text must cover exactly [start, end)")
         return self
 
 
@@ -174,6 +218,28 @@ class TimelineEntry(BaseModel):
     origin: EntryOrigin
     review_status: ReviewStatus | None = None
     internal: bool = True
+
+
+class EntryRef(BaseModel):
+    """What the agent records about an entry it loaded, so citations can be checked against it."""
+
+    entry_id: UUID
+    type: EntryType
+    author_role: Role
+    timestamp: datetime
+    length: int = Field(ge=0)
+    internal: bool
+
+    @classmethod
+    def from_entry(cls, entry: TimelineEntry) -> EntryRef:
+        return cls(
+            entry_id=entry.id,
+            type=entry.type,
+            author_role=entry.author_role,
+            timestamp=entry.timestamp,
+            length=len(entry.content),
+            internal=entry.internal,
+        )
 
 
 class Highlight(BaseModel):
