@@ -182,16 +182,14 @@ docs/              Architecture and development documentation
 
 ## Documentation
 
-- `docs/ARCHITECTURE.md`
-- `docs/AGENT_DESIGN.md`
-- `docs/AGENT_ROADMAP.md`
-- `docs/DEVELOPMENT.md`
-- `docs/TECHNICAL_BRIEF.md`
-- `docs/DEMO_SCRIPT.md`
-- `docs/DELIVERY_CHECKLIST.md`
-- `docs/PERFORMANCE.md`
-- `ATTRIBUTION.txt`
-- `SUBMISSION_CHECKLIST.md`
+- [Architecture](docs/ARCHITECTURE.md): layers, trust boundaries and production direction
+- [Technical brief](docs/TECHNICAL_BRIEF.md): product thesis, scope and design choices
+- [Development](docs/DEVELOPMENT.md): requirements, setup, tests and operation
+- [Production security](docs/PRODUCTION_SECURITY.md): required configuration and secret handling
+- [Performance](docs/PERFORMANCE.md): Glance warm-path measurements
+- [Clinical Review Agent design](docs/AGENT_DESIGN.md): proposed multi-step review agent
+- [Agent roadmap](docs/AGENT_ROADMAP.md): build phases, progress and decisions
+- [Attribution](ATTRIBUTION.txt): third-party licences
 
 ## License
 
