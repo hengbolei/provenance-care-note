@@ -921,6 +921,8 @@ class CareNoteService:
         expected_version: int,
     ) -> SectionState:
         self._reject_system_writes(actor)
+        # Sections are internal care-team documents: patients can neither read nor create them.
+        self._require_internal_collaborator(actor)
         current = self.repository.get_section(patient_id, section)
         owner = current.owner_role if current else actor.role
         clinic_id = current.clinic_id if current else actor.clinic_id
