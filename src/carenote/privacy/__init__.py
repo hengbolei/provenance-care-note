@@ -1,3 +1,3 @@
-from carenote.privacy.redaction import PHIRedactionGateway, RedactionResult
+from carenote.privacy.redaction import PHIRedactionGateway, RedactedSpan, RedactionResult
 
-__all__ = ["PHIRedactionGateway", "RedactionResult"]
+__all__ = ["PHIRedactionGateway", "RedactedSpan", "RedactionResult"]
