@@ -891,7 +891,13 @@ class CareNoteService:
         if actor.role not in {Role.STAFF, Role.CLINICIAN, Role.ADMIN}:
             raise AccessDeniedError("internal collaboration requires a care-team role")
 
+    @staticmethod
+    def _reject_system_writes(actor: Actor) -> None:
+        if actor.role is Role.SYSTEM:
+            raise AccessDeniedError("system actors cannot write; a clinician must commit changes")
+
     def add_entry(self, actor: Actor, entry: TimelineEntry) -> TimelineEntry:
+        self._reject_system_writes(actor)
         if actor.clinic_id != entry.clinic_id:
             raise AccessDeniedError("cross-clinic writes are forbidden")
         ownership = {
@@ -914,6 +920,7 @@ class CareNoteService:
         content: str,
         expected_version: int,
     ) -> SectionState:
+        self._reject_system_writes(actor)
         current = self.repository.get_section(patient_id, section)
         owner = current.owner_role if current else actor.role
         clinic_id = current.clinic_id if current else actor.clinic_id
