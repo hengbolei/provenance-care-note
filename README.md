@@ -183,6 +183,8 @@ docs/              Architecture and development documentation
 ## Documentation
 
 - `docs/ARCHITECTURE.md`
+- `docs/AGENT_DESIGN.md`
+- `docs/AGENT_ROADMAP.md`
 - `docs/DEVELOPMENT.md`
 - `docs/TECHNICAL_BRIEF.md`
 - `docs/DEMO_SCRIPT.md`
