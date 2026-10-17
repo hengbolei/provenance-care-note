@@ -120,6 +120,23 @@ class ProvenancePointer(BaseModel):
         return self
 
 
+class Span(BaseModel):
+    """An exact, citable range of an entry's content, with the text it covers."""
+
+    entry_id: UUID
+    start: int = Field(ge=0)
+    end: int = Field(gt=0)
+    text: str
+
+    @model_validator(mode="after")
+    def validate_span(self) -> Span:
+        if self.end <= self.start:
+            raise ValueError("span end must be greater than start")
+        if len(self.text) != self.end - self.start:
+            raise ValueError("span text must cover exactly [start, end)")
+        return self
+
+
 # Backwards-compatible domain name used by the initial test scaffold.
 SourceSpan = ProvenancePointer
 

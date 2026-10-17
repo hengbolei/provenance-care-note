@@ -16,8 +16,10 @@ from carenote.domain.models import (
     SectionRevision,
     SectionState,
     SourceArtifact,
+    Span,
     TimelineEntry,
 )
+from carenote.repositories.search import keyword_search
 
 
 class InMemoryCareNoteRepository:
@@ -73,6 +75,25 @@ class InMemoryCareNoteRepository:
             key=lambda item: item.timestamp,
             reverse=True,
         )
+
+    def search_entries(
+        self,
+        patient_id: UUID,
+        clinic_id: UUID,
+        query: str,
+        k: int = 10,
+        include_internal: bool = True,
+    ) -> list[Span]:
+        """Keyword search over one patient's active entries in one clinic.
+
+        Archived entries are excluded. Pass include_internal=False for anything patient-facing.
+        """
+        entries = [
+            entry
+            for entry in self.list_entries(patient_id, clinic_id)
+            if include_internal or not entry.internal
+        ]
+        return keyword_search(entries, query, k)
 
     def get_entry(self, entry_id: UUID) -> TimelineEntry | None:
         return self.entries.get(entry_id)
