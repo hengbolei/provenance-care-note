@@ -1,0 +1,25 @@
+Provenance Care Note - third-party attribution
+
+Runtime libraries
+-----------------
+FastAPI - MIT License - https://github.com/fastapi/fastapi
+Uvicorn - BSD 3-Clause License - https://github.com/encode/uvicorn
+Pydantic - MIT License - https://github.com/pydantic/pydantic
+HTTPX - BSD 3-Clause License - https://github.com/encode/httpx
+Cryptography - Apache License 2.0 or BSD 3-Clause License - https://github.com/pyca/cryptography
+psycopg - GNU Lesser General Public License v3.0 - https://github.com/psycopg/psycopg
+
+Development libraries
+---------------------
+Pytest - MIT License - https://github.com/pytest-dev/pytest
+Ruff - MIT License - https://github.com/astral-sh/ruff
+Hatchling - MIT License - https://github.com/pypa/hatch
+
+Optional external services/models
+---------------------------------
+OpenAI Responses API - optional external service; governed by the applicable OpenAI service terms
+Configured default text model: gpt-5-mini
+Configured transcription model: gpt-4o-transcribe
+
+No model weights, external clinical datasets, copied UI kits, icons, fonts, images, or third-party
+patient data are redistributed by this repository. All bundled patient content is synthetic.

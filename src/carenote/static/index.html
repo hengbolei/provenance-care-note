@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Provenance Care Note</title>
+    <meta name="theme-color" content="#173a38" />
+    <link rel="manifest" href="/static/manifest.webmanifest" />
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Care Note home">
+        <span class="brand-mark">N</span>
+        <span>Care Note</span>
+      </a>
+      <div class="view-context">
+        <span class="context-dot" aria-hidden="true"></span>
+        <span id="current-role">Signed out</span>
+        <span id="presence-status" class="presence-status" hidden></span>
+        <button id="logout-button" class="text-button" type="button" hidden>Sign out</button>
+      </div>
+    </header>
+
+    <main class="shell" aria-live="polite">
+      <section id="login-panel" class="login-panel" aria-labelledby="login-title">
+        <p class="eyebrow">SECURE DEMO SESSION</p>
+        <h1 id="login-title">Sign in to Care Note</h1>
+        <p class="helper-text">Identity, role, clinic membership, and session expiry are verified by the server.</p>
+        <div class="login-fields">
+          <label class="field-label" for="login-username">Username</label>
+          <input id="login-username" autocomplete="username" value="clinician" />
+          <label class="field-label" for="login-password">Password</label>
+          <input id="login-password" type="password" autocomplete="current-password" />
+          <button id="login-button" class="primary-button" type="button">Sign in</button>
+          <p id="login-feedback" class="form-feedback" role="status"></p>
+        </div>
+      </section>
+      <header id="patient-header" class="patient-header" aria-labelledby="patient-name" aria-busy="true">
+        <div class="patient-avatar" aria-hidden="true">MC</div>
+        <div class="patient-identity">
+          <div class="identity-labels">
+            <span class="synthetic-badge">SYNTHETIC PATIENT</span>
+            <span id="patient-pronouns">—</span>
+          </div>
+          <h1 id="patient-name">Loading patient record…</h1>
+          <dl class="patient-meta">
+            <div>
+              <dt>MRN</dt>
+              <dd id="patient-mrn">—</dd>
+            </div>
+            <div>
+              <dt>Date of birth</dt>
+              <dd id="patient-dob">—</dd>
+            </div>
+            <div>
+              <dt>Record scope</dt>
+              <dd>Longitudinal care note</dd>
+            </div>
+          </dl>
+        </div>
+      </header>
+
+      <section id="screen-state" class="screen-state loading" role="status" data-state="loading">
+        <span id="state-icon" class="state-icon" aria-hidden="true"></span>
+        <div>
+          <h2 id="state-title">Loading longitudinal record</h2>
+          <p id="state-message">Securely retrieving patient details, priorities, and timeline.</p>
+        </div>
+        <button id="retry-button" class="retry-button" type="button" hidden>Try again</button>
+      </section>
+
+      <div id="patient-content" hidden>
+        <section id="patient-dashboard" class="patient-dashboard" aria-labelledby="patient-dashboard-title" hidden>
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">YOUR CARE</p>
+              <h2 id="patient-dashboard-title">Your plan and next steps</h2>
+            </div>
+            <p id="patient-action-count" class="count-label"></p>
+          </div>
+          <div class="patient-dashboard-grid">
+            <article class="patient-dashboard-card">
+              <h3>Clinician-confirmed guidance</h3>
+              <p class="helper-text">Only guidance reviewed by your clinical team appears here.</p>
+              <div id="patient-action-list" class="patient-action-list"></div>
+            </article>
+            <article class="patient-dashboard-card">
+              <h3>Share an update</h3>
+              <p class="helper-text">Add a symptom or question for your care team to review.</p>
+              <label class="field-label" for="patient-entry-title">Update title</label>
+              <input id="patient-entry-title" maxlength="160" placeholder="e.g. Morning symptom update" />
+              <label class="field-label" for="patient-entry-content">What would you like the team to know?</label>
+              <textarea id="patient-entry-content" rows="4" maxlength="10000"></textarea>
+              <div class="form-actions">
+                <button id="add-patient-entry" class="primary-button" type="button">Share with care team</button>
+              </div>
+              <p id="patient-entry-feedback" class="form-feedback" role="status"></p>
+            </article>
+          </div>
+        </section>
+        <section id="glance-panel" class="glance-panel" aria-labelledby="glance-title">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">10-SECOND GLANCE</p>
+              <h2 id="glance-title">What needs attention now</h2>
+            </div>
+            <p id="highlight-count" class="count-label"></p>
+          </div>
+          <div id="conflict-panel" class="conflict-panel" hidden>
+            <div class="conflict-heading">
+              <h3>Conflicts requiring verification</h3>
+              <span id="conflict-count" class="count-label"></span>
+            </div>
+            <div id="conflict-list" class="conflict-list"></div>
+          </div>
+          <div id="highlight-list" class="highlight-list"></div>
+        </section>
+        <section class="timeline-panel" aria-labelledby="timeline-title">
+          <div class="section-heading timeline-heading">
+            <div>
+              <p class="eyebrow">LONGITUDINAL RECORD</p>
+              <h2 id="timeline-title">Timeline</h2>
+            </div>
+            <p id="entry-count" class="count-label"></p>
+          </div>
+          <div class="timeline-legend" aria-label="Record type legend">
+            <span class="legend-item patient">Patient</span>
+            <span class="legend-item staff">Staff</span>
+            <span class="legend-item clinician">Clinician</span>
+            <span class="legend-item ai">AI-generated</span>
+          </div>
+          <div id="timeline-list" class="timeline-list"></div>
+        </section>
+        <section id="workspace-panel" class="workspace-panel" aria-labelledby="workspace-title">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">CARE-TEAM WORKSPACE</p>
+              <h2 id="workspace-title">Plan, review and handoff</h2>
+            </div>
+            <p class="count-label">Internal only</p>
+          </div>
+          <div class="workspace-grid">
+            <article class="workspace-card">
+              <div class="workspace-card-heading">
+                <div>
+                  <p class="eyebrow">CLINICIAN SECTION</p>
+                  <h3>Care plan</h3>
+                </div>
+                <span id="section-version" class="version-label">Version —</span>
+              </div>
+              <textarea id="section-content" rows="6" aria-label="Care plan content"></textarea>
+              <div class="form-actions">
+                <button id="save-section" class="primary-button" type="button">Save new version</button>
+                <button id="show-history" class="secondary-button" type="button">Refresh history</button>
+              </div>
+              <p id="section-feedback" class="form-feedback" role="status"></p>
+              <div class="version-compare-controls">
+                <label class="compact-field"><span class="field-label">From</span><select id="compare-from"></select></label>
+                <label class="compact-field"><span class="field-label">To</span><select id="compare-to"></select></label>
+                <button id="compare-versions" class="secondary-button" type="button">Compare versions</button>
+              </div>
+              <pre id="version-compare-output" class="revision-diff" hidden></pre>
+              <div id="revision-list" class="revision-list" aria-label="Care plan revision history"></div>
+            </article>
+            <article class="workspace-card">
+              <div class="workspace-card-heading">
+                <div>
+                  <p class="eyebrow">THREADED HANDOFF</p>
+                  <h3>Care-team comments</h3>
+                </div>
+                <span id="comment-count" class="version-label"></span>
+              </div>
+              <label class="field-label" for="comment-content">New comment</label>
+              <textarea id="comment-content" rows="3" placeholder="Try @staff or @clinician…"></textarea>
+              <label class="field-label" for="comment-target">Attach comment to</label>
+              <select id="comment-target"></select>
+              <button id="comment-on-plan-selection" class="text-button" type="button">Use selected Care Plan text</button>
+              <label class="field-label" for="comment-assignee">Assign follow-up</label>
+              <select id="comment-assignee">
+                <option value="">Unassigned</option>
+                <option value="staff">Staff</option>
+                <option value="clinician">Clinician</option>
+              </select>
+              <div class="form-actions">
+                <button id="add-comment" class="primary-button" type="button">Add comment</button>
+              </div>
+              <p id="comment-feedback" class="form-feedback" role="status"></p>
+              <div id="comment-list" class="comment-list"></div>
+            </article>
+            <article id="staff-note-card" class="workspace-card" hidden>
+              <div class="workspace-card-heading">
+                <div>
+                  <p class="eyebrow">STAFF ENTRY</p>
+                  <h3>Add timeline note</h3>
+                </div>
+              </div>
+              <label class="field-label" for="entry-title">Note title</label>
+              <input id="entry-title" maxlength="160" placeholder="e.g. Follow-up call" />
+              <label class="field-label" for="entry-content">Note content</label>
+              <textarea id="entry-content" rows="4" maxlength="10000"></textarea>
+              <div class="form-actions">
+                <button id="add-entry" class="primary-button" type="button">Add to timeline</button>
+              </div>
+              <p id="entry-feedback" class="form-feedback" role="status"></p>
+            </article>
+            <article id="highlight-composer-card" class="workspace-card" hidden>
+              <div class="workspace-card-heading">
+                <div>
+                  <p class="eyebrow">CLINICIAN REVIEW</p>
+                  <h3>Create highlight from source</h3>
+                </div>
+              </div>
+              <p class="helper-text">Select text in a Timeline entry, then choose “Use selected text”.</p>
+              <blockquote id="selected-source" class="selected-source">No source text selected.</blockquote>
+              <label class="field-label" for="highlight-reason">Risk reason</label>
+              <input id="highlight-reason" maxlength="500" />
+              <label class="field-label" for="highlight-action">Suggested action</label>
+              <input id="highlight-action" maxlength="240" />
+              <label class="field-label" for="highlight-patient-instruction">Patient-facing instruction (optional)</label>
+              <input id="highlight-patient-instruction" maxlength="500" placeholder="Shown only after clinician confirmation" />
+              <div class="highlight-controls">
+                <label class="compact-field">
+                  <span class="field-label">Risk level</span>
+                  <select id="highlight-risk-level">
+                    <option value="moderate">Moderate</option>
+                    <option value="high">High</option>
+                    <option value="critical">Critical</option>
+                    <option value="low">Low</option>
+                  </select>
+                </label>
+                <label class="compact-field">
+                  <span class="field-label">Review status</span>
+                  <select id="highlight-status">
+                    <option value="needs_review">Needs review</option>
+                    <option value="clinician_confirmed">Clinician confirmed</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
+                </label>
+                <label class="compact-field">
+                  <span class="field-label">Assign to</span>
+                  <select id="highlight-assignee">
+                    <option value="">Unassigned</option>
+                    <option value="staff">Staff</option>
+                    <option value="clinician">Clinician</option>
+                  </select>
+                </label>
+              </div>
+              <label class="field-label" for="highlight-entities">Clinical factors</label>
+              <input id="highlight-entities" maxlength="120" placeholder="medication, dose, allergy, symptom" />
+              <div class="form-actions">
+                <button id="create-highlight" class="primary-button" type="button" disabled>Create highlight</button>
+              </div>
+              <p id="highlight-create-feedback" class="form-feedback" role="status"></p>
+            </article>
+            <article id="ai-ingest-card" class="workspace-card" hidden>
+              <div class="workspace-card-heading">
+                <div>
+                  <p class="eyebrow">AI-ASSISTED INTAKE</p>
+                  <h3>Summarize a consult or recording</h3>
+                </div>
+              </div>
+              <p class="helper-text">Names and recognized identifiers are redacted before model submission. The result remains unconfirmed until clinical review.</p>
+              <label class="field-label" for="ai-title">Timeline title</label>
+              <input id="ai-title" maxlength="160" value="Consult summary" />
+              <label class="field-label" for="ai-source">Source type</label>
+              <select id="ai-source">
+                <option value="doctor_consult">Doctor consult</option>
+                <option value="nurse_consult">Nurse consult</option>
+                <option value="patient_session">Patient session</option>
+              </select>
+              <label class="field-label" for="ai-raw-text">Transcript or source text</label>
+              <textarea id="ai-raw-text" rows="6" maxlength="50000"></textarea>
+              <div class="form-actions">
+                <button id="record-audio" class="secondary-button" type="button">Start recording</button>
+                <button id="ai-ingest" class="primary-button" type="button">Create AI summary</button>
+              </div>
+              <p id="ai-feedback" class="form-feedback" role="status"></p>
+            </article>
+            <article class="workspace-card audit-card">
+              <div class="workspace-card-heading">
+                <div>
+                  <p class="eyebrow">METADATA ONLY</p>
+                  <h3>Audit trail</h3>
+                </div>
+                <span id="audit-count" class="version-label"></span>
+              </div>
+              <div id="audit-list" class="audit-list" aria-label="Patient audit trail"></div>
+            </article>
+          </div>
+        </section>
+      </div>
+    </main>
+    <script type="module" src="/static/app.js"></script>
+  </body>
+</html>

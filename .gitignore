@@ -1,0 +1,56 @@
+﻿# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Node
+node_modules/
+dist/
+.env
+npm-debug.log
+yarn-error.log
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+build/
+*.egg-info/
+
+# Local environments and secrets
+.env.*
+!.env.example
+
+# IDEs
+.vscode/
+.idea/
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+~$*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local planning materials (intentionally not published)
+INTRODUCTION.md
+docs/IMPLEMENTATION_FLOW.md
+docs/DEMO_SCRIPT.md
+docs/演示说明_中文.md
+docs/DELIVERY_CHECKLIST.md
+SUBMISSION_CHECKLIST.md
