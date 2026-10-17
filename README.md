@@ -1,5 +1,7 @@
 # Provenance Care Note
 
+[![CI](https://github.com/hengbolei/provenance-care-note/actions/workflows/ci.yml/badge.svg)](https://github.com/hengbolei/provenance-care-note/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 A provenance-first longitudinal care note prototype for a single synthetic patient. The project
 helps clinical staff understand urgent information quickly while keeping AI-generated content,
 human-authored notes, source evidence, and access boundaries explicit.
