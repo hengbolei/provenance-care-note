@@ -1,4 +1,3 @@
-import re
 from dataclasses import dataclass
 from uuid import NAMESPACE_URL, UUID, uuid5
 
@@ -9,6 +8,7 @@ from carenote.domain.models import (
     Role,
     TimelineEntry,
 )
+from carenote.services.entities import extract_entities
 
 
 @dataclass(frozen=True, slots=True)
@@ -22,67 +22,12 @@ class ClinicalFact:
 class DeterministicConflictDetector:
     """Narrow deterministic checks for medication state, dose, and allergy polarity."""
 
-    DOSE = re.compile(
-        r"\b(?P<med>[A-Za-z][A-Za-z-]{2,})\s+(?P<dose>\d+(?:\.\d+)?\s*(?:mg|mcg|g|ml|units?))\b",
-        re.IGNORECASE,
-    )
-    MEDICATION_STATE = re.compile(
-        r"\b(?P<state>hold|stop|discontinue|continue|take|start|started)\s+"
-        r"(?:the\s+|morning\s+)?(?P<med>[A-Za-z][A-Za-z-]{2,})\b",
-        re.IGNORECASE,
-    )
-    ALLERGY_POSITIVE = re.compile(
-        r"(?<!not )\ballergic\s+(?:to\s+)?(?P<agent>[A-Za-z][A-Za-z-]{2,30})\b|"
-        r"(?<!no )\ballergy\s+(?:to\s+)?(?P<allergy_agent>[A-Za-z][A-Za-z-]{2,30})\b",
-        re.IGNORECASE,
-    )
-    ALLERGY_NEGATIVE = re.compile(
-        r"\b(?:not allergic to|no allergy to)\s+(?P<agent>[A-Za-z][A-Za-z-]{2,30})\b",
-        re.IGNORECASE,
-    )
-
     def detect(self, patient_id: UUID, entries: list[TimelineEntry]) -> list[Conflict]:
-        facts: list[ClinicalFact] = []
-        for entry in entries:
-            for match in self.DOSE.finditer(entry.content):
-                facts.append(
-                    ClinicalFact(
-                        ConflictCategory.DOSE,
-                        match.group("med").lower(),
-                        re.sub(r"\s+", "", match.group("dose").lower()),
-                        entry,
-                    )
-                )
-            for match in self.MEDICATION_STATE.finditer(entry.content):
-                raw_state = match.group("state").lower()
-                state = "hold" if raw_state in {"hold", "stop", "discontinue"} else "take"
-                facts.append(
-                    ClinicalFact(
-                        ConflictCategory.MEDICATION,
-                        match.group("med").lower(),
-                        state,
-                        entry,
-                    )
-                )
-            for match in self.ALLERGY_POSITIVE.finditer(entry.content):
-                agent = match.group("agent") or match.group("allergy_agent")
-                facts.append(
-                    ClinicalFact(
-                        ConflictCategory.ALLERGY,
-                        agent.lower(),
-                        "present",
-                        entry,
-                    )
-                )
-            for match in self.ALLERGY_NEGATIVE.finditer(entry.content):
-                facts.append(
-                    ClinicalFact(
-                        ConflictCategory.ALLERGY,
-                        match.group("agent").lower(),
-                        "absent",
-                        entry,
-                    )
-                )
+        facts = [
+            ClinicalFact(item.category, item.entity, item.value, entry)
+            for entry in entries
+            for item in extract_entities(entry.content)
+        ]
 
         grouped: dict[tuple[ConflictCategory, str], list[ClinicalFact]] = {}
         for fact in facts:
