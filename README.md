@@ -1,5 +1,7 @@
 # Provenance Care Note
 
+**English** | [简体中文](README.zh-CN.md)
+
 [![CI](https://github.com/hengbolei/provenance-care-note/actions/workflows/ci.yml/badge.svg)](https://github.com/hengbolei/provenance-care-note/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 A provenance-first longitudinal care note prototype for a single synthetic patient. The project
