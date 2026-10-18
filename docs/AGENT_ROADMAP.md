@@ -4,7 +4,7 @@ Status tracker for building the agent described in [AGENT_DESIGN.md](AGENT_DESIG
 design says *what* and *why*; this file says *in what order* and *where we are*. Update it in the
 same PR as the work it describes.
 
-Last updated: 2026-10-17 · Current phase: **Phase 1 — Minimal end-to-end loop**
+Last updated: 2026-10-18 · Current phase: **Phase 1 — Minimal end-to-end loop**
 
 ## How we work
 
@@ -33,11 +33,11 @@ Merged in PR #3 (`e62d79c`).
 - [x] 0.4 `AgentActor` and `EntryRef`; SYSTEM writes rejected (`4ab4238`)
 - [x] fix: patients could create internal sections (`96f6aff`)
 
-## Phase 1 — Minimal end-to-end loop · ⏳ next
+## Phase 1 — Minimal end-to-end loop · 🚧 in progress
 
 Branch: `feat/agent-mvp`. Design §17 week 1. Build framework-free parts first, LangGraph last.
 
-- [ ] 1.1 `agent/state.py`: `Citation`, `Claim`, `DraftReview`, `CandidateHighlight`,
+- [x] 1.1 `agent/state.py`: `Citation`, `Claim`, `DraftReview`, `CandidateHighlight`,
       `ClaimCheck`, `Budget`, `ReviewState`
 - [ ] 1.2 `agent/verify.py`: deterministic checks 1–6 from design §8, pure functions with dense
       unit tests (exists and in scope, in bounds, quote match with relocation, entity support,
@@ -105,6 +105,9 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-18 | Verification results are a `VerificationReport` (per-claim `ClaimCheck` plus uncovered conflict IDs) instead of `list[ClaimCheck]` | Conflict coverage (check 6) belongs to the whole draft, not to one claim |
+| 2026-10-18 | `CandidateHighlight` has no risk level or priority field, and model-output schemas forbid extra keys | Design §10: the deterministic scorer sets highlight risk and priority; the model cannot smuggle them in |
+| 2026-10-18 | Default budget: 60k tokens and $0.50 per run, beside the design's 12 steps, 2 revisions and 60 s | The design names token and cost ceilings without values; revisit with Phase 2 trace data |
 | 2026-10-17 | Agent tools **read as the principal clinician**; the `AgentActor` (Role.SYSTEM) is write-denied | Every service read already denies SYSTEM; reading as the clinician reuses their exact scope instead of adding agent-specific permissions |
 | 2026-10-17 | Redaction offset mapping moved from a risk (design §18) to a Phase 0 prerequisite | Citations cannot be verified without it |
 
