@@ -42,7 +42,7 @@ Branch: `feat/agent-mvp`. Design §17 week 1. Build framework-free parts first, 
 - [x] 1.2 `agent/verify.py`: deterministic checks 1–6 from design §8, pure functions with dense
       unit tests (exists and in scope, in bounds, quote match with relocation, entity support,
       patient-source risk cap, conflict coverage)
-- [ ] 1.3 `agent/gateway.py`: `ModelGateway` protocol (`structured()`, `text()`);
+- [x] 1.3 `agent/gateway.py`: `ModelGateway` protocol (`structured()`, `text()`);
       `OpenAIGateway` with JSON-schema output and mandatory redaction; `RecordedGateway` over
       `evals/cassettes/`; move `summarize` onto it without changing `services/ai.py` callers
 - [ ] 1.4 `agent/tools.py`: read tools that call `CareNoteService` as `agent.principal`;
@@ -105,6 +105,10 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-18 | Gateway requests take `RedactionResult` inputs only (plain strings raise `TypeError`); instructions are the only free text | Makes design §10 "refuses unredacted input by construction" concrete |
+| 2026-10-18 | Cassettes are keyed by a SHA-256 of purpose, schema, instructions and redacted input, and store only the output, model and usage | Any prompt or input change forces a re-record; no record text is written to disk |
+| 2026-10-18 | Cost is reported only when per-token prices are configured, otherwise `None` | Prices change per model; a guessed figure would mislead the budget |
+| 2026-10-18 | Audio transcription stays on its direct HTTP call, outside the gateway | It sends audio, not redactable text; moving it is out of scope for the agent |
 | 2026-10-18 | Check 5 phrasing is enforced: claims resting only on patient-sourced text (patient notes and AI patient-session summaries) must contain a reporting cue such as "reports" or "states", else `patient_source_phrasing` | Design §8 requires reported phrasing; a deterministic cue list is checkable, and the revise loop can fix misses |
 | 2026-10-18 | Check 4 support: every medication, dose and allergy fact the claim states must appear in its cited text with the same dose and polarity; claims with no extractable facts pass on valid citations alone | Reuses `extract_entities`, so support is only as strong as extraction (see Known limitations) |
 | 2026-10-18 | Verification results are a `VerificationReport` (per-claim `ClaimCheck` plus uncovered conflict IDs) instead of `list[ClaimCheck]` | Conflict coverage (check 6) belongs to the whole draft, not to one claim |
@@ -125,6 +129,8 @@ Departures from or refinements of the design, newest first.
 
 ## Known limitations
 
+- `OpenAIGateway` is covered by mocked HTTP tests only; strict structured output has not yet been
+  run against the live API, so schema keywords the provider rejects may surface at step 1.9.
 - Entity extraction (`services/entities.py`) only recognises a medication as a word followed by
   a dose or an action verb, which will cap recall. Revisit in Phase 3 using eval results.
 - `labelled_id` redaction now requires a digit in the identifier, so letter-only identifiers are

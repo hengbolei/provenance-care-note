@@ -1,19 +1,25 @@
-import hashlib
 from typing import Any
 
 import httpx
 
+from carenote.agent.gateway import (
+    ExternalModelError,
+    ModelGateway,
+    ModelNotConfiguredError,
+    ModelRequest,
+    OpenAIGateway,
+)
 from carenote.core.config import settings
 from carenote.domain.models import TranscriptionResponse, TranscriptSegment
 from carenote.privacy.redaction import PHIRedactionGateway, RedactionResult
 
+__all__ = ["ExternalModelError", "ModelNotConfiguredError", "OpenAIClinicalGateway"]
 
-class ModelNotConfiguredError(RuntimeError):
-    pass
-
-
-class ExternalModelError(RuntimeError):
-    pass
+SUMMARY_INSTRUCTIONS = (
+    "Create a concise clinical timeline summary from the supplied redacted text. "
+    "Do not infer diagnoses, medication doses, allergies, dates, or certainty that "
+    "are not explicit. Preserve uncertainty and label conflicts for review."
+)
 
 
 class OpenAIClinicalGateway:
@@ -24,38 +30,32 @@ class OpenAIClinicalGateway:
         api_key: str | None = None,
         model: str | None = None,
         client: httpx.Client | None = None,
+        model_gateway: ModelGateway | None = None,
     ) -> None:
         self.api_key = api_key if api_key is not None else settings.openai_api_key
         self.model = model or settings.openai_model
         self.client = client or httpx.Client(timeout=45)
         self.redactor = PHIRedactionGateway()
+        self.model_gateway = model_gateway or OpenAIGateway(
+            api_key=self.api_key, model=self.model, client=self.client
+        )
 
     def summarize(
         self, raw_text: str, known_names: list[str], safety_subject: str
     ) -> tuple[str, RedactionResult]:
-        self._require_key()
         redacted = self.redactor.redact(raw_text, known_names)
-        response = self.client.post(
-            "https://api.openai.com/v1/responses",
-            headers={"Authorization": f"Bearer {self.api_key}"},
-            json={
-                "model": self.model,
-                "store": False,
-                "max_output_tokens": 800,
-                "safety_identifier": hashlib.sha256(safety_subject.encode()).hexdigest(),
-                "instructions": (
-                    "Create a concise clinical timeline summary from the supplied redacted text. "
-                    "Do not infer diagnoses, medication doses, allergies, dates, or certainty that "
-                    "are not explicit. Preserve uncertainty and label conflicts for review."
-                ),
-                "input": redacted.text,
-            },
+        result = self.model_gateway.text(
+            ModelRequest(
+                purpose="ai_ingest_summary",
+                instructions=SUMMARY_INSTRUCTIONS,
+                inputs=[redacted],
+                max_output_tokens=800,
+                safety_subject=safety_subject,
+            )
         )
-        payload = self._json_or_error(response)
-        output_text = payload.get("output_text") or self._extract_output_text(payload)
-        if not output_text:
+        if not result.output:
             raise ExternalModelError("model returned no text")
-        return str(output_text).strip(), redacted
+        return result.output, redacted
 
     def transcribe(self, audio: bytes, content_type: str) -> TranscriptionResponse:
         self._require_key()
@@ -104,15 +104,6 @@ class OpenAIClinicalGateway:
         if not isinstance(payload, dict):
             raise ExternalModelError("external model returned an invalid payload")
         return payload
-
-    @staticmethod
-    def _extract_output_text(payload: dict[str, Any]) -> str:
-        pieces: list[str] = []
-        for item in payload.get("output", []):
-            for content in item.get("content", []):
-                if content.get("type") == "output_text" and content.get("text"):
-                    pieces.append(str(content["text"]))
-        return "\n".join(pieces)
 
     @staticmethod
     def _segment(item: dict[str, Any]) -> TranscriptSegment:
