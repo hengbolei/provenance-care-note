@@ -1,3 +1,5 @@
+import { t } from "/static/i18n.js";
+
 export const DEMO_CONTEXT = {
   patientId: "20000000-0000-4000-8000-000000000001",
   actorRole: null,
@@ -57,7 +59,7 @@ async function request(path, options = {}, context = DEMO_CONTEXT) {
     },
   });
   if (!response.ok) {
-    let message = "Unable to load the patient record";
+    let message = t("api.loadFailed");
     try {
       const payload = await response.json();
       message = payload.detail || message;

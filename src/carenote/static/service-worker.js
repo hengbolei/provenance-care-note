@@ -1,5 +1,5 @@
-const CACHE = "carenote-shell-v1";
-const SHELL = ["/", "/static/styles.css", "/static/app.js", "/static/api.js"];
+const CACHE = "carenote-shell-v2";
+const SHELL = ["/", "/static/styles.css", "/static/app.js", "/static/api.js", "/static/i18n.js"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)));

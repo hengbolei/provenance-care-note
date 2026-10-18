@@ -30,6 +30,15 @@ import {
   updateConflict,
   updateSection,
 } from "/static/api.js";
+import {
+  LANGUAGES,
+  applyTranslations,
+  getLanguage,
+  getLocale,
+  onLanguageChange,
+  setLanguage,
+  t,
+} from "/static/i18n.js";
 
 const elements = {
   name: document.querySelector("#patient-name"),
@@ -130,6 +139,7 @@ const elements = {
   agentLatestReview: document.querySelector("#agent-latest-review"),
   agentLatestVersion: document.querySelector("#agent-latest-version"),
   agentLatestContent: document.querySelector("#agent-latest-content"),
+  languageSelect: document.querySelector("#language-select"),
 };
 
 let currentPlanVersion = 0;
@@ -145,45 +155,30 @@ let agentRun = null;
 let agentPollTimer = null;
 let agentDecisions = new Map();
 let agentHighlightAccepts = new Set();
+let currentSession = null;
+let latestDetail = null;
+let latestAuditEvents = [];
+let currentScreenState = "loading";
+let aiDefaultTitle = elements.aiTitle.value;
 
-const screenStates = {
-  loading: ["Loading longitudinal record", "Securely retrieving patient details, priorities, and timeline."],
-  empty: ["No longitudinal record yet", "This patient has no visible priority items or timeline entries."],
-  forbidden: ["Access denied", "Your current identity cannot view this patient record. Check your role and clinic scope."],
-  notFound: ["Patient record not found", "This patient does not exist or is not visible within your clinic scope."],
-  error: ["Unable to load the record", "The service could not be reached. Please try again."],
-};
+const SCREEN_STATES = ["loading", "empty", "forbidden", "notFound", "error"];
 
-const statusLabels = {
-  ai_suggested: "AI suggested · Unconfirmed",
-  clinician_confirmed: "Clinician confirmed",
-  needs_review: "Needs review",
-  rejected: "Rejected",
-};
-
-const entryTypeLabels = {
-  patient_note: "Patient note",
-  staff_note: "Staff note",
-  clinician_note: "Clinician note",
-  ai_doctor_consult_summary: "AI doctor consult summary",
-  ai_nurse_consult_summary: "AI nurse consult summary",
-  ai_patient_session_summary: "AI patient session summary",
-  system_event: "System event",
-};
-
-const roleLabels = {
-  patient: "Patient",
-  staff: "Staff",
-  clinician: "Clinician",
-  admin: "Admin",
-  system: "AI / System",
-};
-
-const actionStatusLabels = {
-  open: "Open",
-  in_progress: "In progress",
-  completed: "Completed",
-};
+const labelFor = (prefix, value) => (value ? t(`${prefix}.${value}`) : "");
+const statusLabel = (value) => labelFor("status", value);
+const entryTypeLabel = (value) => labelFor("entryType", value);
+const roleLabel = (value) => labelFor("role", value);
+const actionStatusLabel = (value) => labelFor("action", value);
+const statusOptions = () =>
+  Object.fromEntries(
+    ["ai_suggested", "clinician_confirmed", "needs_review", "rejected"].map((value) => [
+      value,
+      statusLabel(value),
+    ]),
+  );
+const actionStatusOptions = () =>
+  Object.fromEntries(
+    ["open", "in_progress", "completed"].map((value) => [value, actionStatusLabel(value)]),
+  );
 
 function createElement(tag, className, text) {
   const node = document.createElement(tag);
@@ -194,12 +189,16 @@ function createElement(tag, className, text) {
 
 function setScreenState(state) {
   if (state === "ready") {
+    currentScreenState = "ready";
     elements.screenState.hidden = true;
     elements.content.hidden = false;
     elements.patientHeader.setAttribute("aria-busy", "false");
     return;
   }
-  const [title, message] = screenStates[state];
+  currentScreenState = state;
+  const [title, message] = SCREEN_STATES.includes(state)
+    ? [t(`state.${state}.title`), t(`state.${state}.message`)]
+    : [state, ""];
   elements.screenState.hidden = false;
   elements.screenState.className = `screen-state ${state}`;
   elements.screenState.dataset.state = state;
@@ -214,18 +213,21 @@ function showAuthenticatedSession(session) {
   DEMO_CONTEXT.actorRole = session.actor.role;
   elements.loginPanel.hidden = true;
   elements.patientHeader.hidden = false;
-  elements.currentRole.textContent = roleLabels[session.actor.role] || session.actor.role;
+  currentSession = session;
+  elements.currentRole.textContent = roleLabel(session.actor.role);
   elements.logoutButton.hidden = false;
   connectRealtime();
 }
 
 function showLogin() {
   DEMO_CONTEXT.actorRole = null;
+  currentSession = null;
+  latestDetail = null;
   elements.loginPanel.hidden = false;
   elements.patientHeader.hidden = true;
   elements.screenState.hidden = true;
   elements.content.hidden = true;
-  elements.currentRole.textContent = "Signed out";
+  elements.currentRole.textContent = t("session.signedOut");
   elements.logoutButton.hidden = true;
   elements.presenceStatus.hidden = true;
   realtimeSocket?.close();
@@ -238,7 +240,7 @@ function showLogin() {
 }
 
 function clearPatient() {
-  elements.name.textContent = "Patient record";
+  elements.name.textContent = t("patient.record");
   elements.pronouns.textContent = "—";
   elements.mrn.textContent = "—";
   elements.dob.textContent = "—";
@@ -248,7 +250,7 @@ function clearPatient() {
 }
 
 function formatDate(value) {
-  return new Intl.DateTimeFormat("en-US", {
+  return new Intl.DateTimeFormat(getLocale(), {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -256,7 +258,7 @@ function formatDate(value) {
 }
 
 function formatDateTime(value) {
-  return new Intl.DateTimeFormat("en-US", {
+  return new Intl.DateTimeFormat(getLocale(), {
     month: "short",
     day: "numeric",
     hour: "2-digit",
@@ -267,20 +269,20 @@ function formatDateTime(value) {
 
 function renderPatient(patient) {
   elements.name.textContent = patient.display_name;
-  elements.pronouns.textContent = patient.pronouns || "Pronouns not provided";
+  elements.pronouns.textContent = patient.pronouns || t("patient.noPronouns");
   elements.mrn.textContent = patient.medical_record_number;
   elements.dob.textContent = formatDate(patient.date_of_birth);
 }
 
 function renderPatientActions(actions) {
   elements.patientActionList.replaceChildren();
-  elements.patientActionCount.textContent = `${actions.length} confirmed item${actions.length === 1 ? "" : "s"}`;
+  elements.patientActionCount.textContent = t("dashboard.confirmedCount", { count: actions.length });
   if (actions.length === 0) {
     elements.patientActionList.append(
       createElement(
         "p",
         "helper-text",
-        "Your care team has not published any new guidance yet.",
+        t("dashboard.noGuidance"),
       ),
     );
     return;
@@ -293,7 +295,7 @@ function renderPatientActions(actions) {
       createElement(
         "span",
         "patient-action-status",
-        actionStatusLabels[action.action_status] || action.action_status,
+        actionStatusLabel(action.action_status),
       ),
     );
     elements.patientActionList.append(item);
@@ -317,25 +319,19 @@ function focusTimelineEntries(entryIds) {
 function renderConflicts(conflicts) {
   elements.conflictList.replaceChildren();
   elements.conflictPanel.hidden = conflicts.length === 0;
-  elements.conflictCount.textContent = `${conflicts.length} conflict${conflicts.length === 1 ? "" : "s"}`;
+  elements.conflictCount.textContent = t("conflict.count", { count: conflicts.length });
   conflicts.forEach((conflict) => {
     const card = createElement("article", `conflict-card ${conflict.status}`);
     const top = createElement("div", "conflict-card-top");
-    const conflictStatusLabels = {
-      needs_review: "Needs review",
-      clinician_precedence: "Clinician precedence",
-      clinician_confirmed: "Clinician confirmed",
-      resolved: "Resolved",
-    };
     top.append(
-      createElement("span", "conflict-category", conflict.category),
+      createElement("span", "conflict-category", labelFor("conflictCategory", conflict.category)),
       createElement(
         "span",
         `status-chip ${conflict.status}`,
-        conflictStatusLabels[conflict.status] || conflict.status,
+        labelFor("conflictStatus", conflict.status),
       ),
     );
-    const source = createElement("button", "text-button", "Compare source entries");
+    const source = createElement("button", "text-button", t("conflict.compare"));
     source.type = "button";
     source.addEventListener("click", () => focusTimelineEntries(conflict.entry_ids));
     card.append(
@@ -347,7 +343,7 @@ function renderConflicts(conflicts) {
     if (conflict.resolution_note) {
       card.append(createElement("p", "conflict-resolution", conflict.resolution_note));
     }
-    const history = createElement("button", "text-button", "History");
+    const history = createElement("button", "text-button", t("history.history"));
     history.type = "button";
     history.addEventListener("click", async () => {
       try {
@@ -359,20 +355,20 @@ function renderConflicts(conflicts) {
     card.append(history);
     if (["clinician", "admin"].includes(DEMO_CONTEXT.actorRole)) {
       const status = createSelect(
-        "Adjudication",
+        t("conflict.adjudication"),
         {
-          clinician_confirmed: "Clinician confirmed",
-          resolved: "Resolved",
-          needs_review: "Reopen for review",
+          clinician_confirmed: labelFor("conflictStatus", "clinician_confirmed"),
+          resolved: labelFor("conflictStatus", "resolved"),
+          needs_review: t("conflict.reopen"),
         },
         conflict.status,
         `conflict-status-${conflict.id}`,
       );
       const note = createElement("textarea", "conflict-note");
       note.rows = 2;
-      note.placeholder = "Resolution or verification note";
+      note.placeholder = t("conflict.notePlaceholder");
       note.value = conflict.resolution_note || "";
-      const save = createElement("button", "primary-button", "Save adjudication");
+      const save = createElement("button", "primary-button", t("conflict.save"));
       save.type = "button";
       save.addEventListener("click", async () => {
         try {
@@ -394,7 +390,7 @@ function renderConflicts(conflicts) {
 
 function renderHighlights(highlights) {
   elements.highlightList.replaceChildren();
-  elements.highlightCount.textContent = `${highlights.length} priority item${highlights.length === 1 ? "" : "s"}`;
+  elements.highlightCount.textContent = t("glance.count", { count: highlights.length });
   highlights.forEach((highlight, index) => {
     if (!recordedImpressions.has(highlight.id)) {
       recordedImpressions.add(highlight.id);
@@ -414,8 +410,8 @@ function renderHighlights(highlights) {
     const body = createElement("div", "highlight-body");
     const top = createElement("div", "highlight-topline");
     top.append(
-      createElement("span", `status-chip ${highlight.status}`, statusLabels[highlight.status]),
-      createElement("span", "priority-score", `Priority ${highlight.priority}`),
+      createElement("span", `status-chip ${highlight.status}`, statusLabel(highlight.status)),
+      createElement("span", "priority-score", t("glance.priority", { value: highlight.priority })),
     );
     body.append(
       top,
@@ -426,7 +422,7 @@ function renderHighlights(highlights) {
     const explanationSummary = createElement(
       "summary",
       "",
-      `Why this priority is ${highlight.priority}`,
+      t("glance.whyPriority", { value: highlight.priority }),
     );
     const factorList = createElement("ul", "priority-factor-list");
     highlight.priority_factors.forEach((factor) => {
@@ -442,10 +438,10 @@ function renderHighlights(highlights) {
     const footer = createElement("div", "highlight-footer");
     const action = createElement("p", "suggested-action");
     action.append(
-      createElement("span", "action-label", "Suggested action"),
+      createElement("span", "action-label", t("glance.suggestedAction")),
       document.createTextNode(highlight.suggested_action),
     );
-    const sourceButton = createElement("button", "text-button", "View exact source");
+    const sourceButton = createElement("button", "text-button", t("glance.viewSource"));
     sourceButton.type = "button";
     const openSource = () => {
       const target = document.querySelector(`#source-${highlight.id}`)
@@ -458,7 +454,7 @@ function renderHighlights(highlights) {
       target.scrollIntoView({ behavior: "smooth", block: "center" });
     };
     sourceButton.addEventListener("click", openSource);
-    const claimButton = createElement("button", "text-button", "View original claim");
+    const claimButton = createElement("button", "text-button", t("glance.viewClaim"));
     claimButton.type = "button";
     claimButton.disabled = !highlight.source_evidence_pointer;
     claimButton.addEventListener("click", async () => {
@@ -477,7 +473,7 @@ function renderHighlights(highlights) {
         showFeedback(feedback, error.message, true);
       }
     });
-    const historyButton = createElement("button", "text-button", "Version history");
+    const historyButton = createElement("button", "text-button", t("glance.versionHistory"));
     historyButton.type = "button";
     historyButton.addEventListener("click", async () => {
       try {
@@ -490,8 +486,8 @@ function renderHighlights(highlights) {
 
     const controls = createElement("div", "highlight-controls");
     const reviewSelect = createSelect(
-      "Review status",
-      statusLabels,
+      t("glance.reviewStatus"),
+      statusOptions(),
       highlight.status,
       `review-${highlight.id}`,
     );
@@ -501,32 +497,37 @@ function renderHighlights(highlights) {
       });
     }
     const assignmentSelect = createSelect(
-      "Assigned to",
-      { "": "Unassigned", staff: "Staff", clinician: "Clinician", admin: "Admin" },
+      t("glance.assignedTo"),
+      {
+        "": roleLabel("unassigned"),
+        staff: roleLabel("staff"),
+        clinician: roleLabel("clinician"),
+        admin: roleLabel("admin"),
+      },
       highlight.assigned_to || "",
       `assignee-${highlight.id}`,
     );
     const actionSelect = createSelect(
-      "Action status",
-      actionStatusLabels,
+      t("glance.actionStatus"),
+      actionStatusOptions(),
       highlight.action_status,
       `action-${highlight.id}`,
     );
     controls.append(reviewSelect.wrapper, assignmentSelect.wrapper, actionSelect.wrapper);
 
-    const noteLabel = createElement("label", "field-label", "Disposition note");
+    const noteLabel = createElement("label", "field-label", t("glance.dispositionNote"));
     noteLabel.htmlFor = `note-${highlight.id}`;
     const note = createElement("textarea", "highlight-note");
     note.id = `note-${highlight.id}`;
     note.rows = 2;
     note.maxLength = 1000;
     note.value = highlight.disposition_note || "";
-    const save = createElement("button", "primary-button", "Save update");
+    const save = createElement("button", "primary-button", t("glance.saveUpdate"));
     save.type = "button";
     const feedback = createElement("span", "form-feedback");
     save.addEventListener("click", async () => {
       save.disabled = true;
-      showFeedback(feedback, "Saving…");
+      showFeedback(feedback, t("common.saving"));
       try {
         await updateHighlight(highlight.id, {
           expected_version: highlight.version,
@@ -586,7 +587,7 @@ function useSelectedTimelineText(entry, content) {
   if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
     showFeedback(
       elements.highlightCreateFeedback,
-      "Select a phrase in this entry first.",
+      t("selection.selectFirst"),
       true,
     );
     return;
@@ -595,7 +596,7 @@ function useSelectedTimelineText(entry, content) {
   if (!content.contains(range.startContainer) || !content.contains(range.endContainer)) {
     showFeedback(
       elements.highlightCreateFeedback,
-      "The selection must stay within one timeline entry.",
+      t("selection.oneTimelineEntry"),
       true,
     );
     return;
@@ -613,19 +614,19 @@ function useSelectedTimelineText(entry, content) {
   };
   elements.selectedSource.textContent = `“${text}” — ${entry.title}`;
   elements.createHighlight.disabled = false;
-  showFeedback(elements.highlightCreateFeedback, "Source captured. Complete the fields below.");
+  showFeedback(elements.highlightCreateFeedback, t("composer.captured"));
   elements.highlightComposerCard.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
 function useSelectedCommentText(entry, content) {
   const selection = window.getSelection();
   if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
-    showFeedback(elements.commentFeedback, "Select a phrase in this entry first.", true);
+    showFeedback(elements.commentFeedback, t("selection.selectFirst"), true);
     return;
   }
   const range = selection.getRangeAt(0);
   if (!content.contains(range.startContainer) || !content.contains(range.endContainer)) {
-    showFeedback(elements.commentFeedback, "The selection must stay within one entry.", true);
+    showFeedback(elements.commentFeedback, t("selection.oneEntry"), true);
     return;
   }
   const before = document.createRange();
@@ -639,12 +640,12 @@ function useSelectedCommentText(entry, content) {
     end: start + range.toString().length,
   };
   elements.commentContent.focus();
-  showFeedback(elements.commentFeedback, `Comment will attach to “${range.toString()}”.`);
+  showFeedback(elements.commentFeedback, t("comments.willAttachQuote", { text: range.toString() }));
 }
 
 function renderTimeline(entries, highlights) {
   elements.timelineList.replaceChildren();
-  elements.entryCount.textContent = `${entries.length} timeline entr${entries.length === 1 ? "y" : "ies"}`;
+  elements.entryCount.textContent = t("timeline.count", { count: entries.length });
   entries.forEach((entry) => {
     const item = createElement(
       "article",
@@ -656,8 +657,8 @@ function renderTimeline(entries, highlights) {
     const card = createElement("div", "entry-card");
     const meta = createElement("div", "entry-meta");
     meta.append(
-      createElement("span", "entry-type", entryTypeLabels[entry.type] || entry.type),
-      createElement("span", "entry-role", roleLabels[entry.author_role] || entry.author_role),
+      createElement("span", "entry-type", entryTypeLabel(entry.type)),
+      createElement("span", "entry-role", roleLabel(entry.author_role)),
       createElement("time", "entry-time", formatDateTime(entry.timestamp)),
     );
     card.append(meta, createElement("h3", "entry-title", entry.title));
@@ -666,7 +667,7 @@ function renderTimeline(entries, highlights) {
         createElement(
           "p",
           "ai-disclaimer",
-          "AI-generated content · Review against the original session; not clinically confirmed",
+          t("timeline.aiDisclaimer"),
         ),
       );
     }
@@ -675,10 +676,10 @@ function renderTimeline(entries, highlights) {
     card.append(content);
     const footer = createElement("div", "entry-footer");
     footer.append(
-      createElement("span", "origin-label", `Source: ${entry.origin.source_label}`),
+      createElement("span", "origin-label", t("timeline.source", { label: entry.origin.source_label })),
     );
     if (entry.origin.source_pointer && DEMO_CONTEXT.actorRole !== "patient") {
-      const evidenceButton = createElement("button", "text-button", "View original evidence");
+      const evidenceButton = createElement("button", "text-button", t("timeline.viewEvidence"));
       evidenceButton.type = "button";
       evidenceButton.addEventListener("click", async () => {
         evidenceButton.disabled = true;
@@ -708,7 +709,7 @@ function renderTimeline(entries, highlights) {
         createElement(
           "span",
           `status-chip ${entry.review_status}`,
-          statusLabels[entry.review_status],
+          statusLabel(entry.review_status),
         ),
       );
     }
@@ -716,7 +717,7 @@ function renderTimeline(entries, highlights) {
       const selectButton = createElement(
         "button",
         "text-button entry-selection-action",
-        "Use selected text",
+        t("timeline.useSelection"),
       );
       selectButton.type = "button";
       selectButton.addEventListener("mousedown", (event) => event.preventDefault());
@@ -727,7 +728,7 @@ function renderTimeline(entries, highlights) {
       const commentButton = createElement(
         "button",
         "text-button entry-selection-action",
-        "Comment on selected text",
+        t("timeline.commentSelection"),
       );
       commentButton.type = "button";
       commentButton.addEventListener("mousedown", (event) => event.preventDefault());
@@ -743,12 +744,12 @@ function renderTimeline(entries, highlights) {
 function renderCommentTargets(entries, sections) {
   elements.commentTarget.replaceChildren();
   sections.forEach((section) => {
-    const option = createElement("option", "", `Section: ${section.section}`);
+    const option = createElement("option", "", t("comments.targetSection", { name: section.section }));
     option.value = `section:${section.section}`;
     elements.commentTarget.append(option);
   });
   entries.forEach((entry) => {
-    const option = createElement("option", "", `Entry: ${entry.title}`);
+    const option = createElement("option", "", t("comments.targetEntry", { name: entry.title }));
     option.value = `entry:${entry.id}`;
     elements.commentTarget.append(option);
   });
@@ -764,11 +765,12 @@ function selectedCommentTarget() {
 }
 
 function renderAudit(events) {
+  latestAuditEvents = events;
   elements.auditList.replaceChildren();
-  elements.auditCount.textContent = `${events.length} event${events.length === 1 ? "" : "s"}`;
+  elements.auditCount.textContent = t("audit.count", { count: events.length });
   if (events.length === 0) {
     elements.auditList.append(
-      createElement("p", "helper-text", "No audited changes in this session yet."),
+      createElement("p", "helper-text", t("audit.empty")),
     );
     return;
   }
@@ -780,7 +782,7 @@ function renderAudit(events) {
         "audit-operation",
         `${event.operation.replaceAll("_", " ")} · ${event.resource} v${event.version}`,
       ),
-      createElement("span", "audit-actor", `Actor ${event.changed_by}`),
+      createElement("span", "audit-actor", t("audit.actor", { id: event.changed_by })),
       createElement("time", "", formatDateTime(event.changed_at)),
     );
     elements.auditList.append(item);
@@ -791,12 +793,12 @@ function renderSection(sections) {
   const plan = sections.find((section) => section.section === "plan");
   currentPlanVersion = plan?.version || 0;
   elements.sectionContent.value = plan?.content || "";
-  elements.sectionVersion.textContent = `Version ${currentPlanVersion}`;
+  elements.sectionVersion.textContent = t("plan.version", { version: currentPlanVersion });
 }
 
 function renderComments(comments) {
   elements.commentList.replaceChildren();
-  elements.commentCount.textContent = `${comments.length} comment${comments.length === 1 ? "" : "s"}`;
+  elements.commentCount.textContent = t("comments.count", { count: comments.length });
   comments.forEach((comment) => {
     const item = createElement(
       "article",
@@ -807,13 +809,13 @@ function renderComments(comments) {
       createElement(
         "span",
         "",
-        `${roleLabels[comment.author_role] || comment.author_role} · ${formatDateTime(comment.created_at)}`,
+        `${roleLabel(comment.author_role)} · ${formatDateTime(comment.created_at)}`,
       ),
     );
     const toggle = createElement(
       "button",
       "text-button",
-      comment.resolved ? "Reopen" : "Resolve",
+      comment.resolved ? t("comments.reopen") : t("comments.resolve"),
     );
     toggle.type = "button";
     toggle.addEventListener("click", async () => {
@@ -824,14 +826,14 @@ function renderComments(comments) {
         showFeedback(elements.commentFeedback, error.message, true);
       }
     });
-    const reply = createElement("button", "text-button", "Reply");
+    const reply = createElement("button", "text-button", t("comments.reply"));
     reply.type = "button";
     reply.addEventListener("click", () => {
       replyToCommentId = comment.id;
       elements.commentContent.focus();
-      showFeedback(elements.commentFeedback, "Your next comment will be added as a reply.");
+      showFeedback(elements.commentFeedback, t("comments.replyNext"));
     });
-    const history = createElement("button", "text-button", "History");
+    const history = createElement("button", "text-button", t("history.history"));
     history.type = "button";
     history.addEventListener("click", async () => {
       try {
@@ -845,15 +847,15 @@ function renderComments(comments) {
     meta.append(controls);
     item.append(meta, createElement("p", "comment-content", comment.content));
     const targetLabel = comment.target.resource_type === "entry"
-      ? `Attached to timeline entry ${comment.target.resource_id}`
-      : `Attached to section ${comment.target.resource_id}`;
+      ? t("comments.attachedEntry", { id: comment.target.resource_id })
+      : t("comments.attachedSection", { id: comment.target.resource_id });
     item.append(createElement("span", "comment-target", targetLabel));
     if (comment.target.start !== null && comment.target.start !== undefined) {
       item.append(
         createElement(
           "span",
           "comment-target",
-          ` · exact span ${comment.target.start}–${comment.target.end}`,
+          t("comments.exactSpan", { start: comment.target.start, end: comment.target.end }),
         ),
       );
     }
@@ -862,7 +864,7 @@ function renderComments(comments) {
     });
     if (comment.assigned_to) {
       item.append(
-        createElement("span", "assignment-chip", `Assigned: ${comment.assigned_to}`),
+        createElement("span", "assignment-chip", t("comments.assigned", { role: roleLabel(comment.assigned_to) })),
       );
     }
     elements.commentList.append(item);
@@ -871,23 +873,6 @@ function renderComments(comments) {
 
 const AGENT_RUN_STORAGE_KEY = "carenote.agentRunId";
 const AGENT_STEPS = 4;
-const agentStatusLabels = {
-  running: "Running",
-  awaiting_review: "Awaiting your review",
-  committed: "Committed",
-  discarded: "Discarded",
-  budget_exceeded: "Stopped: budget reached",
-  failed: "Failed",
-};
-const failureLabels = {
-  unknown_entry: "Cites an entry outside this record",
-  out_of_bounds: "Cites text outside the entry",
-  quote_mismatch: "Quoted text is not in the entry",
-  unsupported_entities: "Cited text does not support the stated facts",
-  patient_source_risk: "Patient-reported only; risk must stay low or moderate",
-  patient_source_phrasing: "Patient-reported only; must be phrased as reported",
-};
-
 function rememberAgentRun(runId) {
   try {
     if (runId) sessionStorage.setItem(AGENT_RUN_STORAGE_KEY, runId);
@@ -909,10 +894,15 @@ function agentRunSummary(run) {
   const report = run.verification;
   if (!report) return { text: "", warning: false };
   const unsupported = report.checks.filter((check) => check.failures.length).length;
-  const parts = [`${report.checks.length - unsupported} of ${report.checks.length} claims verified`];
-  if (unsupported) parts.push(`${unsupported} unsupported`);
+  const parts = [
+    t("agent.summaryVerified", {
+      verified: report.checks.length - unsupported,
+      total: report.checks.length,
+    }),
+  ];
+  if (unsupported) parts.push(t("agent.summaryUnsupported", { count: unsupported }));
   if (report.uncovered_conflict_ids.length) {
-    parts.push(`${report.uncovered_conflict_ids.length} conflict(s) not mentioned by a verified claim`);
+    parts.push(t("agent.summaryUncovered", { count: report.uncovered_conflict_ids.length }));
   }
   return {
     text: parts.join(" · "),
@@ -939,9 +929,13 @@ function focusCitation(citation) {
 }
 
 function citationButton(citation, label, clickable) {
-  const button = createElement("button", "text-button agent-citation", `${label}: “${citation.quote}”`);
+  const button = createElement(
+    "button",
+    "text-button agent-citation",
+    t("agent.citationLabel", { label, quote: citation.quote }),
+  );
   button.type = "button";
-  button.title = clickable ? "Show this text in the timeline" : "This citation did not verify";
+  button.title = clickable ? t("agent.citationShow") : t("agent.citationUnverified");
   button.disabled = !clickable;
   if (clickable) button.addEventListener("click", () => focusCitation(citation));
   return button;
@@ -949,17 +943,12 @@ function citationButton(citation, label, clickable) {
 
 function decisionControls(index, decision, verified, editable) {
   const controls = createElement("div", "agent-decision");
-  const label = createElement("label", "field-label", "Decision");
+  const decisionLabel = createElement("label", "field-label", t("agent.decision"));
   const select = document.createElement("select");
   select.id = `agent-claim-decision-${index}`;
-  label.htmlFor = select.id;
-  [
-    ["accept", "Include as written"],
-    ["edit", "Edit, then include"],
-    ["reject", "Reject"],
-    ["skip", "Leave out"],
-  ].forEach(([value, text]) => {
-    const option = createElement("option", "", text);
+  decisionLabel.htmlFor = select.id;
+  ["accept", "edit", "reject", "skip"].forEach((value) => {
+    const option = createElement("option", "", t(`agent.decision.${value}`));
     option.value = value;
     option.disabled = value === "accept" && !verified;
     select.append(option);
@@ -971,13 +960,13 @@ function decisionControls(index, decision, verified, editable) {
   editBox.maxLength = 400;
   editBox.value = decision.text;
   editBox.disabled = !editable;
-  editBox.setAttribute("aria-label", `Edited text for claim ${index + 1}`);
+  editBox.setAttribute("aria-label", t("agent.editedText", { number: index + 1 }));
   const reasonBox = document.createElement("input");
   reasonBox.maxLength = 500;
-  reasonBox.placeholder = "Reason for rejecting";
+  reasonBox.placeholder = t("agent.rejectReason");
   reasonBox.value = decision.reason;
   reasonBox.disabled = !editable;
-  reasonBox.setAttribute("aria-label", `Reason for rejecting claim ${index + 1}`);
+  reasonBox.setAttribute("aria-label", t("agent.rejectReasonFor", { number: index + 1 }));
   const sync = () => {
     editBox.hidden = decision.action !== "edit";
     reasonBox.hidden = decision.action !== "reject";
@@ -993,7 +982,7 @@ function decisionControls(index, decision, verified, editable) {
     decision.reason = reasonBox.value;
   });
   sync();
-  controls.append(label, select, editBox, reasonBox);
+  controls.append(decisionLabel, select, editBox, reasonBox);
   return controls;
 }
 
@@ -1001,7 +990,7 @@ function renderAgentClaims(run, editable) {
   elements.agentClaimList.replaceChildren();
   const checks = run.verification?.checks || [];
   if (!run.draft.claims.length) {
-    elements.agentClaimList.append(createElement("p", "helper-text", "The draft has no claims."));
+    elements.agentClaimList.append(createElement("p", "helper-text", t("agent.noClaims")));
   }
   run.draft.claims.forEach((claim, index) => {
     const check = checks[index] || { failures: [], citations: [] };
@@ -1013,16 +1002,20 @@ function renderAgentClaims(run, editable) {
       createElement(
         "span",
         `agent-chip ${verified ? "verified" : "unsupported"}`,
-        verified ? "Verified" : "Unsupported",
+        verified ? t("agent.verified") : t("agent.unsupported"),
       ),
-      createElement("span", "agent-chip", claim.category.replace("_", " ")),
-      createElement("span", `agent-chip risk-${claim.risk_level}`, `${claim.risk_level} risk`),
+      createElement("span", "agent-chip", t(`agent.category.${claim.category}`)),
+      createElement(
+        "span",
+        `agent-chip risk-${claim.risk_level}`,
+        t("agent.riskChip", { risk: labelFor("risk", claim.risk_level) }),
+      ),
     );
     body.append(createElement("p", "agent-claim-text", claim.text), meta);
     if (!verified) {
       const failures = createElement("ul", "agent-failures");
       check.failures.forEach((failure) => {
-        failures.append(createElement("li", "", failureLabels[failure] || failure));
+        failures.append(createElement("li", "", t(`agent.failure.${failure}`)));
       });
       body.append(failures);
     }
@@ -1030,7 +1023,13 @@ function renderAgentClaims(run, editable) {
     const citations = createElement("div", "agent-citations");
     const shown = check.citations.length ? check.citations : claim.citations;
     shown.forEach((citation, position) => {
-      citations.append(citationButton(citation, `Source ${position + 1}`, check.citations.length > 0));
+      citations.append(
+        citationButton(
+          citation,
+          t("agent.sourceNumbered", { number: position + 1 }),
+          check.citations.length > 0,
+        ),
+      );
     });
     body.append(citations);
     if (!agentDecisions.has(index)) {
@@ -1050,10 +1049,10 @@ function renderAgentHighlights(run, editable) {
     const card = createElement("div", `agent-claim ${resolved ? "verified" : "unsupported"}`);
     const body = createElement("div");
     const citations = createElement("div", "agent-citations");
-    citations.append(citationButton(resolved || candidate.citation, "Source", Boolean(resolved)));
+    citations.append(citationButton(resolved || candidate.citation, t("agent.source"), Boolean(resolved)));
     body.append(
       createElement("p", "agent-claim-text", candidate.risk_reason),
-      createElement("p", "helper-text", `Suggested action: ${candidate.suggested_action}`),
+      createElement("p", "helper-text", t("agent.suggestedAction", { action: candidate.suggested_action })),
       citations,
     );
     const controls = createElement("div", "agent-decision");
@@ -1068,7 +1067,7 @@ function renderAgentHighlights(run, editable) {
     });
     label.append(
       checkbox,
-      document.createTextNode(resolved ? "Create highlight (needs review)" : "Source not verified"),
+      document.createTextNode(resolved ? t("agent.createHighlight") : t("agent.sourceNotVerified")),
     );
     controls.append(label);
     card.append(body, controls);
@@ -1077,19 +1076,19 @@ function renderAgentHighlights(run, editable) {
 }
 
 function agentFeedbackFor(run) {
-  if (run.status === "failed") return [run.error || "The review run failed.", true];
+  if (run.status === "failed") return [run.error || t("agent.failed"), true];
   if (run.stop_reason) return [run.stop_reason, run.status === "budget_exceeded"];
-  if (run.status === "running") return ["Preparing the review…", false];
+  if (run.status === "running") return [t("agent.preparing"), false];
   if (run.status === "committed") {
-    return ["Committed. Accepted claims are in the agent review section.", false];
+    return [t("agent.committedMessage"), false];
   }
-  if (run.status === "discarded") return ["Discarded. Nothing was saved.", false];
+  if (run.status === "discarded") return [t("agent.discardedMessage"), false];
   return ["", false];
 }
 
 function renderAgentRun(run) {
   agentRun = run;
-  elements.agentRunStatus.textContent = run ? agentStatusLabels[run.status] || run.status : "No review yet";
+  elements.agentRunStatus.textContent = run ? t(`agent.status.${run.status}`) : t("agent.noReview");
   const running = run?.status === "running";
   elements.agentStart.disabled = running || run?.status === "awaiting_review";
   elements.agentProgress.hidden = !run;
@@ -1121,10 +1120,14 @@ function renderAgentRun(run) {
   elements.agentReviewActions.hidden = !editable;
   const budget = run.budget;
   elements.agentBudget.textContent = budget
-    ? `Steps ${budget.steps}/${budget.max_steps} · revisions ${budget.revisions}/${budget.max_revisions}` +
-      ` · tokens ${(budget.input_tokens + budget.output_tokens).toLocaleString()}` +
-      ` · prompt ${run.prompt_version}` +
-      (run.model ? ` · draft by ${run.model}` : "")
+    ? t("agent.budget", {
+        steps: budget.steps,
+        maxSteps: budget.max_steps,
+        revisions: budget.revisions,
+        maxRevisions: budget.max_revisions,
+        tokens: (budget.input_tokens + budget.output_tokens).toLocaleString(getLocale()),
+        prompt: run.prompt_version,
+      }) + (run.model ? t("agent.draftBy", { model: run.model }) : "")
     : "";
 }
 
@@ -1168,10 +1171,10 @@ function agentCommitPayload() {
   for (const [index, decision] of ordered) {
     if (decision.action === "skip") continue;
     if (decision.action === "edit" && !decision.text.trim()) {
-      throw new Error(`Claim ${index + 1}: edited text cannot be empty.`);
+      throw new Error(t("agent.editEmpty", { number: index + 1 }));
     }
     if (decision.action === "reject" && !decision.reason.trim()) {
-      throw new Error(`Claim ${index + 1}: give a reason for rejecting it.`);
+      throw new Error(t("agent.rejectNeedsReason", { number: index + 1 }));
     }
     claims.push({
       claim_index: index,
@@ -1190,7 +1193,7 @@ function renderAgentReviewSection(sections) {
   const review = sections.find((section) => section.section === "agent_review");
   elements.agentLatestReview.hidden = !review;
   if (!review) return;
-  elements.agentLatestVersion.textContent = `(version ${review.version})`;
+  elements.agentLatestVersion.textContent = t("agent.latestVersion", { version: review.version });
   elements.agentLatestContent.textContent = review.content;
 }
 
@@ -1210,7 +1213,7 @@ async function runAgentAction(button, action) {
     const message =
       typeof error.message === "string" && !error.message.startsWith("[object")
         ? error.message
-        : "The request was not accepted.";
+        : t("agent.requestRejected");
     showFeedback(elements.agentFeedback, message, true);
     return null;
   }
@@ -1232,7 +1235,7 @@ function connectRealtime() {
     const message = JSON.parse(event.data);
     if (message.type === "presence") {
       elements.presenceStatus.hidden = false;
-      elements.presenceStatus.textContent = `${message.count} online`;
+      elements.presenceStatus.textContent = t("session.online", { count: message.count });
     }
     if (message.type?.startsWith("agent.") && message.run_id === agentRun?.run_id) {
       refreshAgentRun();
@@ -1261,14 +1264,14 @@ function showResourceHistory(container, revisions) {
     const from = createElement("select");
     const to = createElement("select");
     revisions.forEach((revision) => {
-      const first = createElement("option", "", `Version ${revision.version}`);
+      const first = createElement("option", "", t("plan.version", { version: revision.version }));
       first.value = String(revision.version);
       from.append(first);
       to.append(first.cloneNode(true));
     });
     from.value = String(revisions[0].version);
     to.value = String(revisions.at(-1).version);
-    const run = createElement("button", "secondary-button", "Compare A/B");
+    const run = createElement("button", "secondary-button", t("history.compare"));
     const output = createElement("pre", "resource-snapshot");
     output.hidden = true;
     run.type = "button";
@@ -1282,7 +1285,7 @@ function showResourceHistory(container, revisions) {
         }
       });
       output.hidden = false;
-      output.textContent = JSON.stringify(changes, null, 2) || "No differences.";
+      output.textContent = JSON.stringify(changes, null, 2) || t("history.noDifferences");
     });
     compare.append(from, to, run);
     history.append(compare, output);
@@ -1302,7 +1305,7 @@ function showResourceHistory(container, revisions) {
       createElement(
         "p",
         "resource-change-list",
-        `Changed fields: ${changedFields.join(", ") || "none"}`,
+        t("history.changedFields", { fields: changedFields.join(", ") || t("history.none") }),
       ),
       createElement("pre", "resource-snapshot", JSON.stringify(revision.snapshot, null, 2)),
     );
@@ -1317,7 +1320,7 @@ async function renderHistory() {
     elements.compareFrom.replaceChildren();
     elements.compareTo.replaceChildren();
     revisions.forEach((revision) => {
-      const fromOption = createElement("option", "", `Version ${revision.version}`);
+      const fromOption = createElement("option", "", t("plan.version", { version: revision.version }));
       fromOption.value = revision.version;
       const toOption = fromOption.cloneNode(true);
       elements.compareFrom.append(fromOption);
@@ -1334,16 +1337,20 @@ async function renderHistory() {
         createElement(
           "span",
           "",
-          `Version ${revision.version} · ${revision.operation} · ${formatDateTime(revision.changed_at)}`,
+          t("plan.revisionMeta", {
+            version: revision.version,
+            operation: revision.operation,
+            time: formatDateTime(revision.changed_at),
+          }),
         ),
       );
       if (index > 0) {
-        const button = createElement("button", "text-button", "Revert to this");
+        const button = createElement("button", "text-button", t("plan.revertTo"));
         button.type = "button";
         button.addEventListener("click", async () => {
           try {
             await revertSection("plan", revision.version);
-            showFeedback(elements.sectionFeedback, `Reverted to version ${revision.version}.`);
+            showFeedback(elements.sectionFeedback, t("plan.reverted", { version: revision.version }));
             await loadPatient();
             await renderHistory();
           } catch (error) {
@@ -1367,6 +1374,7 @@ async function loadPatient() {
   setScreenState("loading");
   try {
     const detail = await getPatientDetail();
+    latestDetail = detail;
     renderPatient(detail.patient);
     renderConflicts(detail.conflicts || []);
     renderHighlights(detail.highlights);
@@ -1420,7 +1428,7 @@ async function loadPatient() {
 elements.retryButton.addEventListener("click", loadPatient);
 elements.loginButton.addEventListener("click", async () => {
   elements.loginButton.disabled = true;
-  showFeedback(elements.loginFeedback, "Signing in…");
+  showFeedback(elements.loginFeedback, t("login.signingIn"));
   try {
     const session = await login(
       elements.loginUsername.value.trim(),
@@ -1448,17 +1456,17 @@ elements.addEntry.addEventListener("click", async () => {
   const title = elements.entryTitle.value.trim();
   const content = elements.entryContent.value.trim();
   if (!title || !content) {
-    showFeedback(elements.entryFeedback, "Enter both a title and note content.", true);
+    showFeedback(elements.entryFeedback, t("staffNote.missingFields"), true);
     return;
   }
   elements.addEntry.disabled = true;
-  showFeedback(elements.entryFeedback, "Adding note…");
+  showFeedback(elements.entryFeedback, t("staffNote.adding"));
   try {
     await addTimelineEntry(title, content);
     elements.entryTitle.value = "";
     elements.entryContent.value = "";
     await loadPatient();
-    showFeedback(elements.entryFeedback, "Staff note added to the timeline.");
+    showFeedback(elements.entryFeedback, t("staffNote.added"));
   } catch (error) {
     showFeedback(elements.entryFeedback, error.message, true);
   } finally {
@@ -1471,19 +1479,19 @@ elements.addPatientEntry.addEventListener("click", async () => {
   if (!title || !content) {
     showFeedback(
       elements.patientEntryFeedback,
-      "Enter both a title and an update for your care team.",
+      t("dashboard.missingFields"),
       true,
     );
     return;
   }
   elements.addPatientEntry.disabled = true;
-  showFeedback(elements.patientEntryFeedback, "Sharing update…");
+  showFeedback(elements.patientEntryFeedback, t("dashboard.sharing"));
   try {
     await addTimelineEntry(title, content);
     elements.patientEntryTitle.value = "";
     elements.patientEntryContent.value = "";
     await loadPatient();
-    showFeedback(elements.patientEntryFeedback, "Your update was added to the timeline.");
+    showFeedback(elements.patientEntryFeedback, t("dashboard.shared"));
   } catch (error) {
     showFeedback(elements.patientEntryFeedback, error.message, true);
   } finally {
@@ -1496,13 +1504,13 @@ elements.createHighlight.addEventListener("click", async () => {
   if (!selectedHighlightSource || !reason || !action) {
     showFeedback(
       elements.highlightCreateFeedback,
-      "Select source text and enter a risk reason and suggested action.",
+      t("composer.missingFields"),
       true,
     );
     return;
   }
   elements.createHighlight.disabled = true;
-  showFeedback(elements.highlightCreateFeedback, "Creating highlight…");
+  showFeedback(elements.highlightCreateFeedback, t("composer.creating"));
   try {
     await createHighlight({
       entry_id: selectedHighlightSource.entryId,
@@ -1520,20 +1528,20 @@ elements.createHighlight.addEventListener("click", async () => {
       assigned_to: elements.highlightAssignee.value || null,
     });
     selectedHighlightSource = null;
-    elements.selectedSource.textContent = "No source text selected.";
+    elements.selectedSource.textContent = t("composer.noSource");
     elements.highlightReason.value = "";
     elements.highlightAction.value = "";
     elements.highlightPatientInstruction.value = "";
     elements.highlightEntities.value = "";
     await loadPatient();
-    showFeedback(elements.highlightCreateFeedback, "Highlight created and audited.");
+    showFeedback(elements.highlightCreateFeedback, t("composer.created"));
   } catch (error) {
     showFeedback(elements.highlightCreateFeedback, error.message, true);
     elements.createHighlight.disabled = false;
   }
 });
 elements.saveSection.addEventListener("click", async () => {
-  showFeedback(elements.sectionFeedback, "Saving…");
+  showFeedback(elements.sectionFeedback, t("common.saving"));
   try {
     const section = await updateSection(
       "plan",
@@ -1541,8 +1549,8 @@ elements.saveSection.addEventListener("click", async () => {
       currentPlanVersion,
     );
     currentPlanVersion = section.version;
-    elements.sectionVersion.textContent = `Version ${section.version}`;
-    showFeedback(elements.sectionFeedback, `Saved version ${section.version}.`);
+    elements.sectionVersion.textContent = t("plan.version", { version: section.version });
+    showFeedback(elements.sectionFeedback, t("plan.saved", { version: section.version }));
     await renderHistory();
   } catch (error) {
     showFeedback(elements.sectionFeedback, error.message, true);
@@ -1557,7 +1565,7 @@ elements.compareVersions.addEventListener("click", async () => {
       Number(elements.compareTo.value),
     );
     elements.versionCompareOutput.hidden = false;
-    elements.versionCompareOutput.textContent = comparison.diff || "No differences.";
+    elements.versionCompareOutput.textContent = comparison.diff || t("history.noDifferences");
   } catch (error) {
     showFeedback(elements.sectionFeedback, error.message, true);
   }
@@ -1566,7 +1574,7 @@ elements.commentOnPlanSelection.addEventListener("click", () => {
   const start = elements.sectionContent.selectionStart;
   const end = elements.sectionContent.selectionEnd;
   if (start === end) {
-    showFeedback(elements.commentFeedback, "Select text in the Care Plan first.", true);
+    showFeedback(elements.commentFeedback, t("comments.selectPlanFirst"), true);
     return;
   }
   selectedCommentSpanTarget = {
@@ -1577,14 +1585,14 @@ elements.commentOnPlanSelection.addEventListener("click", () => {
   };
   showFeedback(
     elements.commentFeedback,
-    `Comment will attach to Care Plan characters ${start}–${end}.`,
+    t("comments.willAttachPlan", { start, end }),
   );
   elements.commentContent.focus();
 });
 elements.addComment.addEventListener("click", async () => {
   const content = elements.commentContent.value.trim();
   if (!content) {
-    showFeedback(elements.commentFeedback, "Enter a comment first.", true);
+    showFeedback(elements.commentFeedback, t("comments.enterFirst"), true);
     return;
   }
   try {
@@ -1594,7 +1602,7 @@ elements.addComment.addEventListener("click", async () => {
     selectedCommentSpanTarget = null;
     elements.commentContent.value = "";
     elements.commentAssignee.value = "";
-    showFeedback(elements.commentFeedback, "Comment added.");
+    showFeedback(elements.commentFeedback, t("comments.added"));
     await loadPatient();
   } catch (error) {
     showFeedback(elements.commentFeedback, error.message, true);
@@ -1604,17 +1612,17 @@ elements.aiIngest.addEventListener("click", async () => {
   const title = elements.aiTitle.value.trim();
   const rawText = elements.aiRawText.value.trim();
   if (!title || !rawText) {
-    showFeedback(elements.aiFeedback, "Enter a title and source text first.", true);
+    showFeedback(elements.aiFeedback, t("ai.missingFields"), true);
     return;
   }
   elements.aiIngest.disabled = true;
-  showFeedback(elements.aiFeedback, "Redacting and summarizing…");
+  showFeedback(elements.aiFeedback, t("ai.summarizing"));
   try {
     const result = await ingestAI(title, rawText, elements.aiSource.value);
     const redacted = Object.values(result.redaction_counts).reduce((sum, value) => sum + value, 0);
     showFeedback(
       elements.aiFeedback,
-      `AI summary created for clinical review; ${redacted} identifier(s) redacted.`,
+      t("ai.created", { count: redacted }),
     );
     elements.aiRawText.value = "";
     await loadPatient();
@@ -1627,11 +1635,11 @@ elements.aiIngest.addEventListener("click", async () => {
 elements.recordAudio.addEventListener("click", async () => {
   if (mediaRecorder?.state === "recording") {
     mediaRecorder.stop();
-    elements.recordAudio.textContent = "Start recording";
+    elements.recordAudio.textContent = t("ai.startRecording");
     return;
   }
   if (!navigator.mediaDevices || !window.MediaRecorder) {
-    showFeedback(elements.aiFeedback, "Audio recording is unavailable in this browser.", true);
+    showFeedback(elements.aiFeedback, t("ai.noRecording"), true);
     return;
   }
   try {
@@ -1642,23 +1650,23 @@ elements.recordAudio.addEventListener("click", async () => {
     mediaRecorder.addEventListener("stop", async () => {
       stream.getTracks().forEach((track) => track.stop());
       const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || "audio/webm" });
-      showFeedback(elements.aiFeedback, "Transcribing recording…");
+      showFeedback(elements.aiFeedback, t("ai.transcribing"));
       try {
         const transcript = await transcribeAudio(blob);
         elements.aiRawText.value = transcript.text;
         const detail = transcript.diarization_available
-          ? "Speaker labels are available."
-          : "Speaker identity was not inferred; segments are marked unknown.";
-        showFeedback(elements.aiFeedback, `Transcription ready. ${detail}`);
+          ? t("ai.speakersAvailable")
+          : t("ai.speakersUnknown");
+        showFeedback(elements.aiFeedback, t("ai.transcriptReady", { detail }));
       } catch (error) {
         showFeedback(elements.aiFeedback, error.message, true);
       }
     });
     mediaRecorder.start();
-    elements.recordAudio.textContent = "Stop and transcribe";
-    showFeedback(elements.aiFeedback, "Recording locally…");
+    elements.recordAudio.textContent = t("ai.stopRecording");
+    showFeedback(elements.aiFeedback, t("ai.recording"));
   } catch (error) {
-    showFeedback(elements.aiFeedback, `Microphone access failed: ${error.message}`, true);
+    showFeedback(elements.aiFeedback, t("ai.micFailed", { message: error.message }), true);
   }
 });
 elements.agentStart.addEventListener("click", () => {
@@ -1667,7 +1675,7 @@ elements.agentStart.addEventListener("click", () => {
 elements.agentRevise.addEventListener("click", () => {
   const instruction = elements.agentReviseInstruction.value.trim();
   if (!instruction) {
-    showFeedback(elements.agentFeedback, "Describe what the agent should change.", true);
+    showFeedback(elements.agentFeedback, t("agent.describeRevision"), true);
     return;
   }
   runAgentAction(elements.agentRevise, async () => {
@@ -1695,6 +1703,58 @@ elements.agentDiscard.addEventListener("click", () => {
   runAgentAction(elements.agentDiscard, () => discardAgentRun(agentRun.run_id));
 });
 
+function renderLanguageOptions() {
+  elements.languageSelect.replaceChildren(
+    ...Object.entries(LANGUAGES).map(([code, language]) => {
+      const option = createElement("option", "", language.label);
+      option.value = code;
+      option.lang = language.htmlLang;
+      return option;
+    }),
+  );
+  elements.languageSelect.value = getLanguage();
+}
+
+function rerenderForLanguage() {
+  elements.currentRole.textContent = currentSession
+    ? roleLabel(currentSession.actor.role)
+    : t("session.signedOut");
+  if (currentScreenState !== "ready") setScreenState(currentScreenState);
+  if (!selectedHighlightSource) elements.selectedSource.textContent = t("composer.noSource");
+  if (mediaRecorder?.state !== "recording") {
+    elements.recordAudio.textContent = t("ai.startRecording");
+  }
+  // Follow the language with the prefilled title, but never overwrite what the user typed.
+  if (elements.aiTitle.value === aiDefaultTitle) {
+    aiDefaultTitle = t("ai.defaultTitle");
+    elements.aiTitle.value = aiDefaultTitle;
+  }
+  if (latestDetail) {
+    const detail = latestDetail;
+    renderPatient(detail.patient);
+    renderConflicts(detail.conflicts || []);
+    renderHighlights(detail.highlights);
+    renderTimeline(detail.entries, detail.highlights);
+    elements.sectionVersion.textContent = t("plan.version", { version: currentPlanVersion });
+    renderAgentReviewSection(detail.sections || []);
+    renderComments(detail.comments || []);
+    renderCommentTargets(detail.entries, detail.sections || []);
+    renderPatientActions(detail.patient_actions || []);
+    if (DEMO_CONTEXT.actorRole !== "patient") renderAudit(latestAuditEvents);
+  } else {
+    elements.name.textContent = t("patient.loading");
+    elements.sectionVersion.textContent = t("plan.versionUnknown");
+  }
+  if (agentRun?.draft || agentRun?.status) renderAgentRun(agentRun);
+  else elements.agentRunStatus.textContent = t("agent.noReview");
+}
+
+elements.languageSelect.addEventListener("change", () => setLanguage(elements.languageSelect.value));
+onLanguageChange(() => {
+  elements.languageSelect.value = getLanguage();
+  rerenderForLanguage();
+});
+
 async function bootstrap() {
   try {
     const session = await getSession();
@@ -1704,6 +1764,10 @@ async function bootstrap() {
     showLogin();
   }
 }
+
+renderLanguageOptions();
+applyTranslations();
+rerenderForLanguage();
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/static/service-worker.js").catch(() => {});
