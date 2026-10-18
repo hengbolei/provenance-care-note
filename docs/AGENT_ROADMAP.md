@@ -69,7 +69,8 @@ intact audit chain; CI green.
 
 ## Phase 2 — Evaluation, self-correction and observability · ✅ done (pending merge)
 
-Branch: `feat/agent-evals`. Design §17 week 2, plus the revise loop from week 3.
+Branch: `feat/agent-evals`. Design §17 week 2, plus the revise loop from week 3. Plan revised in
+`c9d0169`.
 
 No API key is available, so evaluation is split in two (see [Decisions](#decisions)): a
 **pipeline** suite that needs no model and gates CI, and an **agent** suite that scores real
@@ -79,18 +80,21 @@ model drafts from cassettes and reports "not recorded" until they exist.
       families: each case is a synthetic record, the conflicts and identifiers it contains, the
       critical facts a review must cover, and probe claims with the verdict the verifier must
       reach (supported, fabricated citation, misquote, wrong dose, wrong polarity, patient-only
-      overreach, injection-following)
-- [x] 2.2 `evals/run_evals.py`: `--suite pipeline` (conflict recall, redaction leakage, verifier
-      accuracy per failure type) and `--suite agent` (citation validity, unsupported-claim rate,
-      critical-finding recall, conflict coverage, injection resistance, cost and latency from
-      cassettes); Markdown report in `evals/REPORT.md`; CI gate on the pipeline suite
+      overreach, injection-following) (`45187a6`)
+- [x] 2.2 `evals/run_evals.py` runs both suites: pipeline (conflict recall, redaction and
+      model-bound payload leakage, verifier verdict accuracy, key entries in context) and agent
+      (citation validity, unsupported-claim rate, critical-finding recall, conflict coverage,
+      injection resistance, tokens and cost from cassettes); generated `evals/REPORT.md` checked
+      in CI; CI gate (`6a5991d`)
 - [x] 2.3 Automatic `revise` node: unsupported claims and uncovered conflicts go back to the model
-      with the verifier's reasons (versioned `revise_v1` prompt), at most `max_revisions` loops,
-      then remaining failures are shown as unsupported; the agent suite reports revision's effect
+      with the verifier's reasons (versioned `revise_v1` prompt), at most `max_auto_revisions`
+      loops, then remaining failures are shown as unsupported; the agent suite reports revision's
+      effect (`92e38aa`)
 - [x] 2.4 `migrations/002_agent_runs.sql` with RLS and a Postgres checkpointer so runs survive
-      restarts; verified by the CI Docker job
-- [x] 2.5 OpenTelemetry tracing (Langfuse optional): a span per node, tool and model call, trace
-      ID on audit events, run timeline in the panel
+      restarts, with encrypted checkpoints and clinic-scoped RLS; verified by Postgres tests and
+      the CI Docker job (`9008b49`)
+- [x] 2.5 OpenTelemetry tracing (Langfuse optional): a span per node, tool and model call; the
+      trace ID is the run ID that audit events carry; run timeline in the panel (`603e3b7`)
 - [x] Budgets (formerly 2.3): step, revision, token, cost and time ceilings with a partial draft
       and `agent_budget_exceeded` already shipped in Phase 1 (`c2a1900`, `4c630cb`)
 
