@@ -45,7 +45,7 @@ Branch: `feat/agent-mvp`. Design §17 week 1. Build framework-free parts first, 
 - [x] 1.3 `agent/gateway.py`: `ModelGateway` protocol (`structured()`, `text()`);
       `OpenAIGateway` with JSON-schema output and mandatory redaction; `RecordedGateway` over
       `evals/cassettes/`; move `summarize` onto it without changing `services/ai.py` callers
-- [ ] 1.4 `agent/tools.py`: read tools that call `CareNoteService` as `agent.principal`;
+- [x] 1.4 `agent/tools.py`: read tools that call `CareNoteService` as `agent.principal`;
       `propose_highlight` writes to run state only
 - [ ] 1.5 `agent/graph.py`: `load_context → check_conflicts → draft → verify →
       human_review (interrupt) → commit | discard`, `MemorySaver`; `langgraph` as optional
@@ -105,6 +105,9 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-18 | Tools read one patient-view snapshot per run, taken as the principal clinician; search, read and evidence results are redacted and cite offsets in the redacted text, with each entry's `RedactionResult` kept for verification | Every tool sees the same record, and citations stay mappable to the original |
+| 2026-10-18 | `get_patient_overview` returns age in years and pronouns only, never name, date of birth or record number | Design §7 asks for redacted demographics; age is all the review needs |
+| 2026-10-18 | Added `CareNoteService.search_entries` for care-team roles | Tools must read through the service policy boundary, not the repository |
 | 2026-10-18 | Gateway requests take `RedactionResult` inputs only (plain strings raise `TypeError`); instructions are the only free text | Makes design §10 "refuses unredacted input by construction" concrete |
 | 2026-10-18 | Cassettes are keyed by a SHA-256 of purpose, schema, instructions and redacted input, and store only the output, model and usage | Any prompt or input change forces a re-record; no record text is written to disk |
 | 2026-10-18 | Cost is reported only when per-token prices are configured, otherwise `None` | Prices change per model; a guessed figure would mislead the budget |
