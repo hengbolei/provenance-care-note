@@ -140,6 +140,9 @@ const elements = {
   agentLatestVersion: document.querySelector("#agent-latest-version"),
   agentLatestContent: document.querySelector("#agent-latest-content"),
   languageSelect: document.querySelector("#language-select"),
+  agentTimeline: document.querySelector("#agent-timeline"),
+  agentTraceId: document.querySelector("#agent-trace-id"),
+  agentTimelineList: document.querySelector("#agent-timeline-list"),
 };
 
 let currentPlanVersion = 0;
@@ -1086,8 +1089,33 @@ function agentFeedbackFor(run) {
   return ["", false];
 }
 
+function renderAgentTimeline(run) {
+  const steps = run?.timeline || [];
+  elements.agentTimeline.hidden = steps.length === 0;
+  elements.agentTraceId.textContent = run?.trace_id ? t("agent.traceId", { id: run.trace_id }) : "";
+  elements.agentTimelineList.replaceChildren(
+    ...steps.map((step) => {
+      const item = createElement("li", "agent-timeline-step");
+      const details = [t("agent.timelineDuration", { duration: step.duration_ms.toLocaleString(getLocale()) })];
+      const tokens = step.input_tokens + step.output_tokens;
+      if (tokens) details.push(t("agent.timelineTokens", { count: tokens }));
+      if (step.tool_calls) details.push(t("agent.timelineTools", { count: step.tool_calls }));
+      if (step.unsupported_claims) {
+        details.push(t("agent.timelineUnsupported", { count: step.unsupported_claims }));
+      }
+      if (step.model) details.push(step.prompt ? `${step.model} · ${step.prompt}` : step.model);
+      item.append(
+        createElement("span", "agent-timeline-node", t(`agent.node.${step.node}`)),
+        document.createTextNode(` · ${details.join(" · ")}`),
+      );
+      return item;
+    }),
+  );
+}
+
 function renderAgentRun(run) {
   agentRun = run;
+  renderAgentTimeline(run);
   elements.agentRunStatus.textContent = run ? t(`agent.status.${run.status}`) : t("agent.noReview");
   const running = run?.status === "running";
   elements.agentStart.disabled = running || run?.status === "awaiting_review";

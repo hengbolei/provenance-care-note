@@ -112,6 +112,12 @@ stale or a gate fails):
 .\.venv\Scripts\python.exe evals\run_evals.py --check
 ```
 
+Every agent run is one OpenTelemetry trace whose trace ID is the run ID (the same ID audit events
+carry). Spans hold node names, durations, model names and token counts, never record or claim
+text. To export them, install the `otel` extra and set `OTEL_EXPORTER_OTLP_ENDPOINT` to an
+OTLP/HTTP collector such as Langfuse or Jaeger; without it spans are dropped, and the run timeline
+in the review panel still works. The Docker image includes the extra.
+
 Agent persistence tests (restart survival, encrypted checkpoints, clinic isolation) need
 PostgreSQL. Set `CARENOTE_TEST_DATABASE_URL`, or install the optional `pgserver` package to
 start a throwaway local server; otherwise they are skipped. CI runs them against a Postgres

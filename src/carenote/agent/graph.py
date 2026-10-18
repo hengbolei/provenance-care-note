@@ -48,6 +48,7 @@ from carenote.agent.state import (
     VerificationReport,
 )
 from carenote.agent.tools import ReviewTools
+from carenote.agent.tracing import RunTracer, TimelineStep, TracingGateway, timeline_step
 from carenote.agent.verify import resolve_citation, verify_draft
 from carenote.domain.models import (
     Actor,
@@ -111,6 +112,9 @@ class GraphDeps:
     now: Callable[[], datetime] = field(default=lambda: datetime.now(UTC))
     prompt_version: str = PROMPT_VERSION
     max_context_entries: int = MAX_CONTEXT_ENTRIES
+    tracer: RunTracer = field(default_factory=RunTracer)
+    # Receives a metadata-only timeline step as each node finishes.
+    on_step: Callable[[UUID, TimelineStep], None] | None = None
     # Tools cache per run; rebuilt from the service after a restart, since they hold no state that
     # cannot be recomputed (the patient-view snapshot and per-entry redactions).
     tools: dict[UUID, ReviewTools] = field(default_factory=dict)
@@ -155,6 +159,32 @@ def initial_state(
 def build_review_graph(
     deps: GraphDeps, checkpointer: BaseCheckpointSaver | None = None
 ) -> CompiledStateGraph:
+    model = TracingGateway(deps.gateway, deps.tracer)
+
+    def traced(node: Callable[[ReviewState], dict[str, Any]], prompt=None):
+        """Run the node inside its span and report a timeline step when it finishes."""
+
+        def run(state: ReviewState) -> dict[str, Any]:
+            run_id = state["run_id"]
+            tools = deps.tools.get(run_id)
+            calls_before = len(tools.calls) if tools else 0
+            with deps.tracer.node(run_id, node.__name__, prompt(state) if prompt else None) as step:
+                update = node(state)
+                tools = deps.tools.get(run_id)
+                if tools is not None:
+                    step.tool_calls = [
+                        (call.name, call.result_count) for call in tools.calls[calls_before:]
+                    ]
+                report = update.get("verification")
+                if report is not None:
+                    step.unsupported_claims = len(report.unsupported)
+            if deps.on_step is not None:
+                deps.on_step(run_id, timeline_step(step))
+            return update
+
+        run.__name__ = node.__name__
+        return run
+
     def counted(node: Callable[[ReviewState], dict[str, Any]]):
         def run(state: ReviewState) -> dict[str, Any]:
             budget = state["budget"].model_copy(update={"steps": state["budget"].steps + 1})
@@ -215,7 +245,7 @@ def build_review_graph(
                 DataTag.close("clinician_instruction"),
             ]
             budget = budget.model_copy(update={"revisions": budget.revisions + 1})
-        result = deps.gateway.structured(
+        result = model.structured(
             ModelRequest(
                 purpose="agent_draft",
                 instructions=load_prompt(state["prompt_version"]),
@@ -265,7 +295,7 @@ def build_review_graph(
             inputs.append(DataTag.close("uncovered_conflict"))
         budget = state["budget"]
         budget = budget.model_copy(update={"auto_revisions": budget.auto_revisions + 1})
-        result = deps.gateway.structured(
+        result = model.structured(
             ModelRequest(
                 purpose="agent_revise",
                 instructions=load_prompt(REVISE_PROMPT_VERSION),
@@ -361,11 +391,17 @@ def build_review_graph(
         return decisions.action
 
     graph = StateGraph(ReviewState)
-    # Automated work counts against the step budget; review, commit and discard do not.
+    # Automated work counts against the step budget; review, commit and discard do not. Every node
+    # but the review pause is traced.
+    prompts = {
+        "draft": lambda state: state["prompt_version"],
+        "revise": lambda state: REVISE_PROMPT_VERSION,
+    }
     for node in (load_context, check_conflicts, draft, verify, revise):
-        graph.add_node(node.__name__, counted(node))
-    for node in (human_review, commit, discard, stop):
-        graph.add_node(node.__name__, node)
+        graph.add_node(node.__name__, counted(traced(node, prompts.get(node.__name__))))
+    for node in (commit, discard, stop):
+        graph.add_node(node.__name__, traced(node))
+    graph.add_node("human_review", human_review)
 
     graph.add_edge(START, "load_context")
     for source, target in (

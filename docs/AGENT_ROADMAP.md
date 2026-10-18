@@ -67,7 +67,7 @@ Branch: `feat/agent-mvp`. Design §17 week 1. Build framework-free parts first, 
 citations all pass verification; Commit creates the `agent_review` revision, highlights and an
 intact audit chain; CI green.
 
-## Phase 2 — Evaluation, self-correction and observability · 🚧 in progress
+## Phase 2 — Evaluation, self-correction and observability · ✅ done (pending merge)
 
 Branch: `feat/agent-evals`. Design §17 week 2, plus the revise loop from week 3.
 
@@ -89,7 +89,7 @@ model drafts from cassettes and reports "not recorded" until they exist.
       then remaining failures are shown as unsupported; the agent suite reports revision's effect
 - [x] 2.4 `migrations/002_agent_runs.sql` with RLS and a Postgres checkpointer so runs survive
       restarts; verified by the CI Docker job
-- [ ] 2.5 OpenTelemetry tracing (Langfuse optional): a span per node, tool and model call, trace
+- [x] 2.5 OpenTelemetry tracing (Langfuse optional): a span per node, tool and model call, trace
       ID on audit events, run timeline in the panel
 - [x] Budgets (formerly 2.3): step, revision, token, cost and time ceilings with a partial draft
       and `agent_budget_exceeded` already shipped in Phase 1 (`c2a1900`, `4c630cb`)
@@ -125,6 +125,10 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-18 | Each run is one OpenTelemetry trace whose trace ID is the run ID | Spans from separate graph segments, and from before and after a restart, join one trace; audit events already carry the run ID, so they join without changing the hash-chained audit schema |
+| 2026-10-18 | Spans carry IDs, node names, durations, model names, prompt versions and token counts only, never record, claim or quote text | Traces leave the clinical boundary to an external collector, so they must hold nothing that needs redaction |
+| 2026-10-18 | The panel's run timeline comes from metadata-only steps stored on the run (`agent_runs.timeline`), not from the trace backend | It works with no collector configured and survives restarts with the run |
+| 2026-10-18 | OTLP export needs the optional `otel` extra and `OTEL_EXPORTER_OTLP_ENDPOINT`; Langfuse is not bundled in Docker Compose | Any OpenTelemetry collector works, and the default demo stays small |
 | 2026-10-18 | Checkpoints use LangGraph's `PostgresSaver` with every serialized value Fernet-encrypted by the clinical data key; loading an unencrypted value is refused | The rest of the database is encrypted at rest, and drafts, quotes and decisions are clinical text; LangGraph keeps only primitive values (status, prompt version, model) in clear |
 | 2026-10-18 | `agent_runs` (migration 002) is clinic-scoped by forced RLS, and LangGraph's checkpoint tables are scoped through it (migration 003, applied after the saver creates them); connections set `app.current_clinic_id` when they open | Matches the existing per-clinic isolation; a checkpoint is visible only when its run belongs to the current clinic |
 | 2026-10-18 | Postgres tests run against `CARENOTE_TEST_DATABASE_URL` in a CI service container, or a local throwaway server from the optional `pgserver` package, and skip otherwise | Real RLS, encryption and restart behaviour need a real Postgres |

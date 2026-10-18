@@ -26,6 +26,7 @@ from carenote.agent.runs import (
     RunNotFoundError,
     RunStateError,
 )
+from carenote.agent.tracing import configure_tracing
 from carenote.core.config import settings
 from carenote.core.identity import AuthenticationError, session_service
 from carenote.core.security import clinical_cipher
@@ -80,6 +81,7 @@ repository = (
 )
 seed_demo_data(repository)
 service = CareNoteService(repository)
+configure_tracing()
 # With PostgreSQL, agent runs are checkpointed (encrypted) and registered there, so they survive a
 # restart; without it they live in memory like the rest of the development store.
 agent_runs = AgentRunService(

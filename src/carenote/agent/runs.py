@@ -39,6 +39,7 @@ from carenote.agent.state import (
     RunStatus,
     VerificationReport,
 )
+from carenote.agent.tracing import RunTracer, TimelineStep, trace_id_for
 from carenote.domain.models import Actor, AgentActor, AuditEvent, Role
 from carenote.services.ai import ExternalModelError, ModelNotConfiguredError
 from carenote.services.care_notes import AccessDeniedError, CareNoteService
@@ -98,6 +99,9 @@ class AgentRunView(BaseModel):
     verification: VerificationReport | None = None
     highlight_citations: list[Citation | None] = Field(default_factory=list)
     budget: BudgetUsage | None = None
+    # One OpenTelemetry trace per run; its ID is the run ID, as carried by the audit events.
+    trace_id: str | None = None
+    timeline: list[TimelineStep] = Field(default_factory=list)
 
 
 _SAFE_ERRORS = (CassetteMissingError, ModelNotConfiguredError, ExternalModelError)
@@ -118,6 +122,7 @@ class AgentRunService:
         executor: Executor | None = None,
         checkpointer: BaseCheckpointSaver | None = None,
         store: RunStore | None = None,
+        tracer: RunTracer | None = None,
         now: Callable[[], datetime] = lambda: datetime.now(UTC),
         budget_factory: Callable[[datetime], Budget] = lambda now: Budget(started_at=now),
     ) -> None:
@@ -128,7 +133,14 @@ class AgentRunService:
         self.executor = executor or ThreadPoolExecutor(max_workers=4, thread_name_prefix="agent")
         self.now = now
         self.budget_factory = budget_factory
-        self.deps = GraphDeps(service=service, gateway=gateway, commit=self._commit, now=now)
+        self.deps = GraphDeps(
+            service=service,
+            gateway=gateway,
+            commit=self._commit,
+            now=now,
+            on_step=self._on_step,
+            tracer=tracer or RunTracer(),
+        )
         self.graph = build_review_graph(self.deps, checkpointer)
         # Durable registry (Postgres when configured); records are cached here with their locks.
         self.store = store or InMemoryRunStore()
@@ -186,6 +198,8 @@ class AgentRunService:
             verification=values.get("verification"),
             highlight_citations=values.get("highlight_citations") or [],
             budget=_usage(budget) if budget is not None else None,
+            trace_id=trace_id_for(run_id),
+            timeline=[TimelineStep.model_validate(step) for step in record.timeline],
         )
 
     def revise(self, clinician: Actor, run_id: UUID, request: AgentReviseRequest) -> AgentRunView:
@@ -287,6 +301,13 @@ class AgentRunService:
                 resource_id=f"{record.run_id}:{decision.claim_index}",
             )
         self._audit(record, "agent_run_committed", reviewer.id)
+
+    def _on_step(self, run_id: UUID, step: TimelineStep) -> None:
+        record = self._record(run_id)
+        if record is None:
+            return
+        record.timeline.append(step.model_dump(mode="json"))
+        self.store.save(record)
 
     # Checks and helpers
 

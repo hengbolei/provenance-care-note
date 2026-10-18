@@ -56,6 +56,16 @@ DYNAMIC_KEYS = {
     ],
     "agent.category": ["medication", "allergy", "symptom", "plan", "follow_up", "other"],
     "agent.decision": ["accept", "edit", "reject", "skip"],
+    "agent.node": [
+        "load_context",
+        "check_conflicts",
+        "draft",
+        "verify",
+        "revise",
+        "commit",
+        "discard",
+        "stop",
+    ],
 }
 
 
@@ -95,7 +105,7 @@ def test_no_key_is_left_unused():
 def test_chinese_catalogs_are_actually_translated(name):
     # Keys whose text is a product name or code may legitimately match English.
     same_as_english = {key for key, value in CATALOGS[name].items() if value == CATALOGS["en"][key]}
-    assert same_as_english <= {"plan.revisionMeta"}
+    assert same_as_english <= {"plan.revisionMeta", "agent.traceId"}
 
 
 @pytest.mark.parametrize("name", ["zhHans", "zhHant"])

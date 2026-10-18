@@ -24,6 +24,7 @@ import psycopg
 from langgraph.checkpoint.postgres import PostgresSaver
 from langgraph.checkpoint.serde.base import SerializerProtocol
 from psycopg.rows import dict_row
+from psycopg.types.json import Jsonb
 from psycopg_pool import ConnectionPool
 
 from carenote.agent.graph import checkpoint_serializer
@@ -66,6 +67,8 @@ class RunRecord:
     error: str | None = None
     audit_version: int = 0
     tool_calls_audited: int = 0
+    # Metadata-only timeline steps (TimelineStep as JSON); never record text.
+    timeline: list[dict] = field(default_factory=list)
     lock: threading.Lock = field(default_factory=threading.Lock, compare=False, repr=False)
 
 
@@ -104,7 +107,10 @@ class PostgresRunStore:
         return psycopg.connect(self.database_url, options=_scoped_options(self.clinic_id))
 
     def save(self, record: RunRecord) -> None:
-        values = [getattr(record, name) for name in _COLUMNS]
+        values = [
+            Jsonb(record.timeline) if name == "timeline" else getattr(record, name)
+            for name in _COLUMNS
+        ]
         updates = ", ".join(f"{name} = EXCLUDED.{name}" for name in _COLUMNS if name != "run_id")
         with self._connect() as connection:
             connection.execute(

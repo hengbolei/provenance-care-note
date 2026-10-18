@@ -9,7 +9,9 @@ CREATE TABLE IF NOT EXISTS agent_runs (
     created_at timestamptz NOT NULL,
     error text,
     audit_version integer NOT NULL DEFAULT 0,
-    tool_calls_audited integer NOT NULL DEFAULT 0
+    tool_calls_audited integer NOT NULL DEFAULT 0,
+    -- Metadata-only step timeline: node names, durations, token counts and model names.
+    timeline jsonb NOT NULL DEFAULT '[]'
 );
 
 ALTER TABLE agent_runs ENABLE ROW LEVEL SECURITY;

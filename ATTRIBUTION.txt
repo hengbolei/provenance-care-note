@@ -11,6 +11,7 @@ psycopg - GNU Lesser General Public License v3.0 - https://github.com/psycopg/ps
 LangGraph - MIT License - https://github.com/langchain-ai/langgraph
 LangGraph Checkpoint Postgres - MIT License - https://github.com/langchain-ai/langgraph
 psycopg-pool - GNU Lesser General Public License v3.0 - https://github.com/psycopg/psycopg
+OpenTelemetry Python (API, SDK, OTLP exporter) - Apache License 2.0 - https://github.com/open-telemetry/opentelemetry-python
 
 Development libraries
 ---------------------

@@ -220,6 +220,12 @@ textarea:focus, select:focus, input:focus { outline: 2px solid #91c2b1; outline-
 .agent-latest-review { margin-top: 14px; color: #50675f; font-size: 0.78rem; }
 .agent-latest-review summary { cursor: pointer; font-weight: 750; }
 .citation-mark { background: #f2c96f; }
+.agent-timeline { margin-top: 10px; color: #50675f; font-size: 0.76rem; }
+.agent-timeline summary { cursor: pointer; font-weight: 750; }
+.agent-trace-id { color: #7c918b; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-weight: 400; overflow-wrap: anywhere; }
+.agent-timeline-list { display: grid; gap: 4px; margin: 8px 0 0; padding-left: 18px; }
+.agent-timeline-step { overflow-wrap: anywhere; }
+.agent-timeline-node { color: #244c41; font-weight: 750; }
 .agent-checkbox { display: flex; align-items: center; gap: 8px; color: #456159; font-size: 0.76rem; }
 .agent-checkbox input { width: auto; }
 .audit-list { display: grid; gap: 7px; }
