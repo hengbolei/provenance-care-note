@@ -14,6 +14,7 @@ button { font: inherit; }
 .brand-mark { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; color: #fff; background: #245e50; font-family: Georgia, serif; }
 .view-context { display: flex; align-items: center; gap: 8px; color: #667d77; font-size: 0.82rem; }
 .role-switcher { width: auto; min-width: 110px; padding: 6px 28px 6px 9px; font-size: 0.76rem; }
+.language-select { min-width: 0; margin-left: 4px; }
 .context-dot { width: 7px; height: 7px; border-radius: 50%; background: #45a47b; box-shadow: 0 0 0 4px rgb(69 164 123 / 13%); }
 .shell { width: min(1120px, calc(100% - 40px)); margin: 0 auto; padding: 42px 0 72px; }
 .login-panel { width: min(520px, 100%); margin: 40px auto; padding: 28px; border: 1px solid #d2e0da; border-radius: 22px; background: rgb(255 255 255 / 94%); box-shadow: 0 20px 60px rgb(35 78 66 / 9%); }
@@ -187,6 +188,8 @@ textarea:focus, select:focus, input:focus { outline: 2px solid #91c2b1; outline-
 .entry-selection-action { margin-left: auto; }
 .audit-card { grid-column: 1 / -1; }
 .agent-review-card { grid-column: 1 / -1; }
+/* Grid items default to their min-content width; long unwrapped citations would widen the page. */
+.workspace-grid > *, .agent-claim > * { min-width: 0; }
 .agent-progress { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 14px 0 0; padding: 0; list-style: none; color: #8a9b96; font-size: 0.74rem; }
 .agent-progress li::before { content: "○ "; }
 .agent-progress li.done { color: #2d6b59; }
@@ -209,11 +212,11 @@ textarea:focus, select:focus, input:focus { outline: 2px solid #91c2b1; outline-
 .agent-chip.risk-high, .agent-chip.risk-critical { color: #82483d; background: #f6e2dd; }
 .agent-failures { margin: 7px 0 0; padding-left: 16px; color: #8b5a4d; font-size: 0.72rem; line-height: 1.45; }
 .agent-citations { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.agent-citation { max-width: 100%; overflow: hidden; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
+.agent-citation { max-width: 100%; text-align: left; overflow-wrap: anywhere; }
 .agent-decision { display: grid; gap: 6px; align-content: start; }
 .agent-decision .field-label { margin: 0; }
 .agent-question-list { margin: 0; padding-left: 18px; color: #456159; font-size: 0.8rem; line-height: 1.5; }
-.agent-budget { display: block; margin-top: 12px; }
+.agent-budget { display: block; margin-top: 12px; white-space: normal; }
 .agent-latest-review { margin-top: 14px; color: #50675f; font-size: 0.78rem; }
 .agent-latest-review summary { cursor: pointer; font-weight: 750; }
 .citation-mark { background: #f2c96f; }
@@ -228,6 +231,8 @@ textarea:focus, select:focus, input:focus { outline: 2px solid #91c2b1; outline-
   .topbar { padding: 0 20px; }
   .view-context { font-size: 0; }
   .view-context::after { content: "Demo"; font-size: 0.78rem; }
+  .view-context { gap: 6px; }
+  .language-select { max-width: 76px; padding: 5px 18px 5px 6px; }
   .presence-status { font-size: 0.65rem; }
   .shell { width: min(100% - 28px, 1120px); padding-top: 28px; }
   .patient-header { align-items: flex-start; }

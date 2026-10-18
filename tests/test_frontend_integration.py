@@ -109,5 +109,8 @@ def test_patient_api_supplies_every_field_required_by_frontend():
 
 def test_frontend_declares_loading_empty_forbidden_and_error_states():
     app_module = client.get("/static/app.js").text
+    catalog = client.get("/static/i18n.js").text
     for state in ("loading", "empty", "forbidden", "notFound", "error"):
-        assert f"{state}:" in app_module
+        assert f'"{state}"' in app_module
+        assert f'"state.{state}.title":' in catalog
+        assert f'"state.{state}.message":' in catalog

@@ -13,6 +13,9 @@ human-authored notes, source evidence, and access boundaries explicit.
 
 ## Current capabilities
 
+- An interface in English, Simplified Chinese and Traditional Chinese, chosen from the top bar
+  and remembered per browser. Clinical record text, server messages and model output stay in the
+  language they were written in.
 - A Clinical Review Agent (LangGraph) that drafts a patient review in which every claim cites an
   exact span of the record, verifies each citation deterministically, and stops for a clinician
   to accept, edit or reject each claim before anything is saved. See
