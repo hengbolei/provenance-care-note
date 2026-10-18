@@ -17,7 +17,6 @@ import logging
 import threading
 from collections.abc import Callable
 from concurrent.futures import Executor, ThreadPoolExecutor
-from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID, uuid4
@@ -29,6 +28,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from carenote.agent.commit import check_commit_decisions
 from carenote.agent.gateway import CassetteMissingError, ModelGateway
 from carenote.agent.graph import Committer, GraphDeps, build_review_graph, initial_state
+from carenote.agent.persistence import InMemoryRunStore, RunRecord, RunStore
 from carenote.agent.state import (
     Budget,
     Citation,
@@ -100,20 +100,6 @@ class AgentRunView(BaseModel):
     budget: BudgetUsage | None = None
 
 
-@dataclass
-class _RunRecord:
-    run_id: UUID
-    patient_id: UUID
-    clinic_id: UUID
-    started_by: UUID
-    agent_id: UUID
-    created_at: datetime
-    error: str | None = None
-    audit_version: int = 0
-    tool_calls_audited: int = 0
-    lock: threading.Lock = field(default_factory=threading.Lock)
-
-
 _SAFE_ERRORS = (CassetteMissingError, ModelNotConfiguredError, ExternalModelError)
 _CLAIM_OPERATIONS = {
     "accept": "agent_claim_accepted",
@@ -131,6 +117,7 @@ class AgentRunService:
         publish: Publisher | None = None,
         executor: Executor | None = None,
         checkpointer: BaseCheckpointSaver | None = None,
+        store: RunStore | None = None,
         now: Callable[[], datetime] = lambda: datetime.now(UTC),
         budget_factory: Callable[[datetime], Budget] = lambda now: Budget(started_at=now),
     ) -> None:
@@ -143,7 +130,9 @@ class AgentRunService:
         self.budget_factory = budget_factory
         self.deps = GraphDeps(service=service, gateway=gateway, commit=self._commit, now=now)
         self.graph = build_review_graph(self.deps, checkpointer)
-        self._runs: dict[UUID, _RunRecord] = {}
+        # Durable registry (Postgres when configured); records are cached here with their locks.
+        self.store = store or InMemoryRunStore()
+        self._runs: dict[UUID, RunRecord] = {}
         self._registry_lock = threading.Lock()
 
     # Public API
@@ -157,7 +146,7 @@ class AgentRunService:
         except PermissionError as exc:
             raise AccessDeniedError(str(exc)) from exc
         now = self.now()
-        record = _RunRecord(
+        record = RunRecord(
             run_id=run_id,
             patient_id=patient_id,
             clinic_id=clinician.clinic_id,
@@ -167,6 +156,7 @@ class AgentRunService:
         )
         with self._registry_lock:
             self._runs[run_id] = record
+        self.store.save(record)
         self._audit(record, "agent_run_started", clinician.id)
         state = initial_state(run_id, agent, patient_id, now, budget=self.budget_factory(now))
         self._submit(record, state)
@@ -232,10 +222,10 @@ class AgentRunService:
 
     # Graph execution
 
-    def _submit(self, record: _RunRecord, payload: Any) -> None:
+    def _submit(self, record: RunRecord, payload: Any) -> None:
         self.executor.submit(self._run_segment, record, payload)
 
-    def _run_segment(self, record: _RunRecord, payload: Any) -> None:
+    def _run_segment(self, record: RunRecord, payload: Any) -> None:
         with record.lock:
             try:
                 for chunk in self.graph.stream(
@@ -248,11 +238,12 @@ class AgentRunService:
                 record.error = (
                     str(exc) if isinstance(exc, _SAFE_ERRORS) else "the review run failed"
                 )
+                self.store.save(record)
                 logger.exception("agent run %s failed", record.run_id)
                 self._audit(record, "agent_run_failed", record.agent_id)
                 self._event(record, "agent.done", status=RunStatus.FAILED.value)
 
-    def _observe(self, record: _RunRecord, chunk: dict[str, Any]) -> None:
+    def _observe(self, record: RunRecord, chunk: dict[str, Any]) -> None:
         self._audit_tool_calls(record)
         for node, update in chunk.items():
             if node == "__interrupt__":
@@ -284,7 +275,7 @@ class AgentRunService:
     def _commit(self, state, tools) -> None:
         """Graph commit node: persist through the committer, then audit each decision."""
         assert self.committer is not None
-        record = self._runs[state["run_id"]]
+        record = self._record(state["run_id"])
         reviewer = state["reviewer"]
         self.committer(state, tools)
         for decision in state["decisions"].claims:
@@ -299,8 +290,18 @@ class AgentRunService:
 
     # Checks and helpers
 
-    def _authorised(self, clinician: Actor, run_id: UUID) -> _RunRecord:
-        record = self._runs.get(run_id)
+    def _record(self, run_id: UUID) -> RunRecord | None:
+        """The cached record, or the stored one after a restart."""
+        with self._registry_lock:
+            record = self._runs.get(run_id)
+            if record is None:
+                record = self.store.load(run_id)
+                if record is not None:
+                    self._runs[run_id] = record
+            return record
+
+    def _authorised(self, clinician: Actor, run_id: UUID) -> RunRecord:
+        record = self._record(run_id)
         if record is None or record.clinic_id != clinician.clinic_id:
             raise RunNotFoundError("agent run not found")
         if clinician.role is not Role.CLINICIAN:
@@ -308,7 +309,7 @@ class AgentRunService:
         self.service.get_patient_view(clinician, record.patient_id)
         return record
 
-    def _resume_checks(self, clinician: Actor, run_id: UUID) -> _RunRecord:
+    def _resume_checks(self, clinician: Actor, run_id: UUID) -> RunRecord:
         record = self._authorised(clinician, run_id)
         if record.lock.locked():
             raise RunStateError("the run is busy")
@@ -326,11 +327,11 @@ class AgentRunService:
             }
         )
 
-    def _reviewer_id(self, record: _RunRecord) -> UUID:
+    def _reviewer_id(self, record: RunRecord) -> UUID:
         reviewer = self.graph.get_state(self._config(record.run_id)).values.get("reviewer")
         return reviewer.id if reviewer is not None else record.started_by
 
-    def _audit_tool_calls(self, record: _RunRecord) -> None:
+    def _audit_tool_calls(self, record: RunRecord) -> None:
         tools = self.deps.tools.get(record.run_id)
         if tools is None:
             return
@@ -342,17 +343,20 @@ class AgentRunService:
                 resource="agent_tool",
                 resource_id=f"{record.run_id}:{call.name}",
             )
-        record.tool_calls_audited = len(tools.calls)
+        if record.tool_calls_audited != len(tools.calls):
+            record.tool_calls_audited = len(tools.calls)
+            self.store.save(record)
 
     def _audit(
         self,
-        record: _RunRecord,
+        record: RunRecord,
         operation: str,
         changed_by: UUID,
         resource: str = "agent_run",
         resource_id: str | None = None,
     ) -> None:
         record.audit_version += 1
+        self.store.save(record)
         self.service.repository.add_audit_event(
             AuditEvent(
                 patient_id=record.patient_id,
@@ -365,7 +369,7 @@ class AgentRunService:
             )
         )
 
-    def _event(self, record: _RunRecord, kind: str, **fields: Any) -> None:
+    def _event(self, record: RunRecord, kind: str, **fields: Any) -> None:
         self.publish(
             record.patient_id,
             {"type": kind, "run_id": str(record.run_id), "audience": "care_team", **fields},

@@ -16,6 +16,7 @@ from fastapi import (
 
 from carenote.agent.commit import commit_review
 from carenote.agent.gateway import gateway_from_settings
+from carenote.agent.persistence import PostgresRunStore, postgres_checkpointer
 from carenote.agent.runs import (
     AgentCommitRequest,
     AgentReviseRequest,
@@ -79,11 +80,21 @@ repository = (
 )
 seed_demo_data(repository)
 service = CareNoteService(repository)
+# With PostgreSQL, agent runs are checkpointed (encrypted) and registered there, so they survive a
+# restart; without it they live in memory like the rest of the development store.
 agent_runs = AgentRunService(
     service,
     gateway_from_settings(),
     committer=commit_review(service),
     publish=realtime_hub.publish,
+    checkpointer=(
+        postgres_checkpointer(settings.database_url, DEMO_CLINIC_ID, clinical_cipher)
+        if settings.database_url
+        else None
+    ),
+    store=PostgresRunStore(settings.database_url, DEMO_CLINIC_ID)
+    if settings.database_url
+    else None,
 )
 
 

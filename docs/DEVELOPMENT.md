@@ -112,6 +112,11 @@ stale or a gate fails):
 .\.venv\Scripts\python.exe evals\run_evals.py --check
 ```
 
+Agent persistence tests (restart survival, encrypted checkpoints, clinic isolation) need
+PostgreSQL. Set `CARENOTE_TEST_DATABASE_URL`, or install the optional `pgserver` package to
+start a throwaway local server; otherwise they are skipped. CI runs them against a Postgres
+service container.
+
 To run the full stack offline, use `docker compose up --build` and then
 `python scripts/smoke_demo.py` against `http://127.0.0.1:8000`.
 

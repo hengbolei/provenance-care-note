@@ -31,6 +31,15 @@ class ClinicalDataCipher:
         except (InvalidToken, json.JSONDecodeError) as exc:
             raise EncryptionError("clinical payload authentication failed") from exc
 
+    def encrypt_bytes(self, value: bytes) -> bytes:
+        return self._fernet.encrypt(value)
+
+    def decrypt_bytes(self, value: bytes) -> bytes:
+        try:
+            return self._fernet.decrypt(value)
+        except InvalidToken as exc:
+            raise EncryptionError("clinical payload authentication failed") from exc
+
 
 clinical_cipher = ClinicalDataCipher(
     settings.encryption_key or f"development-only:{settings.token_secret}"

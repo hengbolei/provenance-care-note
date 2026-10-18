@@ -87,7 +87,7 @@ model drafts from cassettes and reports "not recorded" until they exist.
 - [x] 2.3 Automatic `revise` node: unsupported claims and uncovered conflicts go back to the model
       with the verifier's reasons (versioned `revise_v1` prompt), at most `max_revisions` loops,
       then remaining failures are shown as unsupported; the agent suite reports revision's effect
-- [ ] 2.4 `migrations/002_agent_runs.sql` with RLS and a Postgres checkpointer so runs survive
+- [x] 2.4 `migrations/002_agent_runs.sql` with RLS and a Postgres checkpointer so runs survive
       restarts; verified by the CI Docker job
 - [ ] 2.5 OpenTelemetry tracing (Langfuse optional): a span per node, tool and model call, trace
       ID on audit events, run timeline in the panel
@@ -125,6 +125,9 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-18 | Checkpoints use LangGraph's `PostgresSaver` with every serialized value Fernet-encrypted by the clinical data key; loading an unencrypted value is refused | The rest of the database is encrypted at rest, and drafts, quotes and decisions are clinical text; LangGraph keeps only primitive values (status, prompt version, model) in clear |
+| 2026-10-18 | `agent_runs` (migration 002) is clinic-scoped by forced RLS, and LangGraph's checkpoint tables are scoped through it (migration 003, applied after the saver creates them); connections set `app.current_clinic_id` when they open | Matches the existing per-clinic isolation; a checkpoint is visible only when its run belongs to the current clinic |
+| 2026-10-18 | Postgres tests run against `CARENOTE_TEST_DATABASE_URL` in a CI service container, or a local throwaway server from the optional `pgserver` package, and skip otherwise | Real RLS, encryption and restart behaviour need a real Postgres |
 | 2026-10-18 | Automatic revisions (`max_auto_revisions`, default 2) are budgeted separately from clinician-requested redrafts (`max_revisions`) | A run that used its automatic fixes can still be redrafted at the clinician's request |
 | 2026-10-18 | Only automated nodes (load, conflicts, draft, verify, revise) count as steps; review, commit and discard do not | With two automatic and two clinician revisions the worst case is exactly the design's 12 steps |
 | 2026-10-18 | The revise request sends the previous claims, citations and failure reasons as `DataTag`s with redacted text, and the state keeps the first draft's verification | Typed tags keep IDs and reasons out of free text; keeping the first verification lets the agent suite measure what revision changed |
@@ -186,8 +189,8 @@ Departures from or refinements of the design, newest first.
   addresses this.
 - Commit writes the section, then each highlight; a failure part-way leaves the earlier writes in
   place and marks the run failed. Decisions are validated first to make this unlikely.
-- Run records and checkpoints live in memory, so a server restart loses runs; step 2.4 moves
-  them to Postgres.
+- Without `CARENOTE_DATABASE_URL`, runs and checkpoints live in memory and a restart loses them;
+  with Postgres they persist (step 2.4).
 - `OpenAIGateway` is covered by mocked HTTP tests only; strict structured output has not yet been
   run against the live API. The first `record_demo_cassette.py --source openai` run will show
   whether the provider rejects any schema keyword.

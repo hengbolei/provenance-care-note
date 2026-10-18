@@ -9,6 +9,8 @@ HTTPX - BSD 3-Clause License - https://github.com/encode/httpx
 Cryptography - Apache License 2.0 or BSD 3-Clause License - https://github.com/pyca/cryptography
 psycopg - GNU Lesser General Public License v3.0 - https://github.com/psycopg/psycopg
 LangGraph - MIT License - https://github.com/langchain-ai/langgraph
+LangGraph Checkpoint Postgres - MIT License - https://github.com/langchain-ai/langgraph
+psycopg-pool - GNU Lesser General Public License v3.0 - https://github.com/psycopg/psycopg
 
 Development libraries
 ---------------------
