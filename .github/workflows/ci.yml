@@ -32,7 +32,7 @@ jobs:
         with:
           node-version: "20"
       - name: Install
-        run: pip install -e ".[dev,agent]"
+        run: pip install -e ".[dev]"
       - name: Lint
         run: ruff check .
       - name: Check frontend syntax

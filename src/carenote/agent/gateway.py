@@ -361,3 +361,15 @@ class RecordedGateway:
             encoding="utf-8",
         )
         return result
+
+
+def gateway_from_settings(mode: str | None = None) -> ModelGateway:
+    """Build the gateway named by CARENOTE_AGENT_GATEWAY: recorded, openai or record."""
+    mode = mode or settings.agent_gateway
+    if mode == "recorded":
+        return RecordedGateway()
+    if mode == "openai":
+        return OpenAIGateway()
+    if mode == "record":
+        return RecordedGateway(record_with=OpenAIGateway())
+    raise ValueError(f"unknown agent gateway mode: {mode!r}")

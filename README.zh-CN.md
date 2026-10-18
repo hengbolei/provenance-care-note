@@ -51,7 +51,7 @@ AI 生成内容、人工撰写的记录、原始证据和访问边界都清晰�
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -e ".[dev,agent]"
+.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
 ```
 
 启动带自动重载的开发服务器：

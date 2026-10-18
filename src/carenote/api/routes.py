@@ -14,6 +14,16 @@ from fastapi import (
     status,
 )
 
+from carenote.agent.gateway import gateway_from_settings
+from carenote.agent.runs import (
+    AgentCommitRequest,
+    AgentReviseRequest,
+    AgentRunService,
+    AgentRunView,
+    CommitUnavailableError,
+    RunNotFoundError,
+    RunStateError,
+)
 from carenote.core.config import settings
 from carenote.core.identity import AuthenticationError, session_service
 from carenote.core.security import clinical_cipher
@@ -68,6 +78,8 @@ repository = (
 )
 seed_demo_data(repository)
 service = CareNoteService(repository)
+# Committing a review (step 1.7 of docs/AGENT_ROADMAP.md) is not wired yet: commit returns 501.
+agent_runs = AgentRunService(service, gateway_from_settings(), publish=realtime_hub.publish)
 
 
 def session_token(
@@ -95,6 +107,10 @@ ActorDependency = Annotated[Actor, Depends(current_actor)]
 
 
 def translate_service_error(exc: Exception) -> HTTPException:
+    if isinstance(exc, RunStateError):
+        return HTTPException(status_code=409, detail=str(exc))
+    if isinstance(exc, CommitUnavailableError):
+        return HTTPException(status_code=501, detail=str(exc))
     if isinstance(exc, PatientNotFoundError):
         return HTTPException(status_code=404, detail=str(exc))
     if isinstance(exc, PermissionError):
@@ -513,3 +529,57 @@ def enforce_audit_retention(actor: ActorDependency) -> dict[str, int | bool]:
         "retention_days": settings.audit_retention_days,
         "chain_valid": repository.verify_audit_chain(),
     }
+
+
+AGENT_RUN_ERRORS = (
+    PatientNotFoundError,
+    RunNotFoundError,
+    RunStateError,
+    CommitUnavailableError,
+    PermissionError,
+    ValueError,
+)
+
+
+@router.post("/patients/{patient_id}/agent-runs", response_model=AgentRunView, status_code=202)
+def start_agent_run(patient_id: UUID, actor: ActorDependency) -> AgentRunView:
+    try:
+        return agent_runs.start(actor, patient_id)
+    except AGENT_RUN_ERRORS as exc:
+        raise translate_service_error(exc) from exc
+
+
+@router.get("/agent-runs/{run_id}", response_model=AgentRunView)
+def get_agent_run(run_id: UUID, actor: ActorDependency) -> AgentRunView:
+    try:
+        return agent_runs.get_run(actor, run_id)
+    except AGENT_RUN_ERRORS as exc:
+        raise translate_service_error(exc) from exc
+
+
+@router.post("/agent-runs/{run_id}/review", response_model=AgentRunView, status_code=202)
+def revise_agent_run(
+    run_id: UUID, payload: AgentReviseRequest, actor: ActorDependency
+) -> AgentRunView:
+    try:
+        return agent_runs.revise(actor, run_id, payload)
+    except AGENT_RUN_ERRORS as exc:
+        raise translate_service_error(exc) from exc
+
+
+@router.post("/agent-runs/{run_id}/commit", response_model=AgentRunView)
+def commit_agent_run(
+    run_id: UUID, payload: AgentCommitRequest, actor: ActorDependency
+) -> AgentRunView:
+    try:
+        return agent_runs.commit(actor, run_id, payload)
+    except AGENT_RUN_ERRORS as exc:
+        raise translate_service_error(exc) from exc
+
+
+@router.post("/agent-runs/{run_id}/discard", response_model=AgentRunView)
+def discard_agent_run(run_id: UUID, actor: ActorDependency) -> AgentRunView:
+    try:
+        return agent_runs.discard(actor, run_id)
+    except AGENT_RUN_ERRORS as exc:
+        raise translate_service_error(exc) from exc

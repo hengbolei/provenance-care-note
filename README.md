@@ -72,7 +72,7 @@ Create a virtual environment and install the application with development depend
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -e ".[dev,agent]"
+.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
 ```
 
 Start the development server with automatic reload:

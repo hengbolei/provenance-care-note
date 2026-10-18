@@ -13,12 +13,10 @@ dependencies = [
   "cryptography>=45,<47",
   "psycopg[binary]>=3.2,<4.0",
   "httpx>=0.27,<1.0",
+  "langgraph>=1.0,<2.0",
 ]
 
 [project.optional-dependencies]
-agent = [
-  "langgraph>=1.0,<2.0",
-]
 dev = [
   "pytest>=8.0,<9.0",
   "ruff>=0.8,<1.0",

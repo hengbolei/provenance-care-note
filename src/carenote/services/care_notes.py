@@ -159,9 +159,7 @@ class CareNoteService:
             excerpt=artifact.content[pointer.start : pointer.end],
         )
 
-    def search_entries(
-        self, actor: Actor, patient_id: UUID, query: str, k: int = 10
-    ) -> list[Span]:
+    def search_entries(self, actor: Actor, patient_id: UUID, query: str, k: int = 10) -> list[Span]:
         """Keyword search over a patient's active entries, for the care team only."""
         self._require_internal_collaborator(actor)
         if self.repository.get_patient(patient_id, actor.clinic_id) is None:

@@ -48,9 +48,8 @@ Branch: `feat/agent-mvp`. Design §17 week 1. Build framework-free parts first, 
 - [x] 1.4 `agent/tools.py`: read tools that call `CareNoteService` as `agent.principal`;
       `propose_highlight` writes to run state only
 - [x] 1.5 `agent/graph.py`: `load_context → check_conflicts → draft → verify →
-      human_review (interrupt) → commit | discard`, `MemorySaver`; `langgraph` as optional
-      extra `[agent]`
-- [ ] 1.6 `agent/runs.py` and API: endpoints from design §15, the nine `agent_*` audit
+      human_review (interrupt) → commit | discard`, `MemorySaver`; `langgraph` dependency
+- [x] 1.6 `agent/runs.py` and API: endpoints from design §15, the nine `agent_*` audit
       operations, WebSocket `agent.step` / `agent.draft` / `agent.done`
 - [ ] 1.7 Commit path: accepted claims become a clinician-authored revision of an internal
       `agent_review` section; accepted highlights go through `create_highlight`
@@ -105,6 +104,12 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-18 | `langgraph` is a core dependency, not an optional `[agent]` extra | The API serves agent endpoints at startup; an optional extra would leave the app half-working without it |
+| 2026-10-18 | Review endpoints split by action: `POST /agent-runs/{id}/review` takes only a revise instruction, `/commit` takes per-item decisions, `/discard` takes nothing | Each request has one meaning, and validation can be exact |
+| 2026-10-18 | `/commit` returns 501 until step 1.7 wires a committer | Marking a run committed without persisting anything would mislead |
+| 2026-10-18 | Start and revise run on a 4-worker thread pool and return 202 at once; commit and discard run inline | Drafting takes seconds; commit and discard are fast and their result belongs in the response |
+| 2026-10-18 | Audit: run-level events use `resource=agent_run`; tool calls `agent_tool:{run}:{tool}`; claim decisions `agent_claim:{run}:{index}`; added `agent_run_failed` | `AuditEvent` has no metadata field, so the run id and item travel in `resource_id` |
+| 2026-10-18 | Realtime events carry `audience: care_team` and counts only, never text; patient sockets skip them | Agent runs are internal |
 | 2026-10-18 | Phase 1 graph supports clinician-requested revision (`ReviewDecisions.action = "revise"` routes back to `draft` with the instruction, within `max_revisions`); the automatic `revise` loop stays in step 3.3 | Design §11 lets the clinician ask for changes; reusing `draft` avoids a second prompt in Phase 1 |
 | 2026-10-18 | Record data reaches the model inside `DataTag` markers (`<entry id=... type=... author=...>`) whose attributes must be IDs, enums, timestamps, booleans or integers | Frames untrusted text for injection resistance without letting free text bypass redaction; re-redacting framed text could mangle entry IDs that look like phone numbers |
 | 2026-10-18 | The 60 s wall-clock budget restarts when a clinician answers `human_review` | The ceiling is for automated work; review time is unbounded |
@@ -137,6 +142,8 @@ Departures from or refinements of the design, newest first.
 
 ## Known limitations
 
+- Run records and checkpoints live in memory, so a server restart loses runs; step 2.4 moves
+  them to Postgres.
 - `OpenAIGateway` is covered by mocked HTTP tests only; strict structured output has not yet been
   run against the live API, so schema keywords the provider rejects may surface at step 1.9.
 - Entity extraction (`services/entities.py`) only recognises a medication as a word followed by
