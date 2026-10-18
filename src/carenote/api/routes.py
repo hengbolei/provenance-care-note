@@ -14,6 +14,7 @@ from fastapi import (
     status,
 )
 
+from carenote.agent.commit import commit_review
 from carenote.agent.gateway import gateway_from_settings
 from carenote.agent.runs import (
     AgentCommitRequest,
@@ -78,8 +79,12 @@ repository = (
 )
 seed_demo_data(repository)
 service = CareNoteService(repository)
-# Committing a review (step 1.7 of docs/AGENT_ROADMAP.md) is not wired yet: commit returns 501.
-agent_runs = AgentRunService(service, gateway_from_settings(), publish=realtime_hub.publish)
+agent_runs = AgentRunService(
+    service,
+    gateway_from_settings(),
+    committer=commit_review(service),
+    publish=realtime_hub.publish,
+)
 
 
 def session_token(

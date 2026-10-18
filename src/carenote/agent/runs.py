@@ -26,6 +26,7 @@ from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.types import Command
 from pydantic import BaseModel, ConfigDict, Field
 
+from carenote.agent.commit import check_commit_decisions
 from carenote.agent.gateway import CassetteMissingError, ModelGateway
 from carenote.agent.graph import Committer, GraphDeps, build_review_graph, initial_state
 from carenote.agent.state import (
@@ -206,13 +207,17 @@ class AgentRunService:
             action="commit", claims=request.claims, highlights=request.highlights
         )
         record = self._resume_checks(clinician, run_id)
-        draft = self.graph.get_state(self._config(run_id)).values.get("draft")
+        values = self.graph.get_state(self._config(run_id)).values
+        draft = values.get("draft")
         claim_count = len(draft.claims) if draft else 0
         highlight_count = len(draft.candidate_highlights) if draft else 0
         if any(item.claim_index >= claim_count for item in decisions.claims) or any(
             item.highlight_index >= highlight_count for item in decisions.highlights
         ):
             raise ValueError("a decision refers to a claim or highlight the draft does not have")
+        check_commit_decisions(
+            decisions, values.get("verification"), values.get("highlight_citations") or []
+        )
         self._run_segment(record, self._answer(clinician, decisions))
         return self.get_run(clinician, run_id)
 

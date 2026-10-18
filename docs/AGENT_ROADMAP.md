@@ -51,7 +51,7 @@ Branch: `feat/agent-mvp`. Design §17 week 1. Build framework-free parts first, 
       human_review (interrupt) → commit | discard`, `MemorySaver`; `langgraph` dependency
 - [x] 1.6 `agent/runs.py` and API: endpoints from design §15, the nine `agent_*` audit
       operations, WebSocket `agent.step` / `agent.draft` / `agent.done`
-- [ ] 1.7 Commit path: accepted claims become a clinician-authored revision of an internal
+- [x] 1.7 Commit path: accepted claims become a clinician-authored revision of an internal
       `agent_review` section; accepted highlights go through `create_highlight`
 - [ ] 1.8 Review panel in `static/app.js`: claims, clickable citations, accept / edit / reject,
       Commit
@@ -104,6 +104,10 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-18 | `agent_review` stays internal: it is a section, and sections are care-team only | Resolves the design §18 open question with its default, by construction rather than a flag |
+| 2026-10-18 | A claim that failed verification can be edited or rejected but not accepted as written; a highlight whose citation did not resolve cannot be accepted (422) | Keeps unverified model text out of the record unless a clinician rewrites it |
+| 2026-10-18 | Committed highlights are created as `moderate` and `needs_review`; the scorer sets priority | Design §10 keeps risk out of the model's hands; the scorer takes risk as input, so the clinician sets the final risk in the highlight workflow |
+| 2026-10-18 | Each commit replaces the `agent_review` content as a new revision, listing accepted claims with their source spans | Revision history keeps earlier reviews; the section reads as the latest accepted review |
 | 2026-10-18 | `langgraph` is a core dependency, not an optional `[agent]` extra | The API serves agent endpoints at startup; an optional extra would leave the app half-working without it |
 | 2026-10-18 | Review endpoints split by action: `POST /agent-runs/{id}/review` takes only a revise instruction, `/commit` takes per-item decisions, `/discard` takes nothing | Each request has one meaning, and validation can be exact |
 | 2026-10-18 | `/commit` returns 501 until step 1.7 wires a committer | Marking a run committed without persisting anything would mislead |
@@ -132,8 +136,6 @@ Departures from or refinements of the design, newest first.
 
 ## Open questions
 
-- **`agent_review` visibility (needed by step 1.7).** Design §18 defaults to internal after
-  commit. Proposed: keep it internal; patient-facing guidance goes through the existing flow.
 - **Retrieval storage (blocks Phase 3).** `PostgresCareNoteRepository` stores one encrypted
   snapshot per clinic and searches in memory, so the in-database `tsvector` / pgvector search in
   design §9 cannot index anything. Options: (a) move entries to per-row storage with encrypted
@@ -142,6 +144,8 @@ Departures from or refinements of the design, newest first.
 
 ## Known limitations
 
+- Commit writes the section, then each highlight; a failure part-way leaves the earlier writes in
+  place and marks the run failed. Decisions are validated first to make this unlikely.
 - Run records and checkpoints live in memory, so a server restart loses runs; step 2.4 moves
   them to Postgres.
 - `OpenAIGateway` is covered by mocked HTTP tests only; strict structured output has not yet been
