@@ -214,3 +214,31 @@ export function revertSection(section, targetVersion, context = DEMO_CONTEXT) {
     body: JSON.stringify({ target_version: targetVersion }),
   }, context);
 }
+
+export function startAgentRun(context = DEMO_CONTEXT) {
+  return request(`/api/patients/${context.patientId}/agent-runs`, { method: "POST" }, context);
+}
+
+export function getAgentRun(runId, context = DEMO_CONTEXT) {
+  return request(`/api/agent-runs/${runId}`, {}, context);
+}
+
+export function reviseAgentRun(runId, instruction, context = DEMO_CONTEXT) {
+  return request(
+    `/api/agent-runs/${runId}/review`,
+    { method: "POST", body: JSON.stringify({ instruction }) },
+    context,
+  );
+}
+
+export function commitAgentRun(runId, decisions, context = DEMO_CONTEXT) {
+  return request(
+    `/api/agent-runs/${runId}/commit`,
+    { method: "POST", body: JSON.stringify(decisions) },
+    context,
+  );
+}
+
+export function discardAgentRun(runId, context = DEMO_CONTEXT) {
+  return request(`/api/agent-runs/${runId}/discard`, { method: "POST" }, context);
+}

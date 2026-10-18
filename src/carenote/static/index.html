@@ -141,6 +141,53 @@
             <p class="count-label">Internal only</p>
           </div>
           <div class="workspace-grid">
+            <article id="agent-review-card" class="workspace-card agent-review-card" aria-labelledby="agent-review-title" hidden>
+              <div class="workspace-card-heading">
+                <div>
+                  <p class="eyebrow">CLINICAL REVIEW AGENT</p>
+                  <h3 id="agent-review-title">Prepare a cited review</h3>
+                </div>
+                <span id="agent-run-status" class="version-label">No review yet</span>
+              </div>
+              <p class="helper-text">The agent drafts claims that cite exact text in this record, then checks every citation. Record text is redacted before any model call. Nothing is saved until you commit.</p>
+              <div class="form-actions">
+                <button id="agent-start" class="primary-button" type="button">Prepare review</button>
+              </div>
+              <ol id="agent-progress" class="agent-progress" aria-label="Review progress" hidden>
+                <li data-step="1">Loading context</li>
+                <li data-step="2">Checking conflicts</li>
+                <li data-step="3">Drafting</li>
+                <li data-step="4">Verifying citations</li>
+              </ol>
+              <p id="agent-feedback" class="form-feedback" role="status"></p>
+              <div id="agent-draft" class="agent-draft" hidden>
+                <p id="agent-summary" class="agent-summary"></p>
+                <h4 class="agent-subheading">Claims</h4>
+                <div id="agent-claim-list" class="agent-claim-list"></div>
+                <div id="agent-questions" hidden>
+                  <h4 class="agent-subheading">Open questions</h4>
+                  <ul id="agent-question-list" class="agent-question-list"></ul>
+                </div>
+                <div id="agent-highlights" hidden>
+                  <h4 class="agent-subheading">Candidate highlights</h4>
+                  <div id="agent-highlight-list" class="agent-claim-list"></div>
+                </div>
+                <div id="agent-review-actions">
+                  <label class="field-label" for="agent-revise-instruction">Ask the agent to revise</label>
+                  <input id="agent-revise-instruction" maxlength="500" placeholder="e.g. Focus on blood pressure changes" />
+                  <div class="form-actions">
+                    <button id="agent-commit" class="primary-button" type="button">Commit accepted items</button>
+                    <button id="agent-revise" class="secondary-button" type="button">Revise draft</button>
+                    <button id="agent-discard" class="secondary-button" type="button">Discard</button>
+                  </div>
+                </div>
+                <p id="agent-budget" class="version-label agent-budget"></p>
+              </div>
+              <details id="agent-latest-review" class="agent-latest-review" hidden>
+                <summary>Latest committed review <span id="agent-latest-version"></span></summary>
+                <p id="agent-latest-content" class="revision-content"></p>
+              </details>
+            </article>
             <article class="workspace-card">
               <div class="workspace-card-heading">
                 <div>

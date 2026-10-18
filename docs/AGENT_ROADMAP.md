@@ -4,7 +4,7 @@ Status tracker for building the agent described in [AGENT_DESIGN.md](AGENT_DESIG
 design says *what* and *why*; this file says *in what order* and *where we are*. Update it in the
 same PR as the work it describes.
 
-Last updated: 2026-10-17 · Current phase: **Phase 1 — Minimal end-to-end loop**
+Last updated: 2026-10-18 · Current phase: **Phase 1 — Minimal end-to-end loop**, ready to merge; next is Phase 2
 
 ## How we work
 
@@ -33,31 +33,33 @@ Merged in PR #3 (`e62d79c`).
 - [x] 0.4 `AgentActor` and `EntryRef`; SYSTEM writes rejected (`4ab4238`)
 - [x] fix: patients could create internal sections (`96f6aff`)
 
-## Phase 1 — Minimal end-to-end loop · ⏳ next
+## Phase 1 — Minimal end-to-end loop · ✅ done (pending merge)
 
 Branch: `feat/agent-mvp`. Design §17 week 1. Build framework-free parts first, LangGraph last.
 
-- [ ] 1.1 `agent/state.py`: `Citation`, `Claim`, `DraftReview`, `CandidateHighlight`,
-      `ClaimCheck`, `Budget`, `ReviewState`
-- [ ] 1.2 `agent/verify.py`: deterministic checks 1–6 from design §8, pure functions with dense
+- [x] 1.1 `agent/state.py`: `Citation`, `Claim`, `DraftReview`, `CandidateHighlight`,
+      `ClaimCheck`, `Budget`, `ReviewState` (`d5cedc1`)
+- [x] 1.2 `agent/verify.py`: deterministic checks 1–6 from design §8, pure functions with dense
       unit tests (exists and in scope, in bounds, quote match with relocation, entity support,
-      patient-source risk cap, conflict coverage)
-- [ ] 1.3 `agent/gateway.py`: `ModelGateway` protocol (`structured()`, `text()`);
+      patient-source risk cap, conflict coverage) (`be586b8`)
+- [x] 1.3 `agent/gateway.py`: `ModelGateway` protocol (`structured()`, `text()`);
       `OpenAIGateway` with JSON-schema output and mandatory redaction; `RecordedGateway` over
       `evals/cassettes/`; move `summarize` onto it without changing `services/ai.py` callers
-- [ ] 1.4 `agent/tools.py`: read tools that call `CareNoteService` as `agent.principal`;
-      `propose_highlight` writes to run state only
-- [ ] 1.5 `agent/graph.py`: `load_context → check_conflicts → draft → verify →
-      human_review (interrupt) → commit | discard`, `MemorySaver`; `langgraph` as optional
-      extra `[agent]`
-- [ ] 1.6 `agent/runs.py` and API: endpoints from design §15, the nine `agent_*` audit
-      operations, WebSocket `agent.step` / `agent.draft` / `agent.done`
-- [ ] 1.7 Commit path: accepted claims become a clinician-authored revision of an internal
-      `agent_review` section; accepted highlights go through `create_highlight`
-- [ ] 1.8 Review panel in `static/app.js`: claims, clickable citations, accept / edit / reject,
-      Commit
-- [ ] 1.9 Offline demo: `RecordedGateway` by default with a seed cassette; `docker-compose.yml`
-      with app and Postgres
+      (`d33310c`)
+- [x] 1.4 `agent/tools.py`: read tools that call `CareNoteService` as `agent.principal`;
+      `propose_highlight` writes to run state only (`9fce3b0`)
+- [x] 1.5 `agent/graph.py`: `load_context → check_conflicts → draft → verify →
+      human_review (interrupt) → commit | discard`, `MemorySaver`; `langgraph` dependency
+      (`c2a1900`)
+- [x] fix: medication-state support check read "hold pending" as a drug (`8d55516`)
+- [x] 1.6 `agent/runs.py` and API: endpoints from design §15, the nine `agent_*` audit
+      operations, WebSocket `agent.step` / `agent.draft` / `agent.done` (`4c630cb`)
+- [x] 1.7 Commit path: accepted claims become a clinician-authored revision of an internal
+      `agent_review` section; accepted highlights go through `create_highlight` (`4ef472d`)
+- [x] 1.8 Review panel in `static/app.js`: claims, clickable citations, accept / edit / reject,
+      Commit (`2b698d4`)
+- [x] 1.9 Offline demo: `RecordedGateway` by default with a seed cassette; `docker-compose.yml`
+      with app and Postgres (`aa19648`)
 
 **Exit criteria**: with no API key, "Prepare review" on the seed patient returns a draft whose
 citations all pass verification; Commit creates the `agent_review` revision, highlights and an
@@ -105,13 +107,44 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-18 | The seed cassette is a curated, hand-written draft (`scripts/record_demo_cassette.py`), labelled `curated-demo` in the cassette and shown in the panel; `--source openai` re-records it live | No API key was available; the demo must never pass hand-written text off as model output |
+| 2026-10-18 | CI gains a `demo` job: `docker compose up --wait`, then `scripts/smoke_demo.py` signs in, runs a review and commits it | Docker was not available locally, so the stack is verified in CI |
+| 2026-10-18 | Checkpoints deserialize only the review state's own types (`allowed_msgpack_modules`) | LangGraph warns it will block unregistered types; an explicit allowlist also stops a tampered checkpoint instantiating anything else |
+| 2026-10-18 | Prompts are loaded with newlines normalised to LF | A Windows checkout with `core.autocrlf=true` would otherwise change the prompt bytes and miss every cassette |
+| 2026-10-18 | Review panel defaults: verified claims start as "include as written", unsupported ones as "leave out" with accept disabled; highlights start unchecked | One click commits what verified; anything unverified needs a deliberate edit |
+| 2026-10-18 | The panel polls the run every second while it is running and also refreshes on `agent.*` socket events; the active run id is kept in `sessionStorage` | Polling keeps progress working if the socket drops; the run survives a page reload |
+| 2026-10-18 | `agent_review` stays internal: it is a section, and sections are care-team only | Resolves the design §18 open question with its default, by construction rather than a flag |
+| 2026-10-18 | A claim that failed verification can be edited or rejected but not accepted as written; a highlight whose citation did not resolve cannot be accepted (422) | Keeps unverified model text out of the record unless a clinician rewrites it |
+| 2026-10-18 | Committed highlights are created as `moderate` and `needs_review`; the scorer sets priority | Design §10 keeps risk out of the model's hands; the scorer takes risk as input, so the clinician sets the final risk in the highlight workflow |
+| 2026-10-18 | Each commit replaces the `agent_review` content as a new revision, listing accepted claims with their source spans | Revision history keeps earlier reviews; the section reads as the latest accepted review |
+| 2026-10-18 | `langgraph` is a core dependency, not an optional `[agent]` extra | The API serves agent endpoints at startup; an optional extra would leave the app half-working without it |
+| 2026-10-18 | Review endpoints split by action: `POST /agent-runs/{id}/review` takes only a revise instruction, `/commit` takes per-item decisions, `/discard` takes nothing | Each request has one meaning, and validation can be exact |
+| 2026-10-18 | `/commit` returns 501 until step 1.7 wires a committer | Marking a run committed without persisting anything would mislead |
+| 2026-10-18 | Start and revise run on a 4-worker thread pool and return 202 at once; commit and discard run inline | Drafting takes seconds; commit and discard are fast and their result belongs in the response |
+| 2026-10-18 | Audit: run-level events use `resource=agent_run`; tool calls `agent_tool:{run}:{tool}`; claim decisions `agent_claim:{run}:{index}`; added `agent_run_failed` | `AuditEvent` has no metadata field, so the run id and item travel in `resource_id` |
+| 2026-10-18 | Realtime events carry `audience: care_team` and counts only, never text; patient sockets skip them | Agent runs are internal |
+| 2026-10-18 | Phase 1 graph supports clinician-requested revision (`ReviewDecisions.action = "revise"` routes back to `draft` with the instruction, within `max_revisions`); the automatic `revise` loop stays in step 3.3 | Design §11 lets the clinician ask for changes; reusing `draft` avoids a second prompt in Phase 1 |
+| 2026-10-18 | Record data reaches the model inside `DataTag` markers (`<entry id=... type=... author=...>`) whose attributes must be IDs, enums, timestamps, booleans or integers | Frames untrusted text for injection resistance without letting free text bypass redaction; re-redacting framed text could mangle entry IDs that look like phone numbers |
+| 2026-10-18 | The 60 s wall-clock budget restarts when a clinician answers `human_review` | The ceiling is for automated work; review time is unbounded |
+| 2026-10-18 | Commit is an injected callable that receives the state and the reviewing clinician; the graph never writes to the record itself | Keeps step 1.7's persistence separate and testable |
+| 2026-10-18 | Medication-state facts count in the support check only for drugs the record doses somewhere | The state pattern reads "hold pending review" as a drug named "pending" |
+| 2026-10-18 | Tools read one patient-view snapshot per run, taken as the principal clinician; search, read and evidence results are redacted and cite offsets in the redacted text, with each entry's `RedactionResult` kept for verification | Every tool sees the same record, and citations stay mappable to the original |
+| 2026-10-18 | `get_patient_overview` returns age in years and pronouns only, never name, date of birth or record number | Design §7 asks for redacted demographics; age is all the review needs |
+| 2026-10-18 | Added `CareNoteService.search_entries` for care-team roles | Tools must read through the service policy boundary, not the repository |
+| 2026-10-18 | Gateway requests take `RedactionResult` inputs only (plain strings raise `TypeError`); instructions are the only free text | Makes design §10 "refuses unredacted input by construction" concrete |
+| 2026-10-18 | Cassettes are keyed by a SHA-256 of purpose, schema, instructions and redacted input, and store only the output, model and usage | Any prompt or input change forces a re-record; no record text is written to disk |
+| 2026-10-18 | Cost is reported only when per-token prices are configured, otherwise `None` | Prices change per model; a guessed figure would mislead the budget |
+| 2026-10-18 | Audio transcription stays on its direct HTTP call, outside the gateway | It sends audio, not redactable text; moving it is out of scope for the agent |
+| 2026-10-18 | Check 5 phrasing is enforced: claims resting only on patient-sourced text (patient notes and AI patient-session summaries) must contain a reporting cue such as "reports" or "states", else `patient_source_phrasing` | Design §8 requires reported phrasing; a deterministic cue list is checkable, and the revise loop can fix misses |
+| 2026-10-18 | Check 4 support: every medication, dose and allergy fact the claim states must appear in its cited text with the same dose and polarity; claims with no extractable facts pass on valid citations alone | Reuses `extract_entities`, so support is only as strong as extraction (see Known limitations) |
+| 2026-10-18 | Verification results are a `VerificationReport` (per-claim `ClaimCheck` plus uncovered conflict IDs) instead of `list[ClaimCheck]` | Conflict coverage (check 6) belongs to the whole draft, not to one claim |
+| 2026-10-18 | `CandidateHighlight` has no risk level or priority field, and model-output schemas forbid extra keys | Design §10: the deterministic scorer sets highlight risk and priority; the model cannot smuggle them in |
+| 2026-10-18 | Default budget: 60k tokens and $0.50 per run, beside the design's 12 steps, 2 revisions and 60 s | The design names token and cost ceilings without values; revisit with Phase 2 trace data |
 | 2026-10-17 | Agent tools **read as the principal clinician**; the `AgentActor` (Role.SYSTEM) is write-denied | Every service read already denies SYSTEM; reading as the clinician reuses their exact scope instead of adding agent-specific permissions |
 | 2026-10-17 | Redaction offset mapping moved from a risk (design §18) to a Phase 0 prerequisite | Citations cannot be verified without it |
 
 ## Open questions
 
-- **`agent_review` visibility (needed by step 1.7).** Design §18 defaults to internal after
-  commit. Proposed: keep it internal; patient-facing guidance goes through the existing flow.
 - **Retrieval storage (blocks Phase 3).** `PostgresCareNoteRepository` stores one encrypted
   snapshot per clinic and searches in memory, so the in-database `tsvector` / pgvector search in
   design §9 cannot index anything. Options: (a) move entries to per-row storage with encrypted
@@ -120,7 +153,18 @@ Departures from or refinements of the design, newest first.
 
 ## Known limitations
 
+- Commit writes the section, then each highlight; a failure part-way leaves the earlier writes in
+  place and marks the run failed. Decisions are validated first to make this unlikely.
+- Run records and checkpoints live in memory, so a server restart loses runs; step 2.4 moves
+  them to Postgres.
+- `OpenAIGateway` is covered by mocked HTTP tests only; strict structured output has not yet been
+  run against the live API. The first `record_demo_cassette.py --source openai` run will show
+  whether the provider rejects any schema keyword.
+- The Docker demo is checked only by the CI `demo` job; it has not been run on a local Docker
+  install.
 - Entity extraction (`services/entities.py`) only recognises a medication as a word followed by
-  a dose or an action verb, which will cap recall. Revisit in Phase 3 using eval results.
+  a dose or an action verb, which will cap recall, and reads any word after "hold", "start" and
+  similar verbs as a drug ("hold pending"). The verifier filters this; the conflict detector does
+  not yet. Revisit in Phase 3 using eval results.
 - `labelled_id` redaction now requires a digit in the identifier, so letter-only identifiers are
   not redacted by that rule.

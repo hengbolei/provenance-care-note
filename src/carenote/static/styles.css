@@ -186,6 +186,39 @@ textarea:focus, select:focus, input:focus { outline: 2px solid #91c2b1; outline-
 .selected-source { min-height: 52px; margin: 0; padding: 10px 12px; border-left: 3px solid #b58a3f; border-radius: 0 8px 8px 0; color: #526a63; background: #faf5e8; font-size: 0.8rem; line-height: 1.5; }
 .entry-selection-action { margin-left: auto; }
 .audit-card { grid-column: 1 / -1; }
+.agent-review-card { grid-column: 1 / -1; }
+.agent-progress { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 14px 0 0; padding: 0; list-style: none; color: #8a9b96; font-size: 0.74rem; }
+.agent-progress li::before { content: "○ "; }
+.agent-progress li.done { color: #2d6b59; }
+.agent-progress li.done::before { content: "● "; }
+.agent-progress li.active { color: #1a3e35; font-weight: 750; }
+.agent-progress li.active::before { content: "◐ "; }
+.agent-draft { margin-top: 12px; }
+.agent-summary { margin: 0 0 6px; color: #456159; font-size: 0.8rem; }
+.agent-summary.warning { color: #8a5a17; }
+.agent-subheading { margin: 16px 0 8px; color: #50675f; font-size: 0.72rem; font-weight: 850; letter-spacing: 0.1em; text-transform: uppercase; }
+.agent-claim-list { display: grid; gap: 8px; }
+.agent-claim { display: grid; grid-template-columns: minmax(0, 1fr) 190px; gap: 12px; padding: 11px 12px; border: 1px solid #dce7e2; border-radius: 11px; background: #fbfdfc; }
+.agent-claim.unsupported { border-color: #ecd3cc; background: #fdf8f6; }
+.agent-claim-text { margin: 0; color: #244c41; font-size: 0.86rem; line-height: 1.5; }
+.agent-claim.unsupported .agent-claim-text { color: #8b6a62; text-decoration: line-through; }
+.agent-claim-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 7px; }
+.agent-chip { display: inline-flex; padding: 3px 7px; border-radius: 999px; color: #50675f; background: #eaf1ee; font-size: 0.65rem; font-weight: 800; }
+.agent-chip.verified { color: #21604e; background: #dbefe6; }
+.agent-chip.unsupported { color: #82483d; background: #f6e2dd; }
+.agent-chip.risk-high, .agent-chip.risk-critical { color: #82483d; background: #f6e2dd; }
+.agent-failures { margin: 7px 0 0; padding-left: 16px; color: #8b5a4d; font-size: 0.72rem; line-height: 1.45; }
+.agent-citations { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.agent-citation { max-width: 100%; overflow: hidden; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
+.agent-decision { display: grid; gap: 6px; align-content: start; }
+.agent-decision .field-label { margin: 0; }
+.agent-question-list { margin: 0; padding-left: 18px; color: #456159; font-size: 0.8rem; line-height: 1.5; }
+.agent-budget { display: block; margin-top: 12px; }
+.agent-latest-review { margin-top: 14px; color: #50675f; font-size: 0.78rem; }
+.agent-latest-review summary { cursor: pointer; font-weight: 750; }
+.citation-mark { background: #f2c96f; }
+.agent-checkbox { display: flex; align-items: center; gap: 8px; color: #456159; font-size: 0.76rem; }
+.agent-checkbox input { width: auto; }
 .audit-list { display: grid; gap: 7px; }
 .audit-item { display: grid; grid-template-columns: minmax(130px, 0.7fr) minmax(160px, 1fr) auto; gap: 12px; align-items: center; padding: 9px 10px; border-bottom: 1px solid #e5ece9; color: #647a73; font-size: 0.72rem; }
 .audit-operation { color: #345c51; font-weight: 750; }
@@ -214,4 +247,5 @@ textarea:focus, select:focus, input:focus { outline: 2px solid #91c2b1; outline-
   .entry-time { width: 100%; margin-left: 0; }
   .entry-footer { align-items: flex-start; flex-direction: column; }
   .workspace-grid { grid-template-columns: 1fr; }
+  .agent-claim { grid-template-columns: 1fr; }
 }

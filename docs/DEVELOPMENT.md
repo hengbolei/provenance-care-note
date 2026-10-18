@@ -84,6 +84,30 @@ Audio transcription currently sends audio to the configured external transcripti
 before text redaction is possible. Treat this as a documented prototype limitation. Clinical
 deployment requires approved local/on-premises ASR or a compliant covered transcription service.
 
+## Clinical review agent
+
+The agent's model gateway is chosen with `CARENOTE_AGENT_GATEWAY`:
+
+| Value | Behaviour |
+| --- | --- |
+| `recorded` (default) | Replays cassettes from `evals/cassettes/`; no key, no network |
+| `openai` | Live calls with `OPENAI_API_KEY` and `CARENOTE_OPENAI_MODEL` |
+| `record` | Live calls that also write new cassettes |
+
+Cassettes are keyed by a hash of the prompt, the redacted input and the output schema, so
+changing the draft prompt, the seed data or how requests are framed makes the replay test
+(`tests/test_agent_demo.py`) fail until the seed cassette is re-recorded:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\record_demo_cassette.py                  # curated draft
+.\.venv\Scripts\python.exe scripts\record_demo_cassette.py --source openai   # live model
+```
+
+The script refuses to write a draft that does not pass citation verification.
+
+To run the full stack offline, use `docker compose up --build` and then
+`python scripts/smoke_demo.py` against `http://127.0.0.1:8000`.
+
 ## Verification
 
 ```powershell
@@ -96,7 +120,7 @@ node --check src/carenote/static/service-worker.js
 .\.venv\Scripts\python.exe scripts\benchmark_glance.py --iterations 1000 --warmup 100
 ```
 
-The current local baseline is 45 passing tests. The performance result is specific to the
+The current local baseline is 192 passing tests. The performance result is specific to the
 single-patient in-memory adapter and is not a production capacity claim.
 
 ## Directory responsibilities

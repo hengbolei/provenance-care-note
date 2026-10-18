@@ -3,8 +3,11 @@ import {
   DEMO_CONTEXT,
   addComment,
   addTimelineEntry,
+  commitAgentRun,
   compareSectionRevisions,
   createHighlight,
+  discardAgentRun,
+  getAgentRun,
   getAuditEvents,
   getEntrySource,
   getCommentRevisions,
@@ -19,7 +22,9 @@ import {
   logout,
   recordHighlightImpression,
   revertSection,
+  reviseAgentRun,
   setCommentResolved,
+  startAgentRun,
   transcribeAudio,
   updateHighlight,
   updateConflict,
@@ -104,6 +109,27 @@ const elements = {
   aiIngest: document.querySelector("#ai-ingest"),
   recordAudio: document.querySelector("#record-audio"),
   aiFeedback: document.querySelector("#ai-feedback"),
+  agentReviewCard: document.querySelector("#agent-review-card"),
+  agentRunStatus: document.querySelector("#agent-run-status"),
+  agentStart: document.querySelector("#agent-start"),
+  agentProgress: document.querySelector("#agent-progress"),
+  agentFeedback: document.querySelector("#agent-feedback"),
+  agentDraft: document.querySelector("#agent-draft"),
+  agentSummary: document.querySelector("#agent-summary"),
+  agentClaimList: document.querySelector("#agent-claim-list"),
+  agentQuestions: document.querySelector("#agent-questions"),
+  agentQuestionList: document.querySelector("#agent-question-list"),
+  agentHighlights: document.querySelector("#agent-highlights"),
+  agentHighlightList: document.querySelector("#agent-highlight-list"),
+  agentReviewActions: document.querySelector("#agent-review-actions"),
+  agentReviseInstruction: document.querySelector("#agent-revise-instruction"),
+  agentCommit: document.querySelector("#agent-commit"),
+  agentRevise: document.querySelector("#agent-revise"),
+  agentDiscard: document.querySelector("#agent-discard"),
+  agentBudget: document.querySelector("#agent-budget"),
+  agentLatestReview: document.querySelector("#agent-latest-review"),
+  agentLatestVersion: document.querySelector("#agent-latest-version"),
+  agentLatestContent: document.querySelector("#agent-latest-content"),
 };
 
 let currentPlanVersion = 0;
@@ -114,6 +140,11 @@ let realtimeSocket = null;
 let mediaRecorder = null;
 let audioChunks = [];
 const recordedImpressions = new Set();
+let latestEntries = [];
+let agentRun = null;
+let agentPollTimer = null;
+let agentDecisions = new Map();
+let agentHighlightAccepts = new Set();
 
 const screenStates = {
   loading: ["Loading longitudinal record", "Securely retrieving patient details, priorities, and timeline."],
@@ -200,6 +231,10 @@ function showLogin() {
   realtimeSocket?.close();
   realtimeSocket = null;
   elements.loginPassword.value = "";
+  window.clearTimeout(agentPollTimer);
+  agentRun = null;
+  resetAgentDecisions();
+  rememberAgentRun(null);
 }
 
 function clearPatient() {
@@ -834,6 +869,353 @@ function renderComments(comments) {
   });
 }
 
+const AGENT_RUN_STORAGE_KEY = "carenote.agentRunId";
+const AGENT_STEPS = 4;
+const agentStatusLabels = {
+  running: "Running",
+  awaiting_review: "Awaiting your review",
+  committed: "Committed",
+  discarded: "Discarded",
+  budget_exceeded: "Stopped: budget reached",
+  failed: "Failed",
+};
+const failureLabels = {
+  unknown_entry: "Cites an entry outside this record",
+  out_of_bounds: "Cites text outside the entry",
+  quote_mismatch: "Quoted text is not in the entry",
+  unsupported_entities: "Cited text does not support the stated facts",
+  patient_source_risk: "Patient-reported only; risk must stay low or moderate",
+  patient_source_phrasing: "Patient-reported only; must be phrased as reported",
+};
+
+function rememberAgentRun(runId) {
+  try {
+    if (runId) sessionStorage.setItem(AGENT_RUN_STORAGE_KEY, runId);
+    else sessionStorage.removeItem(AGENT_RUN_STORAGE_KEY);
+  } catch {
+    // Storage can be unavailable; the panel works without it.
+  }
+}
+
+function storedAgentRunId() {
+  try {
+    return sessionStorage.getItem(AGENT_RUN_STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function agentRunSummary(run) {
+  const report = run.verification;
+  if (!report) return { text: "", warning: false };
+  const unsupported = report.checks.filter((check) => check.failures.length).length;
+  const parts = [`${report.checks.length - unsupported} of ${report.checks.length} claims verified`];
+  if (unsupported) parts.push(`${unsupported} unsupported`);
+  if (report.uncovered_conflict_ids.length) {
+    parts.push(`${report.uncovered_conflict_ids.length} conflict(s) not mentioned by a verified claim`);
+  }
+  return {
+    text: parts.join(" · "),
+    warning: unsupported > 0 || report.uncovered_conflict_ids.length > 0,
+  };
+}
+
+function focusCitation(citation) {
+  const entry = latestEntries.find((item) => item.id === citation.entry_id);
+  const content = document.querySelector(`#entry-${citation.entry_id} .entry-content`);
+  if (!entry || !content || citation.end > entry.content.length) return;
+  const mark = createElement(
+    "mark",
+    "provenance-mark citation-mark source-target",
+    entry.content.slice(citation.start, citation.end),
+  );
+  content.replaceChildren(
+    document.createTextNode(entry.content.slice(0, citation.start)),
+    mark,
+    document.createTextNode(entry.content.slice(citation.end)),
+  );
+  focusTimelineEntries([citation.entry_id]);
+  mark.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function citationButton(citation, label, clickable) {
+  const button = createElement("button", "text-button agent-citation", `${label}: “${citation.quote}”`);
+  button.type = "button";
+  button.title = clickable ? "Show this text in the timeline" : "This citation did not verify";
+  button.disabled = !clickable;
+  if (clickable) button.addEventListener("click", () => focusCitation(citation));
+  return button;
+}
+
+function decisionControls(index, decision, verified, editable) {
+  const controls = createElement("div", "agent-decision");
+  const label = createElement("label", "field-label", "Decision");
+  const select = document.createElement("select");
+  select.id = `agent-claim-decision-${index}`;
+  label.htmlFor = select.id;
+  [
+    ["accept", "Include as written"],
+    ["edit", "Edit, then include"],
+    ["reject", "Reject"],
+    ["skip", "Leave out"],
+  ].forEach(([value, text]) => {
+    const option = createElement("option", "", text);
+    option.value = value;
+    option.disabled = value === "accept" && !verified;
+    select.append(option);
+  });
+  select.value = decision.action;
+  select.disabled = !editable;
+  const editBox = document.createElement("textarea");
+  editBox.rows = 3;
+  editBox.maxLength = 400;
+  editBox.value = decision.text;
+  editBox.disabled = !editable;
+  editBox.setAttribute("aria-label", `Edited text for claim ${index + 1}`);
+  const reasonBox = document.createElement("input");
+  reasonBox.maxLength = 500;
+  reasonBox.placeholder = "Reason for rejecting";
+  reasonBox.value = decision.reason;
+  reasonBox.disabled = !editable;
+  reasonBox.setAttribute("aria-label", `Reason for rejecting claim ${index + 1}`);
+  const sync = () => {
+    editBox.hidden = decision.action !== "edit";
+    reasonBox.hidden = decision.action !== "reject";
+  };
+  select.addEventListener("change", () => {
+    decision.action = select.value;
+    sync();
+  });
+  editBox.addEventListener("input", () => {
+    decision.text = editBox.value;
+  });
+  reasonBox.addEventListener("input", () => {
+    decision.reason = reasonBox.value;
+  });
+  sync();
+  controls.append(label, select, editBox, reasonBox);
+  return controls;
+}
+
+function renderAgentClaims(run, editable) {
+  elements.agentClaimList.replaceChildren();
+  const checks = run.verification?.checks || [];
+  if (!run.draft.claims.length) {
+    elements.agentClaimList.append(createElement("p", "helper-text", "The draft has no claims."));
+  }
+  run.draft.claims.forEach((claim, index) => {
+    const check = checks[index] || { failures: [], citations: [] };
+    const verified = check.failures.length === 0;
+    const card = createElement("div", `agent-claim ${verified ? "verified" : "unsupported"}`);
+    const body = createElement("div");
+    const meta = createElement("div", "agent-claim-meta");
+    meta.append(
+      createElement(
+        "span",
+        `agent-chip ${verified ? "verified" : "unsupported"}`,
+        verified ? "Verified" : "Unsupported",
+      ),
+      createElement("span", "agent-chip", claim.category.replace("_", " ")),
+      createElement("span", `agent-chip risk-${claim.risk_level}`, `${claim.risk_level} risk`),
+    );
+    body.append(createElement("p", "agent-claim-text", claim.text), meta);
+    if (!verified) {
+      const failures = createElement("ul", "agent-failures");
+      check.failures.forEach((failure) => {
+        failures.append(createElement("li", "", failureLabels[failure] || failure));
+      });
+      body.append(failures);
+    }
+    // Verified citations point into the original entry; unverified ones are shown as quoted.
+    const citations = createElement("div", "agent-citations");
+    const shown = check.citations.length ? check.citations : claim.citations;
+    shown.forEach((citation, position) => {
+      citations.append(citationButton(citation, `Source ${position + 1}`, check.citations.length > 0));
+    });
+    body.append(citations);
+    if (!agentDecisions.has(index)) {
+      agentDecisions.set(index, { action: verified ? "accept" : "skip", text: claim.text, reason: "" });
+    }
+    card.append(body, decisionControls(index, agentDecisions.get(index), verified, editable));
+    elements.agentClaimList.append(card);
+  });
+}
+
+function renderAgentHighlights(run, editable) {
+  elements.agentHighlightList.replaceChildren();
+  const candidates = run.draft.candidate_highlights;
+  elements.agentHighlights.hidden = candidates.length === 0;
+  candidates.forEach((candidate, index) => {
+    const resolved = run.highlight_citations[index];
+    const card = createElement("div", `agent-claim ${resolved ? "verified" : "unsupported"}`);
+    const body = createElement("div");
+    const citations = createElement("div", "agent-citations");
+    citations.append(citationButton(resolved || candidate.citation, "Source", Boolean(resolved)));
+    body.append(
+      createElement("p", "agent-claim-text", candidate.risk_reason),
+      createElement("p", "helper-text", `Suggested action: ${candidate.suggested_action}`),
+      citations,
+    );
+    const controls = createElement("div", "agent-decision");
+    const label = createElement("label", "agent-checkbox");
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = agentHighlightAccepts.has(index);
+    checkbox.disabled = !editable || !resolved;
+    checkbox.addEventListener("change", () => {
+      if (checkbox.checked) agentHighlightAccepts.add(index);
+      else agentHighlightAccepts.delete(index);
+    });
+    label.append(
+      checkbox,
+      document.createTextNode(resolved ? "Create highlight (needs review)" : "Source not verified"),
+    );
+    controls.append(label);
+    card.append(body, controls);
+    elements.agentHighlightList.append(card);
+  });
+}
+
+function agentFeedbackFor(run) {
+  if (run.status === "failed") return [run.error || "The review run failed.", true];
+  if (run.stop_reason) return [run.stop_reason, run.status === "budget_exceeded"];
+  if (run.status === "running") return ["Preparing the review…", false];
+  if (run.status === "committed") {
+    return ["Committed. Accepted claims are in the agent review section.", false];
+  }
+  if (run.status === "discarded") return ["Discarded. Nothing was saved.", false];
+  return ["", false];
+}
+
+function renderAgentRun(run) {
+  agentRun = run;
+  elements.agentRunStatus.textContent = run ? agentStatusLabels[run.status] || run.status : "No review yet";
+  const running = run?.status === "running";
+  elements.agentStart.disabled = running || run?.status === "awaiting_review";
+  elements.agentProgress.hidden = !run;
+  const completed = running ? Math.min(run.budget?.steps || 0, AGENT_STEPS) : AGENT_STEPS;
+  elements.agentProgress.querySelectorAll("li").forEach((item) => {
+    const step = Number(item.dataset.step);
+    item.classList.toggle("done", Boolean(run) && step <= completed && run.status !== "failed");
+    item.classList.toggle("active", running && step === completed + 1);
+  });
+  if (!run) {
+    elements.agentDraft.hidden = true;
+    showFeedback(elements.agentFeedback, "");
+    return;
+  }
+  showFeedback(elements.agentFeedback, ...agentFeedbackFor(run));
+  const hasDraft = Boolean(run.draft) && !running;
+  elements.agentDraft.hidden = !hasDraft;
+  if (!hasDraft) return;
+  const editable = run.status === "awaiting_review";
+  const summary = agentRunSummary(run);
+  elements.agentSummary.textContent = summary.text;
+  elements.agentSummary.classList.toggle("warning", summary.warning);
+  renderAgentClaims(run, editable);
+  renderAgentHighlights(run, editable);
+  elements.agentQuestions.hidden = run.draft.open_questions.length === 0;
+  elements.agentQuestionList.replaceChildren(
+    ...run.draft.open_questions.map((question) => createElement("li", "", question)),
+  );
+  elements.agentReviewActions.hidden = !editable;
+  const budget = run.budget;
+  elements.agentBudget.textContent = budget
+    ? `Steps ${budget.steps}/${budget.max_steps} · revisions ${budget.revisions}/${budget.max_revisions}` +
+      ` · tokens ${(budget.input_tokens + budget.output_tokens).toLocaleString()}` +
+      ` · prompt ${run.prompt_version}` +
+      (run.model ? ` · draft by ${run.model}` : "")
+    : "";
+}
+
+function scheduleAgentRefresh() {
+  window.clearTimeout(agentPollTimer);
+  if (agentRun?.status === "running") {
+    agentPollTimer = window.setTimeout(refreshAgentRun, 1000);
+  }
+}
+
+async function refreshAgentRun() {
+  if (!agentRun) return;
+  try {
+    renderAgentRun(await getAgentRun(agentRun.run_id));
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      rememberAgentRun(null);
+      renderAgentRun(null);
+      return;
+    }
+    showFeedback(elements.agentFeedback, error.message, true);
+  }
+  scheduleAgentRefresh();
+}
+
+async function restoreAgentRun() {
+  const runId = storedAgentRunId();
+  if (!runId || agentRun) return;
+  agentRun = { run_id: runId, status: "running" };
+  await refreshAgentRun();
+}
+
+function resetAgentDecisions() {
+  agentDecisions = new Map();
+  agentHighlightAccepts = new Set();
+}
+
+function agentCommitPayload() {
+  const claims = [];
+  const ordered = [...agentDecisions.entries()].sort((left, right) => left[0] - right[0]);
+  for (const [index, decision] of ordered) {
+    if (decision.action === "skip") continue;
+    if (decision.action === "edit" && !decision.text.trim()) {
+      throw new Error(`Claim ${index + 1}: edited text cannot be empty.`);
+    }
+    if (decision.action === "reject" && !decision.reason.trim()) {
+      throw new Error(`Claim ${index + 1}: give a reason for rejecting it.`);
+    }
+    claims.push({
+      claim_index: index,
+      action: decision.action,
+      ...(decision.action === "edit" ? { text: decision.text.trim() } : {}),
+      ...(decision.action === "reject" ? { reason: decision.reason.trim() } : {}),
+    });
+  }
+  const highlights = [...agentHighlightAccepts]
+    .sort((left, right) => left - right)
+    .map((index) => ({ highlight_index: index, action: "accept" }));
+  return { claims, highlights };
+}
+
+function renderAgentReviewSection(sections) {
+  const review = sections.find((section) => section.section === "agent_review");
+  elements.agentLatestReview.hidden = !review;
+  if (!review) return;
+  elements.agentLatestVersion.textContent = `(version ${review.version})`;
+  elements.agentLatestContent.textContent = review.content;
+}
+
+async function runAgentAction(button, action) {
+  button.disabled = true;
+  try {
+    const run = await action();
+    if (run.run_id !== agentRun?.run_id) resetAgentDecisions();
+    rememberAgentRun(run.run_id);
+    button.disabled = false;
+    renderAgentRun(run);
+    scheduleAgentRefresh();
+    return run;
+  } catch (error) {
+    button.disabled = false;
+    if (agentRun?.draft) renderAgentRun(agentRun);
+    const message =
+      typeof error.message === "string" && !error.message.startsWith("[object")
+        ? error.message
+        : "The request was not accepted.";
+    showFeedback(elements.agentFeedback, message, true);
+    return null;
+  }
+}
+
 function showFeedback(element, message, isError = false) {
   element.textContent = message;
   element.classList.toggle("error", isError);
@@ -851,6 +1233,9 @@ function connectRealtime() {
     if (message.type === "presence") {
       elements.presenceStatus.hidden = false;
       elements.presenceStatus.textContent = `${message.count} online`;
+    }
+    if (message.type?.startsWith("agent.") && message.run_id === agentRun?.run_id) {
+      refreshAgentRun();
     }
     if (message.type === "refresh" && !refreshTimer) {
       refreshTimer = window.setTimeout(async () => {
@@ -987,6 +1372,8 @@ async function loadPatient() {
     renderHighlights(detail.highlights);
     renderTimeline(detail.entries, detail.highlights);
     renderSection(detail.sections || []);
+    latestEntries = detail.entries;
+    renderAgentReviewSection(detail.sections || []);
     renderComments(detail.comments || []);
     renderCommentTargets(detail.entries, detail.sections || []);
     renderPatientActions(detail.patient_actions || []);
@@ -1004,6 +1391,8 @@ async function loadPatient() {
     elements.workspacePanel.hidden = isPatient;
     elements.staffNoteCard.hidden = DEMO_CONTEXT.actorRole !== "staff";
     elements.highlightComposerCard.hidden = DEMO_CONTEXT.actorRole !== "clinician";
+    elements.agentReviewCard.hidden = DEMO_CONTEXT.actorRole !== "clinician";
+    if (DEMO_CONTEXT.actorRole === "clinician") restoreAgentRun();
     elements.aiIngestCard.hidden = !["staff", "clinician", "admin"].includes(
       DEMO_CONTEXT.actorRole,
     );
@@ -1272,6 +1661,40 @@ elements.recordAudio.addEventListener("click", async () => {
     showFeedback(elements.aiFeedback, `Microphone access failed: ${error.message}`, true);
   }
 });
+elements.agentStart.addEventListener("click", () => {
+  runAgentAction(elements.agentStart, () => startAgentRun());
+});
+elements.agentRevise.addEventListener("click", () => {
+  const instruction = elements.agentReviseInstruction.value.trim();
+  if (!instruction) {
+    showFeedback(elements.agentFeedback, "Describe what the agent should change.", true);
+    return;
+  }
+  runAgentAction(elements.agentRevise, async () => {
+    const run = await reviseAgentRun(agentRun.run_id, instruction);
+    elements.agentReviseInstruction.value = "";
+    resetAgentDecisions();
+    return run;
+  });
+});
+elements.agentCommit.addEventListener("click", () => {
+  let payload;
+  try {
+    payload = agentCommitPayload();
+  } catch (error) {
+    showFeedback(elements.agentFeedback, error.message, true);
+    return;
+  }
+  runAgentAction(elements.agentCommit, async () => {
+    const run = await commitAgentRun(agentRun.run_id, payload);
+    await loadPatient();
+    return run;
+  });
+});
+elements.agentDiscard.addEventListener("click", () => {
+  runAgentAction(elements.agentDiscard, () => discardAgentRun(agentRun.run_id));
+});
+
 async function bootstrap() {
   try {
     const session = await getSession();

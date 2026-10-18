@@ -13,6 +13,10 @@ human-authored notes, source evidence, and access boundaries explicit.
 
 ## Current capabilities
 
+- A Clinical Review Agent (LangGraph) that drafts a patient review in which every claim cites an
+  exact span of the record, verifies each citation deterministically, and stops for a clinician
+  to accept, edit or reject each claim before anything is saved. See
+  [the design](docs/AGENT_DESIGN.md) and [the roadmap](docs/AGENT_ROADMAP.md).
 - A 10-second Glance view with deterministic explainable priority factors, risk reasons,
   suggested actions, and review states.
 - Narrow medication, dose, and allergy conflict detection with explicit clinician precedence or
@@ -86,6 +90,22 @@ Open:
 - Application: `http://127.0.0.1:8000`
 - Interactive API documentation: `http://127.0.0.1:8000/docs`
 - Health endpoint: `http://127.0.0.1:8000/api/health`
+
+## Offline demo with Docker
+
+```bash
+docker compose up --build
+```
+
+This starts the app on encrypted PostgreSQL with the synthetic seed patient. Sign in as
+`clinician` / `clinician-demo-2026` and use **Prepare review** in the care-team workspace. The
+review agent replays a recorded draft from `evals/cassettes/`, so no API key or model call is
+needed; the panel names the draft's source. The recorded seed draft is hand-written to show the
+workflow and is labelled as such, not presented as model output. Set
+`CARENOTE_AGENT_GATEWAY=openai` and `OPENAI_API_KEY` to draft with a live model instead.
+
+`python scripts/smoke_demo.py` signs in, runs a review and commits it against a running demo;
+CI runs it against the Docker stack on every change.
 
 ## Synthetic demo identity
 
