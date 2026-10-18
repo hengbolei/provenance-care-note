@@ -75,6 +75,23 @@ def verify_draft(
     return VerificationReport(checks=checks, uncovered_conflict_ids=uncovered)
 
 
+def resolve_citation(
+    citation: Citation,
+    entries: Mapping[UUID, TimelineEntry],
+    redactions: Mapping[UUID, RedactionResult] | None = None,
+) -> Citation | None:
+    """Checks 1–3 for a single citation, such as a candidate highlight's.
+
+    Returns the citation mapped to original offsets with its exact original quote, or None when
+    the entry is out of context or the quote cannot be found.
+    """
+    entry = entries.get(citation.entry_id)
+    if entry is None:
+        return None
+    redaction = (redactions or {}).get(entry.id)
+    return _resolve_citation(citation, entry, redaction, "citation", lambda *_: None)
+
+
 def _check_claim(
     index: int,
     claim: Claim,

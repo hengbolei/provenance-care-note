@@ -160,3 +160,11 @@ def test_review_decisions_accept_each_item_once():
                 ClaimDecision(claim_index=0, action="reject", reason="Changed my mind"),
             ]
         )
+
+
+def test_revise_needs_an_instruction_and_only_revise_takes_one():
+    assert ReviewDecisions(action="revise", revise_instruction="Shorter.").action == "revise"
+    with pytest.raises(ValidationError):
+        ReviewDecisions(action="revise")
+    with pytest.raises(ValidationError):
+        ReviewDecisions(action="commit", revise_instruction="Shorter.")

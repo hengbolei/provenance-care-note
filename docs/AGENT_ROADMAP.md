@@ -47,7 +47,7 @@ Branch: `feat/agent-mvp`. Design §17 week 1. Build framework-free parts first, 
       `evals/cassettes/`; move `summarize` onto it without changing `services/ai.py` callers
 - [x] 1.4 `agent/tools.py`: read tools that call `CareNoteService` as `agent.principal`;
       `propose_highlight` writes to run state only
-- [ ] 1.5 `agent/graph.py`: `load_context → check_conflicts → draft → verify →
+- [x] 1.5 `agent/graph.py`: `load_context → check_conflicts → draft → verify →
       human_review (interrupt) → commit | discard`, `MemorySaver`; `langgraph` as optional
       extra `[agent]`
 - [ ] 1.6 `agent/runs.py` and API: endpoints from design §15, the nine `agent_*` audit
@@ -105,6 +105,11 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-18 | Phase 1 graph supports clinician-requested revision (`ReviewDecisions.action = "revise"` routes back to `draft` with the instruction, within `max_revisions`); the automatic `revise` loop stays in step 3.3 | Design §11 lets the clinician ask for changes; reusing `draft` avoids a second prompt in Phase 1 |
+| 2026-10-18 | Record data reaches the model inside `DataTag` markers (`<entry id=... type=... author=...>`) whose attributes must be IDs, enums, timestamps, booleans or integers | Frames untrusted text for injection resistance without letting free text bypass redaction; re-redacting framed text could mangle entry IDs that look like phone numbers |
+| 2026-10-18 | The 60 s wall-clock budget restarts when a clinician answers `human_review` | The ceiling is for automated work; review time is unbounded |
+| 2026-10-18 | Commit is an injected callable that receives the state and the reviewing clinician; the graph never writes to the record itself | Keeps step 1.7's persistence separate and testable |
+| 2026-10-18 | Medication-state facts count in the support check only for drugs the record doses somewhere | The state pattern reads "hold pending review" as a drug named "pending" |
 | 2026-10-18 | Tools read one patient-view snapshot per run, taken as the principal clinician; search, read and evidence results are redacted and cite offsets in the redacted text, with each entry's `RedactionResult` kept for verification | Every tool sees the same record, and citations stay mappable to the original |
 | 2026-10-18 | `get_patient_overview` returns age in years and pronouns only, never name, date of birth or record number | Design §7 asks for redacted demographics; age is all the review needs |
 | 2026-10-18 | Added `CareNoteService.search_entries` for care-team roles | Tools must read through the service policy boundary, not the repository |
@@ -135,6 +140,8 @@ Departures from or refinements of the design, newest first.
 - `OpenAIGateway` is covered by mocked HTTP tests only; strict structured output has not yet been
   run against the live API, so schema keywords the provider rejects may surface at step 1.9.
 - Entity extraction (`services/entities.py`) only recognises a medication as a word followed by
-  a dose or an action verb, which will cap recall. Revisit in Phase 3 using eval results.
+  a dose or an action verb, which will cap recall, and reads any word after "hold", "start" and
+  similar verbs as a drug ("hold pending"). The verifier filters this; the conflict detector does
+  not yet. Revisit in Phase 3 using eval results.
 - `labelled_id` redaction now requires a digit in the identifier, so letter-only identifiers are
   not redacted by that rule.

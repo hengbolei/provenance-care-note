@@ -18,7 +18,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from carenote.domain.models import AgentActor, Conflict, EntryRef, RiskLevel, Span
+from carenote.domain.models import Actor, AgentActor, Conflict, EntryRef, RiskLevel, Span
 
 MAX_CLAIMS = 20
 MAX_CITATIONS_PER_CLAIM = 5
@@ -169,10 +169,11 @@ class HighlightDecision(BaseModel):
 
 
 class ReviewDecisions(BaseModel):
-    """A clinician's response at `human_review`: per-item decisions, or a request to revise."""
+    """A clinician's response at `human_review`: commit with per-item decisions, revise, or discard."""
 
     model_config = ConfigDict(extra="forbid")
 
+    action: Literal["commit", "revise", "discard"] = "commit"
     claims: list[ClaimDecision] = Field(default_factory=list)
     highlights: list[HighlightDecision] = Field(default_factory=list)
     revise_instruction: str | None = Field(default=None, min_length=1, max_length=500)
@@ -185,6 +186,8 @@ class ReviewDecisions(BaseModel):
             raise ValueError("each claim can be decided only once")
         if len(set(highlight_indexes)) != len(highlight_indexes):
             raise ValueError("each highlight can be decided only once")
+        if (self.action == "revise") != (self.revise_instruction is not None):
+            raise ValueError("a revise instruction is required for revise and only allowed there")
         return self
 
 
@@ -205,11 +208,16 @@ class ReviewState(TypedDict):
     patient_id: UUID
     status: RunStatus
     stop_reason: str | None
+    prompt_version: str
     context: list[EntryRef]
     conflicts: list[Conflict]
     questions: list[str]
     evidence: dict[str, list[Span]]
     draft: DraftReview | None
     verification: VerificationReport | None
+    # Candidate highlight citations resolved to original offsets; None where they did not resolve.
+    highlight_citations: list[Citation | None]
     budget: Budget
     decisions: ReviewDecisions | None
+    # The clinician whose session submitted the decisions; commit acts as them.
+    reviewer: Actor | None

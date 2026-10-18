@@ -2,8 +2,10 @@
 
 Every model call in the agent goes through a `ModelGateway`. A request carries trusted
 `instructions` (versioned prompt text written by us) and `inputs` that must be `RedactionResult`
-objects, so record content cannot reach a provider without passing `PHIRedactionGateway` first:
-plain strings are rejected at runtime.
+objects or `DataTag` markers, so record content cannot reach a provider without passing
+`PHIRedactionGateway` first: plain strings are rejected at runtime. Tags carry only typed values
+(IDs, enums, timestamps, numbers), so they frame record text without becoming a way around
+redaction.
 
 Adapters:
 
@@ -20,8 +22,11 @@ import json
 import time
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
 from pathlib import Path
 from typing import Any, Generic, Protocol, TypeVar
+from uuid import UUID
 
 import httpx
 from pydantic import BaseModel, ValidationError
@@ -48,12 +53,57 @@ class CassetteMissingError(LookupError):
 
 
 @dataclass(frozen=True, slots=True)
+class DataTag:
+    """Marks where a block of record data starts or ends, e.g. `<entry id=... type=...>`.
+
+    Attribute values must be IDs, enums, timestamps, booleans or integers: never free text, which
+    could carry identifiers past the redaction boundary.
+    """
+
+    name: str
+    attributes: tuple[tuple[str, UUID | Enum | datetime | bool | int], ...] = ()
+    closing: bool = False
+
+    def __post_init__(self) -> None:
+        if not self.name.isidentifier():
+            raise ValueError("tag names must be identifiers")
+        for key, value in self.attributes:
+            if not key.isidentifier() or not isinstance(value, UUID | Enum | datetime | bool | int):
+                raise TypeError("tag attributes must be typed values, never free text")
+
+    @classmethod
+    def open(cls, name: str, **attributes: UUID | Enum | datetime | bool | int) -> DataTag:
+        return cls(name, tuple(attributes.items()))
+
+    @classmethod
+    def close(cls, name: str) -> DataTag:
+        return cls(name, closing=True)
+
+    @property
+    def text(self) -> str:
+        if self.closing:
+            return f"</{self.name}>"
+        rendered = "".join(f' {key}="{_render(value)}"' for key, value in self.attributes)
+        return f"<{self.name}{rendered}>"
+
+
+def _render(value: UUID | Enum | datetime | bool | int) -> str:
+    if isinstance(value, Enum):
+        return str(value.value)
+    if isinstance(value, datetime):
+        return value.isoformat()
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    return str(value)
+
+
+@dataclass(frozen=True, slots=True)
 class ModelRequest:
     """One model call. `purpose` names the graph node and keys cassettes and traces."""
 
     purpose: str
     instructions: str
-    inputs: Sequence[RedactionResult]
+    inputs: Sequence[RedactionResult | DataTag]
     max_output_tokens: int = 4000
     safety_subject: str | None = None
 
@@ -61,12 +111,14 @@ class ModelRequest:
         if not self.purpose or not self.instructions:
             raise ValueError("a model request needs a purpose and instructions")
         for item in self.inputs:
-            if not isinstance(item, RedactionResult):
-                raise TypeError("model inputs must be RedactionResult; redact record text first")
+            if not isinstance(item, RedactionResult | DataTag):
+                raise TypeError(
+                    "model inputs must be RedactionResult or DataTag; redact record text first"
+                )
 
     @property
     def input_text(self) -> str:
-        return "\n\n".join(item.text for item in self.inputs)
+        return "\n".join(item.text for item in self.inputs)
 
     def fingerprint(self, output_schema: str) -> str:
         """Stable key for this exact request; only redacted text ever contributes to it."""

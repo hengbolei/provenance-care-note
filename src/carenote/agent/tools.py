@@ -236,17 +236,17 @@ class ReviewTools:
             raise LookupError("entry is not in this patient's record")
         return entry
 
-    def _known_names(self) -> list[str]:
+    def known_names(self) -> list[str]:
         patient = self._patient_view().patient
         return [patient.display_name, patient.medical_record_number]
 
     def _redact_entry(self, entry: TimelineEntry) -> RedactionResult:
         if entry.id not in self.redactions:
-            self.redactions[entry.id] = self.redactor.redact(entry.content, self._known_names())
+            self.redactions[entry.id] = self.redactor.redact(entry.content, self.known_names())
         return self.redactions[entry.id]
 
     def _redact_text(self, text: str) -> str:
-        return self.redactor.prepare_for_llm(text, self._known_names())
+        return self.redactor.prepare_for_llm(text, self.known_names())
 
     def _record(self, name: str, entry_id: UUID | None = None, result_count: int = 0) -> None:
         self.calls.append(ToolCall(name=name, entry_id=entry_id, result_count=result_count))

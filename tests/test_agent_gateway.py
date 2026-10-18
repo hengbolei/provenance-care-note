@@ -6,6 +6,7 @@ import pytest
 
 from carenote.agent.gateway import (
     CassetteMissingError,
+    DataTag,
     ExternalModelError,
     ModelNotConfiguredError,
     ModelRequest,
@@ -16,6 +17,7 @@ from carenote.agent.gateway import (
     strict_json_schema,
 )
 from carenote.agent.state import DraftReview
+from carenote.domain.models import Role
 from carenote.privacy.redaction import PHIRedactionGateway
 from carenote.services.ai import OpenAIClinicalGateway
 
@@ -239,3 +241,25 @@ def test_clinical_gateway_summarize_redacts_and_uses_the_model_gateway():
     assert sent[0]["input"] == "[REDACTED_NAME] called [REDACTED_PHONE] about dizziness."
     assert sent[0]["max_output_tokens"] == 800
     assert "text" not in sent[0]
+
+
+def test_data_tags_frame_redacted_text_with_typed_values_only():
+    entry_id = uuid4()
+    request = ModelRequest(
+        purpose="draft",
+        instructions="Draft.",
+        inputs=[
+            DataTag.open("entry", id=entry_id, author=Role.PATIENT, internal=False),
+            REDACTOR.redact("Maya Chen feels dizzy.", ["Maya Chen"]),
+            DataTag.close("entry"),
+        ],
+    )
+
+    assert request.input_text == (
+        f'<entry id="{entry_id}" author="patient" internal="false">\n'
+        "[REDACTED_NAME] feels dizzy.\n</entry>"
+    )
+    with pytest.raises(TypeError):
+        DataTag.open("entry", title="Maya Chen")
+    with pytest.raises(ValueError):
+        DataTag.open("entry><script")
