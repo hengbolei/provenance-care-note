@@ -209,6 +209,8 @@ class ReviewState(TypedDict):
     status: RunStatus
     stop_reason: str | None
     prompt_version: str
+    # Model that produced the current draft, as the gateway reports it (curated cassettes say so).
+    model: str | None
     context: list[EntryRef]
     conflicts: list[Conflict]
     questions: list[str]

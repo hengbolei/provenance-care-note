@@ -1,0 +1,150 @@
+{
+  "fingerprint": "d9738467f67885de0b2a9dd46e2d851257c9809db46d38279d21968494450a54",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "curated-demo (hand-written, not model output)",
+  "usage": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Lisinopril dose is inconsistent: the staff note records lisinopril 10 mg started seven days ago, while the nurse consult summary records a lisinopril 20 mg morning dose.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "50000000-0000-4000-8000-000000000003",
+            "start": 36,
+            "end": 75,
+            "quote": "started lisinopril 10 mg seven days ago"
+          },
+          {
+            "entry_id": "50000000-0000-4000-8000-000000000004",
+            "start": 38,
+            "end": 67,
+            "quote": "lisinopril 20 mg morning dose"
+          }
+        ]
+      },
+      {
+        "text": "The clinician note puts morning lisinopril on hold pending review; this is the latest clinician instruction on the medicine.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "50000000-0000-4000-8000-000000000005",
+            "start": 39,
+            "end": 77,
+            "quote": "Hold morning lisinopril pending review"
+          }
+        ]
+      },
+      {
+        "text": "The nurse consult summary (AI-generated, unconfirmed) records a home blood pressure of 98/62 mmHg with new dizziness after the morning dose.",
+        "category": "symptom",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "50000000-0000-4000-8000-000000000004",
+            "start": 69,
+            "end": 103,
+            "quote": "Home blood pressure was 98/62 mmHg"
+          },
+          {
+            "entry_id": "50000000-0000-4000-8000-000000000004",
+            "start": 18,
+            "end": 31,
+            "quote": "new dizziness"
+          }
+        ]
+      },
+      {
+        "text": "Patient reports feeling light-headed twice this week, usually before breakfast, with no loss of consciousness.",
+        "category": "symptom",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "50000000-0000-4000-8000-000000000001",
+            "start": 7,
+            "end": 66,
+            "quote": "felt light-headed twice this week, usually before breakfast"
+          },
+          {
+            "entry_id": "50000000-0000-4000-8000-000000000002",
+            "start": 67,
+            "end": 91,
+            "quote": "no loss of consciousness"
+          }
+        ]
+      },
+      {
+        "text": "The clinician assessment is likely medication-related hypotension.",
+        "category": "plan",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "50000000-0000-4000-8000-000000000005",
+            "start": 0,
+            "end": 37,
+            "quote": "Likely medication-related hypotension"
+          }
+        ]
+      },
+      {
+        "text": "A blood pressure check within 48 hours was arranged, and the consult summary notes the follow-up check is still unresolved.",
+        "category": "follow_up",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "50000000-0000-4000-8000-000000000005",
+            "start": 82,
+            "end": 128,
+            "quote": "arrange a blood pressure check within 48 hours"
+          },
+          {
+            "entry_id": "50000000-0000-4000-8000-000000000006",
+            "start": 75,
+            "end": 124,
+            "quote": "Follow-up blood pressure check remains unresolved"
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Which lisinopril dose is the patient taking now: 10 mg (staff note) or 20 mg (nurse consult)?",
+      "Has the blood pressure check arranged for within 48 hours been completed?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "50000000-0000-4000-8000-000000000004",
+          "start": 38,
+          "end": 67,
+          "quote": "lisinopril 20 mg morning dose"
+        },
+        "risk_reason": "Recorded dose differs from the reconciled medication list (10 mg).",
+        "suggested_action": "Confirm the current lisinopril dose with the patient and pharmacy.",
+        "clinical_entities": [
+          "lisinopril",
+          "dose"
+        ]
+      },
+      {
+        "citation": {
+          "entry_id": "50000000-0000-4000-8000-000000000005",
+          "start": 82,
+          "end": 128,
+          "quote": "arrange a blood pressure check within 48 hours"
+        },
+        "risk_reason": "Time-bound follow-up from the clinician plan has no completion record.",
+        "suggested_action": "Book the blood pressure check and record the result.",
+        "clinical_entities": [
+          "blood pressure"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,41 @@
+# Offline demo: the app on encrypted PostgreSQL with synthetic seed data, and the review agent
+# replaying recorded responses, so no API key or model calls are needed.
+#
+#   docker compose up --build
+#   open http://127.0.0.1:8000 and sign in as clinician / clinician-demo-2026
+#
+# Every secret below is a demo placeholder. Never reuse these values outside local demos.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: carenote
+      POSTGRES_PASSWORD: carenote-demo-only
+      POSTGRES_DB: carenote
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U carenote -d carenote"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  carenote:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      CARENOTE_ENVIRONMENT: development
+      CARENOTE_PUBLIC_BASE_URL: http://127.0.0.1:8000
+      CARENOTE_DATABASE_URL: postgresql://carenote:carenote-demo-only@postgres:5432/carenote
+      CARENOTE_ENCRYPTION_KEY: demo-only-encryption-key-change-me
+      CARENOTE_TOKEN_SECRET: demo-only-token-secret-change-me
+      # recorded: replay evals/cassettes; set to openai with OPENAI_API_KEY for live drafts.
+      CARENOTE_AGENT_GATEWAY: ${CARENOTE_AGENT_GATEWAY:-recorded}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    ports:
+      - "127.0.0.1:8000:8000"
+
+volumes:
+  postgres-data:

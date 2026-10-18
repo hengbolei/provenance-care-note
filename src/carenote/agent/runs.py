@@ -90,6 +90,7 @@ class AgentRunView(BaseModel):
     stop_reason: str | None = None
     error: str | None = None
     prompt_version: str | None = None
+    model: str | None = None
     created_at: datetime
     draft: DraftReview | None = None
     verification: VerificationReport | None = None
@@ -187,6 +188,7 @@ class AgentRunService:
             stop_reason=values.get("stop_reason"),
             error=record.error,
             prompt_version=values.get("prompt_version"),
+            model=values.get("model"),
             created_at=record.created_at,
             draft=values.get("draft"),
             verification=values.get("verification"),

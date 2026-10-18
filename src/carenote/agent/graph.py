@@ -21,6 +21,7 @@ from uuid import UUID
 
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.types import interrupt
@@ -29,20 +30,72 @@ from carenote.agent.gateway import DataTag, ModelGateway, ModelRequest, Usage
 from carenote.agent.prompts import load_prompt
 from carenote.agent.state import (
     Budget,
+    CandidateHighlight,
+    CheckFailure,
+    Citation,
+    Claim,
+    ClaimCheck,
+    ClaimDecision,
     DraftReview,
+    HighlightDecision,
     ReviewDecisions,
     ReviewState,
     RunStatus,
+    VerificationReport,
 )
 from carenote.agent.tools import ReviewTools
 from carenote.agent.verify import resolve_citation, verify_draft
-from carenote.domain.models import Actor, AgentActor, Role
+from carenote.domain.models import (
+    Actor,
+    AgentActor,
+    Conflict,
+    ConflictCategory,
+    ConflictStatus,
+    EntryRef,
+    EntryType,
+    RiskLevel,
+    Role,
+    Span,
+)
 from carenote.services.care_notes import CareNoteService
 
 PROMPT_VERSION = "draft_v1"
 MAX_CONTEXT_ENTRIES = 40
 
 Committer = Callable[[ReviewState, ReviewTools], None]
+
+# Every type the review state carries. Checkpoints deserialize only these (plus LangGraph's
+# built-in safe types), so a tampered or foreign checkpoint cannot instantiate anything else.
+CHECKPOINT_TYPES = (
+    Actor,
+    AgentActor,
+    Budget,
+    CandidateHighlight,
+    CheckFailure,
+    Citation,
+    Claim,
+    ClaimCheck,
+    ClaimDecision,
+    Conflict,
+    ConflictCategory,
+    ConflictStatus,
+    DraftReview,
+    EntryRef,
+    EntryType,
+    HighlightDecision,
+    ReviewDecisions,
+    RiskLevel,
+    Role,
+    RunStatus,
+    Span,
+    VerificationReport,
+)
+
+
+def checkpoint_serializer() -> JsonPlusSerializer:
+    return JsonPlusSerializer(
+        allowed_msgpack_modules=[(item.__module__, item.__name__) for item in CHECKPOINT_TYPES]
+    )
 
 
 @dataclass
@@ -79,6 +132,7 @@ def initial_state(
         status=RunStatus.RUNNING,
         stop_reason=None,
         prompt_version=prompt_version,
+        model=None,
         context=[],
         conflicts=[],
         questions=[],
@@ -159,6 +213,7 @@ def build_review_graph(
         )
         return {
             "draft": result.output,
+            "model": result.model,
             "budget": _charge(budget, result.usage),
             "decisions": None,
         }
@@ -253,7 +308,7 @@ def build_review_graph(
     )
     for terminal in ("commit", "discard", "stop"):
         graph.add_edge(terminal, END)
-    return graph.compile(checkpointer=checkpointer or InMemorySaver())
+    return graph.compile(checkpointer=checkpointer or InMemorySaver(serde=checkpoint_serializer()))
 
 
 def _charge(budget: Budget, usage: Usage) -> Budget:

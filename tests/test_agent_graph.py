@@ -7,7 +7,12 @@ from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.types import Command
 
 from carenote.agent.gateway import RecordedGateway
-from carenote.agent.graph import GraphDeps, build_review_graph, initial_state
+from carenote.agent.graph import (
+    GraphDeps,
+    build_review_graph,
+    checkpoint_serializer,
+    initial_state,
+)
 from carenote.agent.state import Budget, DraftReview, RunStatus
 from carenote.data.seed import (
     DEMO_CLINIC_ID,
@@ -175,7 +180,7 @@ def test_exceeding_the_budget_stops_with_the_partial_draft(service):
 
 
 def test_a_paused_run_resumes_after_a_restart(service):
-    checkpointer = InMemorySaver()
+    checkpointer = InMemorySaver(serde=checkpoint_serializer())
     _, config, _ = _run(service, ScriptedGateway(), checkpointer=checkpointer)
 
     committer = Committer()

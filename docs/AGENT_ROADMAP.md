@@ -4,7 +4,7 @@ Status tracker for building the agent described in [AGENT_DESIGN.md](AGENT_DESIG
 design says *what* and *why*; this file says *in what order* and *where we are*. Update it in the
 same PR as the work it describes.
 
-Last updated: 2026-10-18 · Current phase: **Phase 1 — Minimal end-to-end loop**
+Last updated: 2026-10-18 · Current phase: **Phase 1 — Minimal end-to-end loop**, ready to merge; next is Phase 2
 
 ## How we work
 
@@ -33,7 +33,7 @@ Merged in PR #3 (`e62d79c`).
 - [x] 0.4 `AgentActor` and `EntryRef`; SYSTEM writes rejected (`4ab4238`)
 - [x] fix: patients could create internal sections (`96f6aff`)
 
-## Phase 1 — Minimal end-to-end loop · 🚧 in progress
+## Phase 1 — Minimal end-to-end loop · ✅ done (pending merge)
 
 Branch: `feat/agent-mvp`. Design §17 week 1. Build framework-free parts first, LangGraph last.
 
@@ -55,7 +55,7 @@ Branch: `feat/agent-mvp`. Design §17 week 1. Build framework-free parts first, 
       `agent_review` section; accepted highlights go through `create_highlight`
 - [x] 1.8 Review panel in `static/app.js`: claims, clickable citations, accept / edit / reject,
       Commit
-- [ ] 1.9 Offline demo: `RecordedGateway` by default with a seed cassette; `docker-compose.yml`
+- [x] 1.9 Offline demo: `RecordedGateway` by default with a seed cassette; `docker-compose.yml`
       with app and Postgres
 
 **Exit criteria**: with no API key, "Prepare review" on the seed patient returns a draft whose
@@ -104,6 +104,10 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-18 | The seed cassette is a curated, hand-written draft (`scripts/record_demo_cassette.py`), labelled `curated-demo` in the cassette and shown in the panel; `--source openai` re-records it live | No API key was available; the demo must never pass hand-written text off as model output |
+| 2026-10-18 | CI gains a `demo` job: `docker compose up --wait`, then `scripts/smoke_demo.py` signs in, runs a review and commits it | Docker was not available locally, so the stack is verified in CI |
+| 2026-10-18 | Checkpoints deserialize only the review state's own types (`allowed_msgpack_modules`) | LangGraph warns it will block unregistered types; an explicit allowlist also stops a tampered checkpoint instantiating anything else |
+| 2026-10-18 | Prompts are loaded with newlines normalised to LF | A Windows checkout with `core.autocrlf=true` would otherwise change the prompt bytes and miss every cassette |
 | 2026-10-18 | Review panel defaults: verified claims start as "include as written", unsupported ones as "leave out" with accept disabled; highlights start unchecked | One click commits what verified; anything unverified needs a deliberate edit |
 | 2026-10-18 | The panel polls the run every second while it is running and also refreshes on `agent.*` socket events; the active run id is kept in `sessionStorage` | Polling keeps progress working if the socket drops; the run survives a page reload |
 | 2026-10-18 | `agent_review` stays internal: it is a section, and sections are care-team only | Resolves the design §18 open question with its default, by construction rather than a flag |
@@ -151,7 +155,10 @@ Departures from or refinements of the design, newest first.
 - Run records and checkpoints live in memory, so a server restart loses runs; step 2.4 moves
   them to Postgres.
 - `OpenAIGateway` is covered by mocked HTTP tests only; strict structured output has not yet been
-  run against the live API, so schema keywords the provider rejects may surface at step 1.9.
+  run against the live API. The first `record_demo_cassette.py --source openai` run will show
+  whether the provider rejects any schema keyword.
+- The Docker demo is checked only by the CI `demo` job; it has not been run on a local Docker
+  install.
 - Entity extraction (`services/entities.py`) only recognises a medication as a word followed by
   a dose or an action verb, which will cap recall, and reads any word after "hold", "start" and
   similar verbs as a drug ("hold pending"). The verifier filters this; the conflict detector does

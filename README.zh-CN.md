@@ -66,6 +66,19 @@ python -m venv .venv
 - 交互式 API 文档：`http://127.0.0.1:8000/docs`
 - 健康检查：`http://127.0.0.1:8000/api/health`
 
+## 用 Docker 离线演示
+
+```bash
+docker compose up --build
+```
+
+这会以加密 PostgreSQL 和合成种子病人启动应用。用 `clinician` / `clinician-demo-2026` 登录，在医护工作区点
+**Prepare review**。审阅 Agent 会回放 `evals/cassettes/` 里录制好的草稿，不需要 API key，也不会调用模型；
+面板会显示草稿的来源。种子草稿是为演示流程手写的，并如实标注，不会冒充模型输出。若要用真实模型起草，设置
+`CARENOTE_AGENT_GATEWAY=openai` 和 `OPENAI_API_KEY`。
+
+`python scripts/smoke_demo.py` 会对运行中的演示登录、发起审阅并提交；CI 在每次改动时都会对 Docker 环境跑一遍。
+
 ## 合成演示账户
 
 界面使用服务端登录和带签名、会过期的 HttpOnly 会话 Cookie。仅限开发环境的账户有 `patient`、`staff`、

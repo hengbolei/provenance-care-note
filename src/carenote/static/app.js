@@ -1123,7 +1123,8 @@ function renderAgentRun(run) {
   elements.agentBudget.textContent = budget
     ? `Steps ${budget.steps}/${budget.max_steps} · revisions ${budget.revisions}/${budget.max_revisions}` +
       ` · tokens ${(budget.input_tokens + budget.output_tokens).toLocaleString()}` +
-      ` · prompt ${run.prompt_version}`
+      ` · prompt ${run.prompt_version}` +
+      (run.model ? ` · draft by ${run.model}` : "")
     : "";
 }
 

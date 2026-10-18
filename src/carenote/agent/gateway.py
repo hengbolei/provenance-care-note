@@ -359,6 +359,7 @@ class RecordedGateway:
             )
             + "\n",
             encoding="utf-8",
+            newline="\n",
         )
         return result
 
