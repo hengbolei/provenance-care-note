@@ -11,6 +11,7 @@ from carenote.evals.suites import (
     MAX_CONTEXT_ENTRIES,
     PIPELINE_GATE,
     PROMPT_VERSION,
+    REVISE_PROMPT_VERSION,
     Check,
     EvalResult,
 )
@@ -66,7 +67,10 @@ def render(result: EvalResult) -> str:
             f"- Cases: **{len(result.cases)}** across {len({case.family for case in result.cases})} "
             "families"
         ),
-        f"- Prompt: `{PROMPT_VERSION}` · context window: {MAX_CONTEXT_ENTRIES} entries",
+        (
+            f"- Prompts: `{PROMPT_VERSION}`, `{REVISE_PROMPT_VERSION}` · context window: "
+            f"{MAX_CONTEXT_ENTRIES} entries"
+        ),
         f"- Gate: **{'pass' if not gate else 'FAIL'}**"
         + ("" if not gate else " — " + "; ".join(gate)),
         "",
@@ -156,6 +160,12 @@ def render(result: EvalResult) -> str:
         for name, label in AGENT_LABELS.items():
             lines.append(f"| {label} | {_value(agent[name])} | {_gate(name, AGENT_GATE)} |")
         lines += [
+            (
+                "| Unsupported-claim rate before automatic revision | "
+                f"{_value(agent['unsupported_rate_before_revision'])} | reported only |"
+            ),
+            f"| Cases revised automatically | {agent['cases_revised']} | reported only |",
+            f"| Automatic revisions | {agent['auto_revisions']} | reported only |",
             f"| Claims scored | {agent['claims']} | reported only |",
             f"| Tokens | {agent['tokens']:,} | reported only |",
             f"| Cost (USD, when prices are configured) | {agent['cost_usd']:.4f} | reported only |",

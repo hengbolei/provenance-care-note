@@ -30,6 +30,7 @@ from carenote.agent.gateway import (
 from carenote.agent.graph import (
     MAX_CONTEXT_ENTRIES,
     PROMPT_VERSION,
+    REVISE_PROMPT_VERSION,
     GraphDeps,
     build_review_graph,
     initial_state,
@@ -88,6 +89,9 @@ class CaseRun:
     requests: list[ModelRequest]
     draft: DraftReview | None = None
     verification: VerificationReport | None = None
+    # Verification of the model's first draft, before automatic revision.
+    initial_verification: VerificationReport | None = None
+    initial_claims: int = 0
     usage: dict[str, int | float] = field(default_factory=dict)
     model: str | None = None
     recorded: bool = False
@@ -137,12 +141,14 @@ def run_case(case: EvalCase, gateway: ModelGateway) -> CaseRun:
     run.recorded = True
     run.draft = values["draft"]
     run.verification = values["verification"]
+    run.initial_verification = values.get("initial_verification")
     run.model = values.get("model")
     run.usage = {
         "input_tokens": budget.input_tokens,
         "output_tokens": budget.output_tokens,
         "cost_usd": budget.cost_usd,
         "revisions": budget.revisions,
+        "auto_revisions": budget.auto_revisions,
     }
     return run
 
@@ -290,9 +296,15 @@ def agent_checks(cases: list[EvalCase], runs: dict[str, CaseRun]) -> list[Check]
 def agent_metrics(cases: list[EvalCase], runs: dict[str, CaseRun]) -> dict[str, Any]:
     recorded = [runs[case.id] for case in cases if runs[case.id].recorded]
     citations = valid = claims = unsupported = 0
+    first_claims = first_unsupported = revised_cases = auto_revisions = 0
     tokens = 0
     cost = 0.0
     for run in recorded:
+        first = run.initial_verification or run.verification
+        first_claims += len(first.checks)
+        first_unsupported += len(first.unsupported)
+        auto_revisions += int(run.usage.get("auto_revisions", 0))
+        revised_cases += 1 if run.usage.get("auto_revisions") else 0
         for claim, check in zip(run.draft.claims, run.verification.checks, strict=True):
             citations += len(claim.citations)
             valid += len(check.citations)
@@ -306,6 +318,11 @@ def agent_metrics(cases: list[EvalCase], runs: dict[str, CaseRun]) -> dict[str, 
         "models": sorted({run.model for run in recorded if run.model}),
         "citation_validity": valid / citations if citations else None,
         "unsupported_rate": unsupported / claims if claims else None,
+        "unsupported_rate_before_revision": (
+            first_unsupported / first_claims if first_claims else None
+        ),
+        "cases_revised": revised_cases,
+        "auto_revisions": auto_revisions,
         "claims": claims,
         "tokens": tokens,
         "cost_usd": cost,
@@ -403,6 +420,7 @@ __all__ = [
     "MAX_CONTEXT_ENTRIES",
     "PIPELINE_GATE",
     "PROMPT_VERSION",
+    "REVISE_PROMPT_VERSION",
     "Check",
     "EvalResult",
     "evaluate",

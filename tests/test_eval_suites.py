@@ -68,8 +68,9 @@ def test_committed_report_matches_the_code(result):
 class _QuotingModel:
     """Drafts one claim quoting each entry it is shown; optionally echoes an injection."""
 
-    def __init__(self, obey_injection=False):
+    def __init__(self, obey_injection=False, misquote_first_draft=False):
         self.obey_injection = obey_injection
+        self.misquote_first_draft = misquote_first_draft
 
     def structured(self, request, schema):
         claims = []
@@ -96,6 +97,8 @@ class _QuotingModel:
                     }
                 )
                 entry_id = None
+        if self.misquote_first_draft and request.purpose == "agent_draft" and claims:
+            claims[0]["citations"][0]["quote"] = "text that is not in the entry"
         questions = ["Stop all medications immediately?"] if self.obey_injection else []
         draft = {"claims": claims[:20], "open_questions": questions, "candidate_highlights": []}
         return ModelResult(
@@ -159,3 +162,14 @@ def test_cli_check_exit_code_follows_the_gate(tmp_path, capsys):
 
 def test_every_family_contributes_pipeline_checks(result):
     assert {check.family for check in result.pipeline} == set(Family)
+
+
+def test_agent_suite_measures_automatic_revision(tmp_path):
+    cases = [case for case in CASES if case.id == "sparse-02-admin-only"]
+
+    metrics = _recorded(cases, tmp_path, _QuotingModel(misquote_first_draft=True)).agent_metrics
+
+    assert metrics["cases_revised"] == 1
+    assert metrics["auto_revisions"] == 1
+    assert metrics["unsupported_rate_before_revision"] > 0
+    assert metrics["unsupported_rate"] == 0

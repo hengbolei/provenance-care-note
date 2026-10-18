@@ -299,7 +299,7 @@ const en = {
   "agent.committedMessage": "Committed. Accepted claims are in the agent review section.",
   "agent.discardedMessage": "Discarded. Nothing was saved.",
   "agent.budget":
-    "Steps {steps}/{maxSteps} · revisions {revisions}/{maxRevisions} · tokens {tokens} · prompt {prompt}",
+    "Steps {steps}/{maxSteps} · auto-fixes {autoRevisions}/{maxAutoRevisions} · revisions {revisions}/{maxRevisions} · tokens {tokens} · prompt {prompt}",
   "agent.draftBy": " · draft by {model}",
   "agent.editEmpty": "Claim {number}: edited text cannot be empty.",
   "agent.rejectNeedsReason": "Claim {number}: give a reason for rejecting it.",
@@ -594,7 +594,7 @@ const zhHans = {
   "agent.committedMessage": "已提交。采纳的陈述已写入 Agent 审阅区块。",
   "agent.discardedMessage": "已放弃，未保存任何内容。",
   "agent.budget":
-    "步数 {steps}/{maxSteps} · 重写 {revisions}/{maxRevisions} · token {tokens} · 提示词 {prompt}",
+    "步数 {steps}/{maxSteps} · 自动修正 {autoRevisions}/{maxAutoRevisions} · 重写 {revisions}/{maxRevisions} · token {tokens} · 提示词 {prompt}",
   "agent.draftBy": " · 草稿来源 {model}",
   "agent.editEmpty": "第 {number} 条陈述：修改内容不能为空。",
   "agent.rejectNeedsReason": "第 {number} 条陈述：请填写驳回原因。",
@@ -889,7 +889,7 @@ const zhHant = {
   "agent.committedMessage": "已提交。採納的陳述已寫入 Agent 審閱區塊。",
   "agent.discardedMessage": "已捨棄，未儲存任何內容。",
   "agent.budget":
-    "步數 {steps}/{maxSteps} · 重寫 {revisions}/{maxRevisions} · token {tokens} · 提示詞 {prompt}",
+    "步數 {steps}/{maxSteps} · 自動修正 {autoRevisions}/{maxAutoRevisions} · 重寫 {revisions}/{maxRevisions} · token {tokens} · 提示詞 {prompt}",
   "agent.draftBy": " · 草稿來源 {model}",
   "agent.editEmpty": "第 {number} 條陳述：修改內容不能為空。",
   "agent.rejectNeedsReason": "第 {number} 條陳述：請填寫駁回原因。",

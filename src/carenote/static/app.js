@@ -1125,6 +1125,8 @@ function renderAgentRun(run) {
         maxSteps: budget.max_steps,
         revisions: budget.revisions,
         maxRevisions: budget.max_revisions,
+        autoRevisions: budget.auto_revisions,
+        maxAutoRevisions: budget.max_auto_revisions,
         tokens: (budget.input_tokens + budget.output_tokens).toLocaleString(getLocale()),
         prompt: run.prompt_version,
       }) + (run.model ? t("agent.draftBy", { model: run.model }) : "")

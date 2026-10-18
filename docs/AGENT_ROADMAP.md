@@ -84,7 +84,7 @@ model drafts from cassettes and reports "not recorded" until they exist.
       accuracy per failure type) and `--suite agent` (citation validity, unsupported-claim rate,
       critical-finding recall, conflict coverage, injection resistance, cost and latency from
       cassettes); Markdown report in `evals/REPORT.md`; CI gate on the pipeline suite
-- [ ] 2.3 Automatic `revise` node: unsupported claims and uncovered conflicts go back to the model
+- [x] 2.3 Automatic `revise` node: unsupported claims and uncovered conflicts go back to the model
       with the verifier's reasons (versioned `revise_v1` prompt), at most `max_revisions` loops,
       then remaining failures are shown as unsupported; the agent suite reports revision's effect
 - [ ] 2.4 `migrations/002_agent_runs.sql` with RLS and a Postgres checkpointer so runs survive
@@ -125,6 +125,9 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-18 | Automatic revisions (`max_auto_revisions`, default 2) are budgeted separately from clinician-requested redrafts (`max_revisions`) | A run that used its automatic fixes can still be redrafted at the clinician's request |
+| 2026-10-18 | Only automated nodes (load, conflicts, draft, verify, revise) count as steps; review, commit and discard do not | With two automatic and two clinician revisions the worst case is exactly the design's 12 steps |
+| 2026-10-18 | The revise request sends the previous claims, citations and failure reasons as `DataTag`s with redacted text, and the state keeps the first draft's verification | Typed tags keep IDs and reasons out of free text; keeping the first verification lets the agent suite measure what revision changed |
 | 2026-10-18 | `evals/REPORT.md` is generated, committed and checked: CI regenerates it and fails if it differs, so the README's metrics always match the code | A metrics table that can drift from the code is worse than none |
 | 2026-10-18 | The pipeline suite also scores the exact model-bound payload, captured before the cassette lookup, so identifier leakage and context coverage are measured with no model | These are properties of what the agent sends, not of what the model answers |
 | 2026-10-18 | A known gap that starts passing fails the gate as stale | Keeps the known-gap list honest; the marker must be removed so a later regression is caught |

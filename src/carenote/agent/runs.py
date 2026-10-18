@@ -78,6 +78,8 @@ class BudgetUsage(BaseModel):
     max_steps: int
     revisions: int
     max_revisions: int
+    auto_revisions: int = 0
+    max_auto_revisions: int = 0
     input_tokens: int
     output_tokens: int
     cost_usd: float
@@ -268,6 +270,8 @@ class AgentRunService:
                     unsupported=len(report.unsupported),
                     uncovered_conflicts=len(report.uncovered_conflict_ids),
                 )
+            elif node == "revise":
+                self._audit(record, "agent_draft_revised", record.agent_id)
             elif node == "stop":
                 self._audit(record, "agent_budget_exceeded", record.agent_id)
                 self._event(record, "agent.done", status=RunStatus.BUDGET_EXCEEDED.value)
@@ -378,6 +382,8 @@ def _usage(budget: Budget) -> BudgetUsage:
         max_steps=budget.max_steps,
         revisions=budget.revisions,
         max_revisions=budget.max_revisions,
+        auto_revisions=budget.auto_revisions,
+        max_auto_revisions=budget.max_auto_revisions,
         input_tokens=budget.input_tokens,
         output_tokens=budget.output_tokens,
         cost_usd=budget.cost_usd,
