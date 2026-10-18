@@ -20,6 +20,8 @@ human-authored notes, source evidence, and access boundaries explicit.
   exact span of the record, verifies each citation deterministically, and stops for a clinician
   to accept, edit or reject each claim before anything is saved. See
   [the design](docs/AGENT_DESIGN.md) and [the roadmap](docs/AGENT_ROADMAP.md).
+- An evaluation suite of 32 golden cases with a CI gate; current results, including known gaps,
+  are in the [evaluation report](evals/REPORT.md).
 - A 10-second Glance view with deterministic explainable priority factors, risk reasons,
   suggested actions, and review states.
 - Narrow medication, dose, and allergy conflict detection with explicit clinician precedence or

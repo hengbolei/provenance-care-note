@@ -80,7 +80,7 @@ model drafts from cassettes and reports "not recorded" until they exist.
       critical facts a review must cover, and probe claims with the verdict the verifier must
       reach (supported, fabricated citation, misquote, wrong dose, wrong polarity, patient-only
       overreach, injection-following)
-- [ ] 2.2 `evals/run_evals.py`: `--suite pipeline` (conflict recall, redaction leakage, verifier
+- [x] 2.2 `evals/run_evals.py`: `--suite pipeline` (conflict recall, redaction leakage, verifier
       accuracy per failure type) and `--suite agent` (citation validity, unsupported-claim rate,
       critical-finding recall, conflict coverage, injection resistance, cost and latency from
       cassettes); Markdown report in `evals/REPORT.md`; CI gate on the pipeline suite
@@ -125,6 +125,9 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-18 | `evals/REPORT.md` is generated, committed and checked: CI regenerates it and fails if it differs, so the README's metrics always match the code | A metrics table that can drift from the code is worse than none |
+| 2026-10-18 | The pipeline suite also scores the exact model-bound payload, captured before the cassette lookup, so identifier leakage and context coverage are measured with no model | These are properties of what the agent sends, not of what the model answers |
+| 2026-10-18 | A known gap that starts passing fails the gate as stale | Keeps the known-gap list honest; the marker must be removed so a later regression is caught |
 | 2026-10-18 | Eval cases mark anything the system is known to get wrong with a `known_gap` reason; reports show known gaps separately and they do not fail the gate | The nine gaps found while writing the 32 cases (brand vs generic names; past-tense "stopped" and "takes"; "and 20 mg" and "at 10 mg" dose parsing; "allergy with"; invented diagnoses and invented undosed drugs passing; partial names and email addresses not redacted) stay visible instead of being worded around |
 | 2026-10-18 | Evaluation has two suites: `pipeline` (no model; conflict detection, redaction and verifier accuracy on probe claims) gates CI, and `agent` scores model drafts from cassettes, reporting "not recorded" until live cassettes exist | Without an API key, scoring hand-written drafts would give good-looking numbers that measure nothing; the deterministic parts can be measured honestly now |
 | 2026-10-18 | The automatic revise loop moves from Phase 3 (3.3) to Phase 2 (2.3) | It is the first step where the model reacts to feedback from its environment, which is what makes this an agent rather than a fixed workflow |
@@ -175,6 +178,9 @@ Departures from or refinements of the design, newest first.
 
 ## Known limitations
 
+- The draft prompt receives only the 40 most recent entries. In 3 of the 4 long-timeline eval
+  cases an earlier key entry never reaches the model (see `evals/REPORT.md`); Phase 3 retrieval
+  addresses this.
 - Commit writes the section, then each highlight; a failure part-way leaves the earlier writes in
   place and marks the run failed. Decisions are validated first to make this unlikely.
 - Run records and checkpoints live in memory, so a server restart loses runs; step 2.4 moves

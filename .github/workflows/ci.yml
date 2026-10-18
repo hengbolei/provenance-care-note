@@ -39,6 +39,11 @@ jobs:
         run: for f in src/carenote/static/*.js; do node --check "$f"; done
       - name: Test
         run: pytest -q
+      - name: Evaluation gate
+        if: matrix.python-version == '3.12'
+        run: |
+          python evals/run_evals.py --check
+          git diff --exit-code evals/REPORT.md
 
   demo:
     name: offline demo (docker compose)

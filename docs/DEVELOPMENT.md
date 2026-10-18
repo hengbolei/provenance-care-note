@@ -105,6 +105,13 @@ changing the draft prompt, the seed data or how requests are framed makes the re
 
 The script refuses to write a draft that does not pass citation verification.
 
+Run the evaluation suites and regenerate `evals/REPORT.md` (CI fails if the committed report is
+stale or a gate fails):
+
+```powershell
+.\.venv\Scripts\python.exe evals\run_evals.py --check
+```
+
 To run the full stack offline, use `docker compose up --build` and then
 `python scripts/smoke_demo.py` against `http://127.0.0.1:8000`.
 
