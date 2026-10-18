@@ -187,6 +187,8 @@ textarea:focus, select:focus, input:focus { outline: 2px solid #91c2b1; outline-
 .entry-selection-action { margin-left: auto; }
 .audit-card { grid-column: 1 / -1; }
 .agent-review-card { grid-column: 1 / -1; }
+/* Grid items default to their min-content width; long unwrapped citations would widen the page. */
+.workspace-grid > *, .agent-claim > * { min-width: 0; }
 .agent-progress { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 14px 0 0; padding: 0; list-style: none; color: #8a9b96; font-size: 0.74rem; }
 .agent-progress li::before { content: "○ "; }
 .agent-progress li.done { color: #2d6b59; }
@@ -209,11 +211,11 @@ textarea:focus, select:focus, input:focus { outline: 2px solid #91c2b1; outline-
 .agent-chip.risk-high, .agent-chip.risk-critical { color: #82483d; background: #f6e2dd; }
 .agent-failures { margin: 7px 0 0; padding-left: 16px; color: #8b5a4d; font-size: 0.72rem; line-height: 1.45; }
 .agent-citations { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.agent-citation { max-width: 100%; overflow: hidden; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
+.agent-citation { max-width: 100%; text-align: left; overflow-wrap: anywhere; }
 .agent-decision { display: grid; gap: 6px; align-content: start; }
 .agent-decision .field-label { margin: 0; }
 .agent-question-list { margin: 0; padding-left: 18px; color: #456159; font-size: 0.8rem; line-height: 1.5; }
-.agent-budget { display: block; margin-top: 12px; }
+.agent-budget { display: block; margin-top: 12px; white-space: normal; }
 .agent-latest-review { margin-top: 14px; color: #50675f; font-size: 0.78rem; }
 .agent-latest-review summary { cursor: pointer; font-weight: 750; }
 .citation-mark { background: #f2c96f; }
