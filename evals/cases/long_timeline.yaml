@@ -1,0 +1,158 @@
+# A few important entries buried in a long, routine timeline.
+- id: long-01-apixaban-dose
+  family: long_timeline
+  description: An anticoagulant dose discrepancy among 55 routine observations.
+  entries:
+    - key: start
+      type: clinician_note
+      author: clinician
+      at: 2026-06-01T09:00:00Z
+      title: Atrial fibrillation
+      content: New atrial fibrillation. Started apixaban 5 mg twice daily.
+    - key: label
+      type: staff_note
+      author: staff
+      at: 2026-08-25T10:00:00Z
+      title: Pharmacy call
+      content: The pharmacy label reads apixaban 2.5 mg twice daily; prescriber to confirm.
+  filler:
+    - count: 55
+      type: staff_note
+      author: staff
+      start: 2026-06-02T08:00:00Z
+      every_hours: 24
+      title: Routine observation {n}
+      content: Routine observation {n}. Observations within the usual range and no new concerns raised.
+  expect:
+    conflicts:
+      - {category: dose, entity: apixaban}
+    critical_facts:
+      - key: apixaban_conflict
+        description: Apixaban prescribed 5 mg but labelled 2.5 mg
+        mentions: [apixaban, 5 mg, 2.5 mg]
+  probes:
+    - id: supported-label
+      claim: The pharmacy label reads apixaban 2.5 mg twice daily.
+      cite: [{entry: label, quote: The pharmacy label reads apixaban 2.5 mg twice daily}]
+    - id: cites-filler
+      claim: Apixaban 5 mg twice daily was started.
+      cite: [{entry: label, quote: Started apixaban 5 mg twice daily, at: The pharmacy label}]
+      expect: [quote_mismatch]
+
+- id: long-02-buried-allergy
+  family: long_timeline
+  description: A new allergy among 60 daily patient check-ins.
+  entries:
+    - key: reaction
+      type: clinician_note
+      author: clinician
+      at: 2026-08-10T14:00:00Z
+      title: Reaction to antibiotic
+      content: Lip swelling after the first dose of cefalexin. Allergic to cefalexin; documented and flagged.
+  filler:
+    - count: 60
+      type: patient_note
+      author: patient
+      start: 2026-06-20T07:00:00Z
+      every_hours: 24
+      title: Daily check-in {n}
+      content: Daily check-in {n}. I slept well and have nothing new to report today.
+  expect:
+    critical_facts:
+      - key: cefalexin_allergy
+        description: Cefalexin allergy with lip swelling
+        mentions: [cefalexin]
+  probes:
+    - id: supported-allergy
+      claim: Allergic to cefalexin after lip swelling with the first dose.
+      category: allergy
+      risk: critical
+      cite: [{entry: reaction, quote: Lip swelling after the first dose of cefalexin. Allergic to cefalexin}]
+    - id: from-patient-filler
+      claim: Patient reports sleeping well with nothing new to report.
+      category: symptom
+      cite: [{entry: reaction, quote: slept well and have nothing new to report, start: 0}]
+      expect: [quote_mismatch]
+
+- id: long-03-hold-among-vitals
+  family: long_timeline
+  description: A diuretic hold among 50 vitals entries.
+  entries:
+    - key: listed
+      type: staff_note
+      author: staff
+      at: 2026-05-01T09:00:00Z
+      title: Medication list
+      content: Continue furosemide 40 mg each morning.
+    - key: hold
+      type: clinician_note
+      author: clinician
+      at: 2026-08-20T16:00:00Z
+      title: Dehydration
+      content: Creatinine rising with dehydration. Hold furosemide and repeat kidney function in 48 hours.
+  filler:
+    - count: 50
+      type: staff_note
+      author: staff
+      start: 2026-05-02T09:00:00Z
+      every_hours: 48
+      title: Vitals {n}
+      content: Vitals set {n} recorded; weight and pulse unchanged from the previous visit.
+  expect:
+    conflicts:
+      - {category: medication, entity: furosemide}
+    critical_facts:
+      - key: furosemide_hold
+        description: Furosemide held for dehydration
+        mentions: [furosemide, hold]
+      - key: repeat_bloods
+        description: Repeat kidney function in 48 hours
+        mentions: [48 hours]
+  probes:
+    - id: supported-hold
+      claim: Furosemide is on hold, with kidney function to repeat in 48 hours.
+      cite: [{entry: hold, quote: Hold furosemide and repeat kidney function in 48 hours}]
+    - id: dose-from-wrong-entry
+      claim: Hold furosemide 40 mg.
+      cite: [{entry: hold, quote: Hold furosemide and repeat kidney function}]
+      expect: [unsupported_entities]
+
+- id: long-04-unresolved-follow-up
+  family: long_timeline
+  description: An unresolved follow-up among 52 routine nurse summaries.
+  entries:
+    - key: plan
+      type: clinician_note
+      author: clinician
+      at: 2026-07-01T10:00:00Z
+      title: Anaemia work-up
+      content: Low haemoglobin. Arrange a colonoscopy referral and repeat blood count in four weeks.
+    - key: pending
+      type: ai_doctor_consult_summary
+      author: system
+      at: 2026-08-26T10:00:00Z
+      title: Doctor consult summary
+      content: Colonoscopy referral has not been booked. AI-generated summary; clinician confirmation required.
+  filler:
+    - count: 52
+      type: ai_nurse_consult_summary
+      author: system
+      start: 2026-07-02T09:00:00Z
+      every_hours: 24
+      title: Nurse check {n}
+      content: Nurse check {n}. Patient comfortable and no concerns raised during the call.
+  expect:
+    critical_facts:
+      - key: referral_unbooked
+        description: Colonoscopy referral not booked
+        mentions: [colonoscopy]
+  probes:
+    - id: supported-pending
+      claim: The colonoscopy referral has not been booked.
+      category: follow_up
+      cite: [{entry: pending, quote: Colonoscopy referral has not been booked}]
+    - id: invented-completion
+      claim: The colonoscopy was completed last week.
+      category: follow_up
+      cite: [{entry: pending, quote: The colonoscopy was completed last week, start: 0}]
+      expect: [quote_mismatch]

@@ -1,14 +1,18 @@
-"""LangGraph state machine for the Clinical Review Agent (design §6, phase 1 subset).
+"""LangGraph state machine for the Clinical Review Agent (design §6).
 
-    load_context → check_conflicts → draft → verify → human_review ─┬→ commit
-                                       ↑                             ├→ discard
-                                       └──── revise (instruction) ───┘
+    load_context → check_conflicts → draft → verify ──→ human_review ─┬→ commit
+                                       ↑      ↑   │                     ├→ discard
+                                       │      └ revise (failures)       │
+                                       └──────── redraft (clinician instruction)
 
-Only `draft` calls a model. Every other node is deterministic. The run pauses at `human_review`
-with a LangGraph `interrupt`, so its state is checkpointed until a clinician answers; nothing
-reaches the record except through the injected `commit` callable, which runs only after a
-clinician's decisions. Each node counts as one step against the run's `Budget`; when a ceiling is
-exceeded the run stops with its partial draft and a visible reason.
+Only `draft` and `revise` call a model; every other node is deterministic. When verification
+fails, `revise` sends the verifier's reasons back to the model and the corrected draft is verified
+again, at most `max_auto_revisions` times; anything still failing is shown to the clinician as
+unsupported. The run pauses at `human_review` with a LangGraph `interrupt`, so its state is
+checkpointed until a clinician answers; nothing reaches the record except through the injected
+`commit` callable, which runs only after a clinician's decisions. Each automated node is one step
+against the run's `Budget`; when a ceiling is exceeded the run stops with its partial draft and a
+visible reason.
 """
 
 from __future__ import annotations
@@ -44,6 +48,7 @@ from carenote.agent.state import (
     VerificationReport,
 )
 from carenote.agent.tools import ReviewTools
+from carenote.agent.tracing import RunTracer, TimelineStep, TracingGateway, timeline_step
 from carenote.agent.verify import resolve_citation, verify_draft
 from carenote.domain.models import (
     Actor,
@@ -60,6 +65,7 @@ from carenote.domain.models import (
 from carenote.services.care_notes import CareNoteService
 
 PROMPT_VERSION = "draft_v1"
+REVISE_PROMPT_VERSION = "revise_v1"
 MAX_CONTEXT_ENTRIES = 40
 
 Committer = Callable[[ReviewState, ReviewTools], None]
@@ -106,6 +112,9 @@ class GraphDeps:
     now: Callable[[], datetime] = field(default=lambda: datetime.now(UTC))
     prompt_version: str = PROMPT_VERSION
     max_context_entries: int = MAX_CONTEXT_ENTRIES
+    tracer: RunTracer = field(default_factory=RunTracer)
+    # Receives a metadata-only timeline step as each node finishes.
+    on_step: Callable[[UUID, TimelineStep], None] | None = None
     # Tools cache per run; rebuilt from the service after a restart, since they hold no state that
     # cannot be recomputed (the patient-view snapshot and per-entry redactions).
     tools: dict[UUID, ReviewTools] = field(default_factory=dict)
@@ -139,6 +148,7 @@ def initial_state(
         evidence={},
         draft=None,
         verification=None,
+        initial_verification=None,
         highlight_citations=[],
         budget=budget or Budget(started_at=started_at),
         decisions=None,
@@ -149,6 +159,32 @@ def initial_state(
 def build_review_graph(
     deps: GraphDeps, checkpointer: BaseCheckpointSaver | None = None
 ) -> CompiledStateGraph:
+    model = TracingGateway(deps.gateway, deps.tracer)
+
+    def traced(node: Callable[[ReviewState], dict[str, Any]], prompt=None):
+        """Run the node inside its span and report a timeline step when it finishes."""
+
+        def run(state: ReviewState) -> dict[str, Any]:
+            run_id = state["run_id"]
+            tools = deps.tools.get(run_id)
+            calls_before = len(tools.calls) if tools else 0
+            with deps.tracer.node(run_id, node.__name__, prompt(state) if prompt else None) as step:
+                update = node(state)
+                tools = deps.tools.get(run_id)
+                if tools is not None:
+                    step.tool_calls = [
+                        (call.name, call.result_count) for call in tools.calls[calls_before:]
+                    ]
+                report = update.get("verification")
+                if report is not None:
+                    step.unsupported_claims = len(report.unsupported)
+            if deps.on_step is not None:
+                deps.on_step(run_id, timeline_step(step))
+            return update
+
+        run.__name__ = node.__name__
+        return run
+
     def counted(node: Callable[[ReviewState], dict[str, Any]]):
         def run(state: ReviewState) -> dict[str, Any]:
             budget = state["budget"].model_copy(update={"steps": state["budget"].steps + 1})
@@ -169,7 +205,8 @@ def build_review_graph(
     def check_conflicts(state: ReviewState) -> dict[str, Any]:
         return {"conflicts": deps.tools_for(state).detect_conflicts()}
 
-    def draft(state: ReviewState) -> dict[str, Any]:
+    def record_inputs(state: ReviewState) -> list[Any]:
+        """The redacted record, framed as data: entries, then deterministic conflicts."""
         tools = deps.tools_for(state)
         names = tools.known_names()
         inputs: list[Any] = []
@@ -193,6 +230,12 @@ def build_review_graph(
                 tools.redactor.redact(conflict.summary, names),
                 DataTag.close("conflict"),
             ]
+        return inputs
+
+    def draft(state: ReviewState) -> dict[str, Any]:
+        tools = deps.tools_for(state)
+        names = tools.known_names()
+        inputs = record_inputs(state)
         budget = state["budget"]
         decisions = state["decisions"]
         if decisions is not None and decisions.action == "revise":
@@ -202,7 +245,7 @@ def build_review_graph(
                 DataTag.close("clinician_instruction"),
             ]
             budget = budget.model_copy(update={"revisions": budget.revisions + 1})
-        result = deps.gateway.structured(
+        result = model.structured(
             ModelRequest(
                 purpose="agent_draft",
                 instructions=load_prompt(state["prompt_version"]),
@@ -216,16 +259,65 @@ def build_review_graph(
             "model": result.model,
             "budget": _charge(budget, result.usage),
             "decisions": None,
+            "initial_verification": None,
+        }
+
+    def revise(state: ReviewState) -> dict[str, Any]:
+        """Send the verifier's findings back to the model and take its corrected draft."""
+        tools = deps.tools_for(state)
+        names = tools.known_names()
+        report = state["verification"]
+        previous = state["draft"] or DraftReview(claims=[])
+        inputs = record_inputs(state)
+        for check in report.checks:
+            claim = previous.claims[check.claim_index]
+            inputs += [
+                DataTag.open("previous_claim", index=check.claim_index, verified=check.verified),
+                tools.redactor.redact(claim.text, names),
+            ]
+            for citation in claim.citations:
+                inputs += [
+                    DataTag.open(
+                        "citation", entry=citation.entry_id, start=citation.start, end=citation.end
+                    ),
+                    tools.redactor.redact(citation.quote, names),
+                    DataTag.close("citation"),
+                ]
+            for failure, detail in zip(check.failures, check.detail or [], strict=False):
+                inputs += [
+                    DataTag.open("failure", reason=failure),
+                    tools.redactor.redact(detail, names),
+                    DataTag.close("failure"),
+                ]
+            inputs.append(DataTag.close("previous_claim"))
+        for conflict_id in report.uncovered_conflict_ids:
+            inputs.append(DataTag.open("uncovered_conflict", id=conflict_id))
+            inputs.append(DataTag.close("uncovered_conflict"))
+        budget = state["budget"]
+        budget = budget.model_copy(update={"auto_revisions": budget.auto_revisions + 1})
+        result = model.structured(
+            ModelRequest(
+                purpose="agent_revise",
+                instructions=load_prompt(REVISE_PROMPT_VERSION),
+                inputs=inputs,
+                safety_subject=str(state["actor"].principal.id),
+            ),
+            DraftReview,
+        )
+        return {
+            "draft": result.output,
+            "model": result.model,
+            "budget": _charge(budget, result.usage),
         }
 
     def verify(state: ReviewState) -> dict[str, Any]:
         tools = deps.tools_for(state)
         entries = tools.context_entries()
         draft_review = state["draft"] or DraftReview(claims=[])
+        report = verify_draft(draft_review, entries, state["conflicts"], tools.redactions)
         return {
-            "verification": verify_draft(
-                draft_review, entries, state["conflicts"], tools.redactions
-            ),
+            "verification": report,
+            "initial_verification": state.get("initial_verification") or report,
             "highlight_citations": [
                 resolve_citation(item.citation, entries, tools.redactions)
                 for item in draft_review.candidate_highlights
@@ -276,6 +368,14 @@ def build_review_graph(
             "stop_reason": state["budget"].exceeded(deps.now()),
         }
 
+    def after_verify(state: ReviewState) -> str:
+        if state["budget"].exceeded(deps.now()):
+            return "stop"
+        report = state["verification"]
+        if report is not None and not report.passed and state["budget"].can_auto_revise:
+            return "revise"
+        return "human_review"
+
     def within_budget(next_node: str) -> Callable[[ReviewState], str]:
         def route(state: ReviewState) -> str:
             return "stop" if state["budget"].exceeded(deps.now()) else next_node
@@ -291,18 +391,27 @@ def build_review_graph(
         return decisions.action
 
     graph = StateGraph(ReviewState)
-    for node in (load_context, check_conflicts, draft, verify, human_review, commit, discard):
-        graph.add_node(node.__name__, counted(node))
-    graph.add_node("stop", stop)
+    # Automated work counts against the step budget; review, commit and discard do not. Every node
+    # but the review pause is traced.
+    prompts = {
+        "draft": lambda state: state["prompt_version"],
+        "revise": lambda state: REVISE_PROMPT_VERSION,
+    }
+    for node in (load_context, check_conflicts, draft, verify, revise):
+        graph.add_node(node.__name__, counted(traced(node, prompts.get(node.__name__))))
+    for node in (commit, discard, stop):
+        graph.add_node(node.__name__, traced(node))
+    graph.add_node("human_review", human_review)
 
     graph.add_edge(START, "load_context")
     for source, target in (
         ("load_context", "check_conflicts"),
         ("check_conflicts", "draft"),
         ("draft", "verify"),
-        ("verify", "human_review"),
+        ("revise", "verify"),
     ):
         graph.add_conditional_edges(source, within_budget(target), [target, "stop"])
+    graph.add_conditional_edges("verify", after_verify, ["revise", "human_review", "stop"])
     graph.add_conditional_edges(
         "human_review", after_review, ["commit", "discard", "draft", "human_review"]
     )

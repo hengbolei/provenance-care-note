@@ -9,11 +9,15 @@ HTTPX - BSD 3-Clause License - https://github.com/encode/httpx
 Cryptography - Apache License 2.0 or BSD 3-Clause License - https://github.com/pyca/cryptography
 psycopg - GNU Lesser General Public License v3.0 - https://github.com/psycopg/psycopg
 LangGraph - MIT License - https://github.com/langchain-ai/langgraph
+LangGraph Checkpoint Postgres - MIT License - https://github.com/langchain-ai/langgraph
+psycopg-pool - GNU Lesser General Public License v3.0 - https://github.com/psycopg/psycopg
+OpenTelemetry Python (API, SDK, OTLP exporter) - Apache License 2.0 - https://github.com/open-telemetry/opentelemetry-python
 
 Development libraries
 ---------------------
 Pytest - MIT License - https://github.com/pytest-dev/pytest
 Ruff - MIT License - https://github.com/astral-sh/ruff
+PyYAML - MIT License - https://github.com/yaml/pyyaml
 Hatchling - MIT License - https://github.com/pypa/hatch
 
 Optional external services/models

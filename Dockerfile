@@ -14,7 +14,7 @@ COPY pyproject.toml ./
 COPY src ./src
 COPY migrations ./migrations
 COPY evals ./evals
-RUN pip install -e . \
+RUN pip install -e ".[otel]" \
     && useradd --create-home --uid 10001 carenote \
     && chown -R carenote /app
 

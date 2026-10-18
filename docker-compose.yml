@@ -34,6 +34,8 @@ services:
       # recorded: replay evals/cassettes; set to openai with OPENAI_API_KEY for live drafts.
       CARENOTE_AGENT_GATEWAY: ${CARENOTE_AGENT_GATEWAY:-recorded}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      # Set to an OTLP/HTTP collector (e.g. Langfuse or Jaeger) to export agent traces.
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
     ports:
       - "127.0.0.1:8000:8000"
 

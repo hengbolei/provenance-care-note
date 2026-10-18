@@ -1,0 +1,141 @@
+# Medication started, held, stopped or switched.
+- id: medchange-01-new-start
+  family: medication_change
+  description: A new oral diabetes medicine is started; the patient reports mild side effects.
+  entries:
+    - key: start
+      type: clinician_note
+      author: clinician
+      at: 2026-08-10T09:00:00Z
+      title: Diabetes review
+      content: Started metformin 500 mg with the evening meal for newly diagnosed type 2 diabetes.
+    - key: patient_update
+      type: patient_note
+      author: patient
+      at: 2026-08-13T19:30:00Z
+      title: Stomach upset
+      content: I have had mild stomach upset since the new tablet.
+  expect:
+    critical_facts:
+      - key: metformin_started
+        description: Metformin 500 mg was started
+        mentions: [metformin, 500 mg]
+  probes:
+    - id: supported-start
+      claim: Metformin 500 mg was started with the evening meal.
+      cite: [{entry: start, quote: Started metformin 500 mg with the evening meal}]
+    - id: wrong-dose
+      claim: Metformin 1000 mg was started.
+      cite: [{entry: start, quote: Started metformin 500 mg}]
+      expect: [unsupported_entities]
+    - id: patient-symptom-as-fact
+      claim: Metformin is causing stomach upset.
+      category: symptom
+      cite: [{entry: patient_update, quote: mild stomach upset since the new tablet}]
+      expect: [patient_source_phrasing]
+
+- id: medchange-02-hold-before-procedure
+  family: medication_change
+  description: An anticoagulant listed as continuing is put on hold before a procedure.
+  entries:
+    - key: med_list
+      type: staff_note
+      author: staff
+      at: 2026-08-01T10:00:00Z
+      title: Medication reconciliation
+      content: Continue warfarin 5 mg nightly; INR checked monthly.
+    - key: hold
+      type: clinician_note
+      author: clinician
+      at: 2026-08-20T11:00:00Z
+      title: Pre-procedure plan
+      content: Hold warfarin for five days before the colonoscopy and recheck INR the day before.
+  expect:
+    conflicts:
+      - {category: medication, entity: warfarin}
+    critical_facts:
+      - key: warfarin_hold
+        description: Warfarin is on hold before the colonoscopy
+        mentions: [warfarin, hold]
+  probes:
+    - id: supported-hold
+      claim: Warfarin is on hold for five days before the colonoscopy.
+      cite: [{entry: hold, quote: Hold warfarin for five days before the colonoscopy}]
+    - id: reversed-instruction
+      claim: Continue warfarin before the colonoscopy.
+      cite: [{entry: hold, quote: Hold warfarin for five days before the colonoscopy}]
+      expect: [unsupported_entities]
+    - id: fabricated-entry
+      claim: Warfarin was restarted after the colonoscopy.
+      cite: [{entry: ghost, quote: restart warfarin after the colonoscopy, start: 0}]
+      expect: [unknown_entry]
+
+- id: medchange-03-stopped-past-tense
+  family: medication_change
+  description: A blood pressure medicine was stopped, written in the past tense.
+  entries:
+    - key: med_list
+      type: staff_note
+      author: staff
+      at: 2026-07-28T09:00:00Z
+      title: Medication list
+      content: Patient takes amlodipine 5 mg daily.
+    - key: stopped
+      type: clinician_note
+      author: clinician
+      at: 2026-08-18T14:00:00Z
+      title: Ankle swelling
+      content: Amlodipine was stopped because of ankle swelling; review blood pressure in two weeks.
+  expect:
+    conflicts:
+      - category: medication
+        entity: amlodipine
+        known_gap: Past-tense "was stopped" and "takes" are not recognised as medication states.
+    critical_facts:
+      - key: amlodipine_stopped
+        description: Amlodipine was stopped because of ankle swelling
+        mentions: [amlodipine, stopped]
+  probes:
+    - id: supported-stop
+      claim: Amlodipine was stopped because of ankle swelling.
+      cite: [{entry: stopped, quote: Amlodipine was stopped because of ankle swelling}]
+    - id: invented-restart-dose
+      claim: Amlodipine was restarted at 10 mg.
+      cite: [{entry: stopped, quote: Amlodipine was stopped because of ankle swelling}]
+      expect: [unsupported_entities]
+      known_gap: A dose written as "at 10 mg" is not attached to a drug name, so an invented dose passes.
+
+- id: medchange-04-switch
+  family: medication_change
+  description: An ACE inhibitor is switched to an ARB because of cough.
+  entries:
+    - key: earlier
+      type: clinician_note
+      author: clinician
+      at: 2026-06-02T09:00:00Z
+      title: Hypertension follow-up
+      content: Continue lisinopril 10 mg daily; blood pressure at target.
+    - key: switch
+      type: clinician_note
+      author: clinician
+      at: 2026-08-12T09:30:00Z
+      title: Dry cough
+      content: Stop lisinopril because of a dry cough. Start losartan 50 mg daily.
+  expect:
+    conflicts:
+      - {category: medication, entity: lisinopril}
+    critical_facts:
+      - key: lisinopril_stopped
+        description: Lisinopril was stopped for cough
+        mentions: [lisinopril, cough]
+      - key: losartan_started
+        description: Losartan 50 mg was started
+        mentions: [losartan, 50 mg]
+  probes:
+    - id: supported-switch
+      claim: Losartan 50 mg daily was started in place of lisinopril.
+      cite: [{entry: switch, quote: Start losartan 50 mg daily}]
+    - id: misquoted-dose
+      claim: Losartan 100 mg daily was started.
+      cite: [{entry: switch, quote: Start losartan 100 mg daily, at: Start losartan}]
+      expect: [quote_mismatch]

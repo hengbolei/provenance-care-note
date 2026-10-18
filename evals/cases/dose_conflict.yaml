@@ -1,0 +1,142 @@
+# The same medicine recorded at different doses.
+- id: dose-01-lisinopril-10-vs-20
+  family: dose_conflict
+  description: Reconciled list and nurse consult disagree on the lisinopril dose.
+  entries:
+    - key: reconciled
+      type: staff_note
+      author: staff
+      at: 2026-08-22T10:15:00Z
+      title: Medication list reconciled
+      content: Medication list reconciled. Patient started lisinopril 10 mg seven days ago.
+    - key: nurse
+      type: ai_nurse_consult_summary
+      author: system
+      at: 2026-08-23T11:40:00Z
+      title: Nurse consult summary
+      content: Patient describes new dizziness after lisinopril 20 mg morning dose. Home blood pressure was 98/62 mmHg.
+  expect:
+    conflicts:
+      - {category: dose, entity: lisinopril}
+    critical_facts:
+      - key: dose_conflict
+        description: Lisinopril recorded as both 10 mg and 20 mg
+        mentions: [lisinopril, 10 mg, 20 mg]
+      - key: low_bp
+        description: Home blood pressure 98/62 mmHg
+        mentions: [98/62]
+  probes:
+    - id: supported-both-doses
+      claim: Lisinopril is recorded as 10 mg in the reconciled list and 20 mg in the nurse consult summary.
+      cite:
+        - {entry: reconciled, quote: started lisinopril 10 mg seven days ago}
+        - {entry: nurse, quote: lisinopril 20 mg morning dose}
+      known_gap: The dose pattern takes the word before a dose as the drug, so "... and 20 mg" is read as a drug called "and" and a correct claim fails.
+    - id: invented-dose
+      claim: Lisinopril 40 mg is the current dose.
+      cite: [{entry: nurse, quote: lisinopril 20 mg morning dose}]
+      expect: [unsupported_entities]
+
+- id: dose-02-levothyroxine-mcg
+  family: dose_conflict
+  description: A thyroid dose change in micrograms; the list still shows the old dose.
+  entries:
+    - key: list
+      type: staff_note
+      author: staff
+      at: 2026-07-01T08:00:00Z
+      title: Medication list
+      content: Medication list includes levothyroxine 50 mcg each morning.
+    - key: increase
+      type: clinician_note
+      author: clinician
+      at: 2026-08-05T10:00:00Z
+      title: Thyroid results
+      content: TSH remains high. Increase levothyroxine 75 mcg daily from Monday.
+  expect:
+    conflicts:
+      - {category: dose, entity: levothyroxine}
+    critical_facts:
+      - key: increase
+        description: Levothyroxine increased to 75 mcg
+        mentions: [levothyroxine, 75 mcg]
+  probes:
+    - id: supported-increase
+      claim: Levothyroxine was increased to 75 mcg daily.
+      cite: [{entry: increase, quote: Increase levothyroxine 75 mcg daily}]
+    - id: unit-confusion
+      claim: Levothyroxine 75 mg daily was prescribed.
+      cite: [{entry: increase, quote: Increase levothyroxine 75 mcg daily}]
+      expect: [unsupported_entities]
+
+- id: dose-03-warfarin-decimal
+  family: dose_conflict
+  description: A decimal dose reduction that the patient has not followed.
+  entries:
+    - key: reduce
+      type: clinician_note
+      author: clinician
+      at: 2026-08-14T16:00:00Z
+      title: INR high
+      content: INR 3.8. Reduce warfarin 2.5 mg nightly and recheck INR on Friday.
+    - key: patient
+      type: patient_note
+      author: patient
+      at: 2026-08-16T20:00:00Z
+      title: Tablets
+      content: I am still taking warfarin 5 mg every night like before.
+  expect:
+    conflicts:
+      - {category: dose, entity: warfarin}
+    critical_facts:
+      - key: reduced_dose
+        description: Warfarin reduced to 2.5 mg
+        mentions: [warfarin, 2.5 mg]
+      - key: patient_still_5mg
+        description: Patient reports still taking 5 mg
+        mentions: [5 mg]
+  probes:
+    - id: supported-reduction
+      claim: Warfarin was reduced to 2.5 mg nightly after an INR of 3.8.
+      cite: [{entry: reduce, quote: Reduce warfarin 2.5 mg nightly}]
+    - id: supported-patient-report
+      claim: Patient reports still taking warfarin 5 mg nightly.
+      cite: [{entry: patient, quote: warfarin 5 mg every night}]
+    - id: patient-report-overreach
+      claim: Patient reports still taking warfarin 5 mg nightly.
+      risk: high
+      cite: [{entry: patient, quote: warfarin 5 mg every night}]
+      expect: [patient_source_risk]
+
+- id: dose-04-brand-and-generic
+  family: dose_conflict
+  description: Brand and generic names of the same medicine at different doses.
+  entries:
+    - key: generic
+      type: staff_note
+      author: staff
+      at: 2026-08-02T09:00:00Z
+      title: Pharmacy list
+      content: Pharmacy list shows metformin 500 mg twice daily.
+    - key: brand
+      type: clinician_note
+      author: clinician
+      at: 2026-08-09T09:00:00Z
+      title: Diabetes clinic
+      content: Glucophage 850 mg twice daily continues; HbA1c improving.
+  expect:
+    conflicts:
+      - category: dose
+        entity: metformin
+        known_gap: Brand and generic names (Glucophage, metformin) are not linked.
+    critical_facts:
+      - key: two_doses
+        description: Metformin recorded at 500 mg and as Glucophage 850 mg
+        mentions: [500 mg, 850 mg]
+  probes:
+    - id: supported-brand
+      claim: Glucophage 850 mg twice daily continues.
+      cite: [{entry: brand, quote: Glucophage 850 mg twice daily continues}]
+    - id: supported-generic
+      claim: The pharmacy list shows metformin 500 mg twice daily.
+      cite: [{entry: generic, quote: metformin 500 mg twice daily}]

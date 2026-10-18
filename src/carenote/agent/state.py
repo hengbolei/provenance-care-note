@@ -112,8 +112,11 @@ class VerificationReport(BaseModel):
 class Budget(BaseModel):
     """Per-run ceilings (design §10) and what the run has used so far."""
 
+    # Steps count automated nodes only; time a clinician spends reviewing is not a step.
     max_steps: int = Field(default=12, ge=1)
+    # Clinician-requested redrafts, and automatic fixes of verifier failures, are budgeted apart.
     max_revisions: int = Field(default=2, ge=0)
+    max_auto_revisions: int = Field(default=2, ge=0)
     max_tokens: int = Field(default=60_000, ge=1)
     max_cost_usd: float = Field(default=0.50, gt=0)
     max_seconds: float = Field(default=60, gt=0)
@@ -121,6 +124,7 @@ class Budget(BaseModel):
     started_at: datetime
     steps: int = Field(default=0, ge=0)
     revisions: int = Field(default=0, ge=0)
+    auto_revisions: int = Field(default=0, ge=0)
     input_tokens: int = Field(default=0, ge=0)
     output_tokens: int = Field(default=0, ge=0)
     cost_usd: float = Field(default=0, ge=0)
@@ -131,6 +135,8 @@ class Budget(BaseModel):
             return f"step limit of {self.max_steps} exceeded"
         if self.revisions > self.max_revisions:
             return f"revision limit of {self.max_revisions} exceeded"
+        if self.auto_revisions > self.max_auto_revisions:
+            return f"automatic revision limit of {self.max_auto_revisions} exceeded"
         if self.input_tokens + self.output_tokens > self.max_tokens:
             return f"token limit of {self.max_tokens} exceeded"
         if self.cost_usd > self.max_cost_usd:
@@ -142,6 +148,10 @@ class Budget(BaseModel):
     @property
     def can_revise(self) -> bool:
         return self.revisions < self.max_revisions
+
+    @property
+    def can_auto_revise(self) -> bool:
+        return self.auto_revisions < self.max_auto_revisions
 
 
 class ClaimDecision(BaseModel):
@@ -217,6 +227,8 @@ class ReviewState(TypedDict):
     evidence: dict[str, list[Span]]
     draft: DraftReview | None
     verification: VerificationReport | None
+    # Verification of the model's draft before any automatic revision, for measuring revision.
+    initial_verification: VerificationReport | None
     # Candidate highlight citations resolved to original offsets; None where they did not resolve.
     highlight_citations: list[Citation | None]
     budget: Budget

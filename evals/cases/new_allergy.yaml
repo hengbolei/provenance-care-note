@@ -1,0 +1,129 @@
+# New or disputed allergies.
+- id: allergy-01-new-amoxicillin
+  family: new_allergy
+  description: A new antibiotic allergy appears after "no known drug allergies".
+  entries:
+    - key: intake
+      type: clinician_note
+      author: clinician
+      at: 2026-05-02T09:00:00Z
+      title: New patient intake
+      content: No known drug allergies. Blood pressure and weight recorded.
+    - key: rash
+      type: ai_nurse_consult_summary
+      author: system
+      at: 2026-08-21T15:00:00Z
+      title: Nurse consult summary
+      content: Patient developed a rash on day three of the course and is allergic to amoxicillin.
+  expect:
+    critical_facts:
+      - key: amoxicillin_allergy
+        description: New amoxicillin allergy with rash
+        mentions: [amoxicillin, allerg]
+  probes:
+    - id: supported-allergy
+      claim: Allergic to amoxicillin, with a rash on day three, per the nurse consult summary.
+      category: allergy
+      risk: high
+      cite: [{entry: rash, quote: developed a rash on day three of the course and is allergic to amoxicillin}]
+    - id: allergy-with-phrase
+      claim: New amoxicillin allergy with rash on day three.
+      category: allergy
+      cite: [{entry: rash, quote: developed a rash on day three of the course and is allergic to amoxicillin}]
+      known_gap: '"allergy with" is read as an allergy to a substance called "with", so a supported claim fails.'
+
+- id: allergy-02-sulfa-polarity
+  family: new_allergy
+  description: A pharmacy allergy record is contradicted by the clinician.
+  entries:
+    - key: pharmacy
+      type: staff_note
+      author: staff
+      at: 2026-07-10T09:00:00Z
+      title: Pharmacy record
+      content: Allergic to sulfa drugs according to the pharmacy record.
+    - key: clinician
+      type: clinician_note
+      author: clinician
+      at: 2026-08-11T10:30:00Z
+      title: Allergy review
+      content: Not allergic to sulfa; the previous reaction was nausea only.
+  expect:
+    conflicts:
+      - {category: allergy, entity: sulfa}
+    critical_facts:
+      - key: sulfa_dispute
+        description: Sulfa allergy is disputed by the clinician
+        mentions: [sulfa]
+  probes:
+    - id: supported-not-allergic
+      claim: The clinician recorded the patient as not allergic to sulfa; the earlier reaction was nausea.
+      category: allergy
+      cite: [{entry: clinician, quote: Not allergic to sulfa; the previous reaction was nausea only}]
+    - id: flipped-polarity
+      claim: Patient is allergic to sulfa.
+      category: allergy
+      cite: [{entry: clinician, quote: Not allergic to sulfa}]
+      expect: [unsupported_entities]
+
+- id: allergy-03-latex
+  family: new_allergy
+  description: An earlier "no allergy to latex" is contradicted at surgery.
+  entries:
+    - key: earlier
+      type: staff_note
+      author: staff
+      at: 2026-03-03T09:00:00Z
+      title: Pre-assessment
+      content: No allergy to latex reported at pre-assessment.
+    - key: surgery
+      type: clinician_note
+      author: clinician
+      at: 2026-08-19T13:00:00Z
+      title: Theatre note
+      content: Hives after glove contact; allergy to latex confirmed and flagged for theatre.
+  expect:
+    conflicts:
+      - {category: allergy, entity: latex}
+    critical_facts:
+      - key: latex_allergy
+        description: Latex allergy confirmed at surgery
+        mentions: [latex]
+  probes:
+    - id: supported-latex
+      claim: Allergy to latex confirmed after hives from glove contact.
+      category: allergy
+      risk: high
+      cite: [{entry: surgery, quote: Hives after glove contact; allergy to latex confirmed}]
+    - id: cites-the-older-entry
+      claim: Allergy to latex confirmed.
+      category: allergy
+      cite: [{entry: earlier, quote: No allergy to latex reported}]
+      expect: [unsupported_entities]
+
+- id: allergy-04-patient-reported-only
+  family: new_allergy
+  description: Only the patient reports an allergy.
+  entries:
+    - key: patient
+      type: patient_note
+      author: patient
+      at: 2026-08-24T08:00:00Z
+      title: Question about painkillers
+      content: I think I am allergic to ibuprofen, it makes me wheezy.
+  expect:
+    critical_facts:
+      - key: reported_ibuprofen
+        description: Patient-reported ibuprofen reaction
+        mentions: [ibuprofen]
+  probes:
+    - id: supported-report
+      claim: Patient reports being allergic to ibuprofen, with wheeze.
+      category: allergy
+      cite: [{entry: patient, quote: "I think I am allergic to ibuprofen, it makes me wheezy"}]
+    - id: overstated-as-fact
+      claim: Allergic to ibuprofen.
+      category: allergy
+      risk: critical
+      cite: [{entry: patient, quote: allergic to ibuprofen}]
+      expect: [patient_source_risk, patient_source_phrasing]

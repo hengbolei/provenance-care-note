@@ -4,7 +4,7 @@ Status tracker for building the agent described in [AGENT_DESIGN.md](AGENT_DESIG
 design says *what* and *why*; this file says *in what order* and *where we are*. Update it in the
 same PR as the work it describes.
 
-Last updated: 2026-10-18 · Current phase: **Phase 2 — Evaluation and observability** (not started)
+Last updated: 2026-10-18 · Current phase: **Phase 2 — Evaluation, self-correction and observability**
 
 ## How we work
 
@@ -67,21 +67,41 @@ Branch: `feat/agent-mvp`. Design §17 week 1. Build framework-free parts first, 
 citations all pass verification; Commit creates the `agent_review` revision, highlights and an
 intact audit chain; CI green.
 
-## Phase 2 — Evaluation and observability · ⏳ next
+## Phase 2 — Evaluation, self-correction and observability · ✅ done (pending merge)
 
-Branch: `feat/agent-evals`. Design §17 week 2.
+Branch: `feat/agent-evals`. Design §17 week 2, plus the revise loop from week 3. Plan revised in
+`c9d0169`.
 
-- [ ] 2.1 `evals/cases/*.yaml`: at least 30 golden cases across the families in design §13
-- [ ] 2.2 `evals/run_evals.py --mode recorded`, Markdown report, CI job that fails on regression
-- [ ] 2.3 Budgets: 12 steps, 2 revise loops, token and cost ceilings, 60 s; partial draft and
-      `agent_budget_exceeded` on breach
-- [ ] 2.4 `migrations/002_agent_runs.sql` with RLS; Postgres checkpointer so runs survive
-      restarts
-- [ ] 2.5 OpenTelemetry tracing (Langfuse optional); trace ID on audit events; run timeline
-      view
+No API key is available, so evaluation is split in two (see [Decisions](#decisions)): a
+**pipeline** suite that needs no model and gates CI, and an **agent** suite that scores real
+model drafts from cassettes and reports "not recorded" until they exist.
 
-**Exit criteria**: metrics table linked from the README; CI eval gate active; trace visible for
-a demo run.
+- [x] 2.1 Eval case format and at least 30 cases in `evals/cases/*.yaml` across the design §13
+      families: each case is a synthetic record, the conflicts and identifiers it contains, the
+      critical facts a review must cover, and probe claims with the verdict the verifier must
+      reach (supported, fabricated citation, misquote, wrong dose, wrong polarity, patient-only
+      overreach, injection-following) (`45187a6`)
+- [x] 2.2 `evals/run_evals.py` runs both suites: pipeline (conflict recall, redaction and
+      model-bound payload leakage, verifier verdict accuracy, key entries in context) and agent
+      (citation validity, unsupported-claim rate, critical-finding recall, conflict coverage,
+      injection resistance, tokens and cost from cassettes); generated `evals/REPORT.md` checked
+      in CI; CI gate (`6a5991d`)
+- [x] 2.3 Automatic `revise` node: unsupported claims and uncovered conflicts go back to the model
+      with the verifier's reasons (versioned `revise_v1` prompt), at most `max_auto_revisions`
+      loops, then remaining failures are shown as unsupported; the agent suite reports revision's
+      effect (`92e38aa`)
+- [x] 2.4 `migrations/002_agent_runs.sql` with RLS and a Postgres checkpointer so runs survive
+      restarts, with encrypted checkpoints and clinic-scoped RLS; verified by Postgres tests and
+      the CI Docker job (`9008b49`)
+- [x] 2.5 OpenTelemetry tracing (Langfuse optional): a span per node, tool and model call; the
+      trace ID is the run ID that audit events carry; run timeline in the panel (`603e3b7`)
+- [x] Budgets (formerly 2.3): step, revision, token, cost and time ceilings with a partial draft
+      and `agent_budget_exceeded` already shipped in Phase 1 (`c2a1900`, `4c630cb`)
+
+**Exit criteria**: the pipeline suite gates CI; the agent suite runs end to end on recorded
+cassettes and reports honestly when none are recorded; the revise loop is covered by tests and
+measured once live cassettes exist; a run survives a restart in the Docker demo; a trace is
+visible for a demo run.
 
 ## Phase 3 — Retrieval, safety and a second provider
 
@@ -90,7 +110,7 @@ Branch: `feat/agent-retrieval`. Design §17 week 3. Blocked on the storage decis
 - [ ] 3.0 Decide the retrieval storage model (see [Open questions](#open-questions))
 - [ ] 3.1 Embedding index with clinic scope; hybrid search with reciprocal rank fusion
 - [ ] 3.2 `plan` and `retrieve` nodes
-- [ ] 3.3 `revise` loop, at most 2 iterations
+- [x] 3.3 `revise` loop: moved to step 2.3
 - [ ] 3.4 Prompt-injection defences and eval cases
 - [ ] 3.5 Second provider adapter with fallback
 
@@ -109,6 +129,23 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-18 | Each run is one OpenTelemetry trace whose trace ID is the run ID | Spans from separate graph segments, and from before and after a restart, join one trace; audit events already carry the run ID, so they join without changing the hash-chained audit schema |
+| 2026-10-18 | Spans carry IDs, node names, durations, model names, prompt versions and token counts only, never record, claim or quote text | Traces leave the clinical boundary to an external collector, so they must hold nothing that needs redaction |
+| 2026-10-18 | The panel's run timeline comes from metadata-only steps stored on the run (`agent_runs.timeline`), not from the trace backend | It works with no collector configured and survives restarts with the run |
+| 2026-10-18 | OTLP export needs the optional `otel` extra and `OTEL_EXPORTER_OTLP_ENDPOINT`; Langfuse is not bundled in Docker Compose | Any OpenTelemetry collector works, and the default demo stays small |
+| 2026-10-18 | Checkpoints use LangGraph's `PostgresSaver` with every serialized value Fernet-encrypted by the clinical data key; loading an unencrypted value is refused | The rest of the database is encrypted at rest, and drafts, quotes and decisions are clinical text; LangGraph keeps only primitive values (status, prompt version, model) in clear |
+| 2026-10-18 | `agent_runs` (migration 002) is clinic-scoped by forced RLS, and LangGraph's checkpoint tables are scoped through it (migration 003, applied after the saver creates them); connections set `app.current_clinic_id` when they open | Matches the existing per-clinic isolation; a checkpoint is visible only when its run belongs to the current clinic |
+| 2026-10-18 | Postgres tests run against `CARENOTE_TEST_DATABASE_URL` in a CI service container, or a local throwaway server from the optional `pgserver` package, and skip otherwise | Real RLS, encryption and restart behaviour need a real Postgres |
+| 2026-10-18 | Automatic revisions (`max_auto_revisions`, default 2) are budgeted separately from clinician-requested redrafts (`max_revisions`) | A run that used its automatic fixes can still be redrafted at the clinician's request |
+| 2026-10-18 | Only automated nodes (load, conflicts, draft, verify, revise) count as steps; review, commit and discard do not | With two automatic and two clinician revisions the worst case is exactly the design's 12 steps |
+| 2026-10-18 | The revise request sends the previous claims, citations and failure reasons as `DataTag`s with redacted text, and the state keeps the first draft's verification | Typed tags keep IDs and reasons out of free text; keeping the first verification lets the agent suite measure what revision changed |
+| 2026-10-18 | `evals/REPORT.md` is generated, committed and checked: CI regenerates it and fails if it differs, so the README's metrics always match the code | A metrics table that can drift from the code is worse than none |
+| 2026-10-18 | The pipeline suite also scores the exact model-bound payload, captured before the cassette lookup, so identifier leakage and context coverage are measured with no model | These are properties of what the agent sends, not of what the model answers |
+| 2026-10-18 | A known gap that starts passing fails the gate as stale | Keeps the known-gap list honest; the marker must be removed so a later regression is caught |
+| 2026-10-18 | Eval cases mark anything the system is known to get wrong with a `known_gap` reason; reports show known gaps separately and they do not fail the gate | The nine gaps found while writing the 32 cases (brand vs generic names; past-tense "stopped" and "takes"; "and 20 mg" and "at 10 mg" dose parsing; "allergy with"; invented diagnoses and invented undosed drugs passing; partial names and email addresses not redacted) stay visible instead of being worded around |
+| 2026-10-18 | Evaluation has two suites: `pipeline` (no model; conflict detection, redaction and verifier accuracy on probe claims) gates CI, and `agent` scores model drafts from cassettes, reporting "not recorded" until live cassettes exist | Without an API key, scoring hand-written drafts would give good-looking numbers that measure nothing; the deterministic parts can be measured honestly now |
+| 2026-10-18 | The automatic revise loop moves from Phase 3 (3.3) to Phase 2 (2.3) | It is the first step where the model reacts to feedback from its environment, which is what makes this an agent rather than a fixed workflow |
+| 2026-10-18 | Budgets (old step 2.3) are marked done | They shipped with the graph and run service in Phase 1 |
 | 2026-10-18 | The seed cassette is a curated, hand-written draft (`scripts/record_demo_cassette.py`), labelled `curated-demo` in the cassette and shown in the panel; `--source openai` re-records it live | No API key was available; the demo must never pass hand-written text off as model output |
 | 2026-10-18 | CI gains a `demo` job: `docker compose up --wait`, then `scripts/smoke_demo.py` signs in, runs a review and commits it | Docker was not available locally, so the stack is verified in CI |
 | 2026-10-18 | Checkpoints deserialize only the review state's own types (`allowed_msgpack_modules`) | LangGraph warns it will block unregistered types; an explicit allowlist also stops a tampered checkpoint instantiating anything else |
@@ -155,10 +192,13 @@ Departures from or refinements of the design, newest first.
 
 ## Known limitations
 
+- The draft prompt receives only the 40 most recent entries. In 3 of the 4 long-timeline eval
+  cases an earlier key entry never reaches the model (see `evals/REPORT.md`); Phase 3 retrieval
+  addresses this.
 - Commit writes the section, then each highlight; a failure part-way leaves the earlier writes in
   place and marks the run failed. Decisions are validated first to make this unlikely.
-- Run records and checkpoints live in memory, so a server restart loses runs; step 2.4 moves
-  them to Postgres.
+- Without `CARENOTE_DATABASE_URL`, runs and checkpoints live in memory and a restart loses them;
+  with Postgres they persist (step 2.4).
 - `OpenAIGateway` is covered by mocked HTTP tests only; strict structured output has not yet been
   run against the live API. The first `record_demo_cassette.py --source openai` run will show
   whether the provider rejects any schema keyword.
