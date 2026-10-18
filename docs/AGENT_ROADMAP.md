@@ -4,7 +4,7 @@ Status tracker for building the agent described in [AGENT_DESIGN.md](AGENT_DESIG
 design says *what* and *why*; this file says *in what order* and *where we are*. Update it in the
 same PR as the work it describes.
 
-Last updated: 2026-10-18 · Current phase: **Phase 2 — Evaluation and observability** (not started)
+Last updated: 2026-10-18 · Current phase: **Phase 2 — Evaluation, self-correction and observability**
 
 ## How we work
 
@@ -67,21 +67,37 @@ Branch: `feat/agent-mvp`. Design §17 week 1. Build framework-free parts first, 
 citations all pass verification; Commit creates the `agent_review` revision, highlights and an
 intact audit chain; CI green.
 
-## Phase 2 — Evaluation and observability · ⏳ next
+## Phase 2 — Evaluation, self-correction and observability · 🚧 in progress
 
-Branch: `feat/agent-evals`. Design §17 week 2.
+Branch: `feat/agent-evals`. Design §17 week 2, plus the revise loop from week 3.
 
-- [ ] 2.1 `evals/cases/*.yaml`: at least 30 golden cases across the families in design §13
-- [ ] 2.2 `evals/run_evals.py --mode recorded`, Markdown report, CI job that fails on regression
-- [ ] 2.3 Budgets: 12 steps, 2 revise loops, token and cost ceilings, 60 s; partial draft and
-      `agent_budget_exceeded` on breach
-- [ ] 2.4 `migrations/002_agent_runs.sql` with RLS; Postgres checkpointer so runs survive
-      restarts
-- [ ] 2.5 OpenTelemetry tracing (Langfuse optional); trace ID on audit events; run timeline
-      view
+No API key is available, so evaluation is split in two (see [Decisions](#decisions)): a
+**pipeline** suite that needs no model and gates CI, and an **agent** suite that scores real
+model drafts from cassettes and reports "not recorded" until they exist.
 
-**Exit criteria**: metrics table linked from the README; CI eval gate active; trace visible for
-a demo run.
+- [ ] 2.1 Eval case format and at least 30 cases in `evals/cases/*.yaml` across the design §13
+      families: each case is a synthetic record, the conflicts and identifiers it contains, the
+      critical facts a review must cover, and probe claims with the verdict the verifier must
+      reach (supported, fabricated citation, misquote, wrong dose, wrong polarity, patient-only
+      overreach, injection-following)
+- [ ] 2.2 `evals/run_evals.py`: `--suite pipeline` (conflict recall, redaction leakage, verifier
+      accuracy per failure type) and `--suite agent` (citation validity, unsupported-claim rate,
+      critical-finding recall, conflict coverage, injection resistance, cost and latency from
+      cassettes); Markdown report in `evals/REPORT.md`; CI gate on the pipeline suite
+- [ ] 2.3 Automatic `revise` node: unsupported claims and uncovered conflicts go back to the model
+      with the verifier's reasons (versioned `revise_v1` prompt), at most `max_revisions` loops,
+      then remaining failures are shown as unsupported; the agent suite reports revision's effect
+- [ ] 2.4 `migrations/002_agent_runs.sql` with RLS and a Postgres checkpointer so runs survive
+      restarts; verified by the CI Docker job
+- [ ] 2.5 OpenTelemetry tracing (Langfuse optional): a span per node, tool and model call, trace
+      ID on audit events, run timeline in the panel
+- [x] Budgets (formerly 2.3): step, revision, token, cost and time ceilings with a partial draft
+      and `agent_budget_exceeded` already shipped in Phase 1 (`c2a1900`, `4c630cb`)
+
+**Exit criteria**: the pipeline suite gates CI; the agent suite runs end to end on recorded
+cassettes and reports honestly when none are recorded; the revise loop is covered by tests and
+measured once live cassettes exist; a run survives a restart in the Docker demo; a trace is
+visible for a demo run.
 
 ## Phase 3 — Retrieval, safety and a second provider
 
@@ -90,7 +106,7 @@ Branch: `feat/agent-retrieval`. Design §17 week 3. Blocked on the storage decis
 - [ ] 3.0 Decide the retrieval storage model (see [Open questions](#open-questions))
 - [ ] 3.1 Embedding index with clinic scope; hybrid search with reciprocal rank fusion
 - [ ] 3.2 `plan` and `retrieve` nodes
-- [ ] 3.3 `revise` loop, at most 2 iterations
+- [x] 3.3 `revise` loop: moved to step 2.3
 - [ ] 3.4 Prompt-injection defences and eval cases
 - [ ] 3.5 Second provider adapter with fallback
 
@@ -109,6 +125,9 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-18 | Evaluation has two suites: `pipeline` (no model; conflict detection, redaction and verifier accuracy on probe claims) gates CI, and `agent` scores model drafts from cassettes, reporting "not recorded" until live cassettes exist | Without an API key, scoring hand-written drafts would give good-looking numbers that measure nothing; the deterministic parts can be measured honestly now |
+| 2026-10-18 | The automatic revise loop moves from Phase 3 (3.3) to Phase 2 (2.3) | It is the first step where the model reacts to feedback from its environment, which is what makes this an agent rather than a fixed workflow |
+| 2026-10-18 | Budgets (old step 2.3) are marked done | They shipped with the graph and run service in Phase 1 |
 | 2026-10-18 | The seed cassette is a curated, hand-written draft (`scripts/record_demo_cassette.py`), labelled `curated-demo` in the cassette and shown in the panel; `--source openai` re-records it live | No API key was available; the demo must never pass hand-written text off as model output |
 | 2026-10-18 | CI gains a `demo` job: `docker compose up --wait`, then `scripts/smoke_demo.py` signs in, runs a review and commits it | Docker was not available locally, so the stack is verified in CI |
 | 2026-10-18 | Checkpoints deserialize only the review state's own types (`allowed_msgpack_modules`) | LangGraph warns it will block unregistered types; an explicit allowlist also stops a tampered checkpoint instantiating anything else |
