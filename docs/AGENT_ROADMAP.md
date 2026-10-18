@@ -38,25 +38,28 @@ Merged in PR #3 (`e62d79c`).
 Branch: `feat/agent-mvp`. Design §17 week 1. Build framework-free parts first, LangGraph last.
 
 - [x] 1.1 `agent/state.py`: `Citation`, `Claim`, `DraftReview`, `CandidateHighlight`,
-      `ClaimCheck`, `Budget`, `ReviewState`
+      `ClaimCheck`, `Budget`, `ReviewState` (`d5cedc1`)
 - [x] 1.2 `agent/verify.py`: deterministic checks 1–6 from design §8, pure functions with dense
       unit tests (exists and in scope, in bounds, quote match with relocation, entity support,
-      patient-source risk cap, conflict coverage)
+      patient-source risk cap, conflict coverage) (`be586b8`)
 - [x] 1.3 `agent/gateway.py`: `ModelGateway` protocol (`structured()`, `text()`);
       `OpenAIGateway` with JSON-schema output and mandatory redaction; `RecordedGateway` over
       `evals/cassettes/`; move `summarize` onto it without changing `services/ai.py` callers
+      (`d33310c`)
 - [x] 1.4 `agent/tools.py`: read tools that call `CareNoteService` as `agent.principal`;
-      `propose_highlight` writes to run state only
+      `propose_highlight` writes to run state only (`9fce3b0`)
 - [x] 1.5 `agent/graph.py`: `load_context → check_conflicts → draft → verify →
       human_review (interrupt) → commit | discard`, `MemorySaver`; `langgraph` dependency
+      (`c2a1900`)
+- [x] fix: medication-state support check read "hold pending" as a drug (`8d55516`)
 - [x] 1.6 `agent/runs.py` and API: endpoints from design §15, the nine `agent_*` audit
-      operations, WebSocket `agent.step` / `agent.draft` / `agent.done`
+      operations, WebSocket `agent.step` / `agent.draft` / `agent.done` (`4c630cb`)
 - [x] 1.7 Commit path: accepted claims become a clinician-authored revision of an internal
-      `agent_review` section; accepted highlights go through `create_highlight`
+      `agent_review` section; accepted highlights go through `create_highlight` (`4ef472d`)
 - [x] 1.8 Review panel in `static/app.js`: claims, clickable citations, accept / edit / reject,
-      Commit
+      Commit (`2b698d4`)
 - [x] 1.9 Offline demo: `RecordedGateway` by default with a seed cassette; `docker-compose.yml`
-      with app and Postgres
+      with app and Postgres (`aa19648`)
 
 **Exit criteria**: with no API key, "Prepare review" on the seed patient returns a draft whose
 citations all pass verification; Commit creates the `agent_review` revision, highlights and an
