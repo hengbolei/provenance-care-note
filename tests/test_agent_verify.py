@@ -372,3 +372,31 @@ def test_each_claim_gets_its_own_check_in_order(entries, clinician_entry, patien
 
 def test_empty_draft_passes_when_there_are_no_conflicts(entries):
     assert verify_draft(DraftReview(claims=[]), entries).passed
+
+
+def test_words_after_hold_or_start_are_not_treated_as_drugs_unless_dosed(entries, clinician_entry):
+    # "hold pending" matches the medication-state pattern; "pending" is never dosed in the record.
+    check = _only_check(
+        _verify(
+            entries,
+            _claim(
+                "Metformin started; next dose on hold pending review.",
+                _cite(clinician_entry, "started metformin"),
+            ),
+        )
+    )
+
+    assert check.verified, check.detail
+
+
+def test_a_dosed_drug_named_in_a_state_claim_must_still_be_cited(entries, clinician_entry):
+    other = _entry("Continue warfarin 5 mg nightly.")
+    check = _only_check(
+        _verify(
+            entries | {other.id: other},
+            _claim("Stop warfarin before surgery.", _cite(clinician_entry, "started metformin")),
+        )
+    )
+
+    assert check.failures == [CheckFailure.UNSUPPORTED_ENTITIES]
+    assert "warfarin" in check.detail[0]

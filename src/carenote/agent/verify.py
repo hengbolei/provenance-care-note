@@ -13,7 +13,7 @@ returned citation points into the original entry content.
 from __future__ import annotations
 
 import re
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from uuid import UUID
 
 from carenote.agent.state import (
@@ -61,8 +61,10 @@ def verify_draft(
     conflicts that no verified claim mentions.
     """
     redactions = redactions or {}
+    known_medications = _known_medications(entries.values())
     checks = [
-        _check_claim(index, claim, entries, redactions) for index, claim in enumerate(draft.claims)
+        _check_claim(index, claim, entries, redactions, known_medications)
+        for index, claim in enumerate(draft.claims)
     ]
     verified_texts = [draft.claims[check.claim_index].text for check in checks if check.verified]
     uncovered = [
@@ -78,6 +80,7 @@ def _check_claim(
     claim: Claim,
     entries: Mapping[UUID, TimelineEntry],
     redactions: Mapping[UUID, RedactionResult],
+    known_medications: set[str],
 ) -> ClaimCheck:
     failures: list[CheckFailure] = []
     detail: list[str] = []
@@ -100,7 +103,7 @@ def _check_claim(
 
     # Content checks only make sense once every citation resolved to real text.
     if not failures:
-        _check_support(claim, resolved, fail)
+        _check_support(claim, resolved, known_medications, fail)
         _check_provenance_policy(claim, [entries[c.entry_id] for c in resolved], fail)
 
     return ClaimCheck(claim_index=index, failures=failures, detail=detail, citations=resolved)
@@ -152,13 +155,32 @@ def _locate(text: str, quote: str, near: int) -> tuple[int, int] | None:
     return min(matches, key=lambda span: abs(span[0] - near))
 
 
-def _check_support(claim: Claim, citations: list[Citation], fail: Fail) -> None:
+def _known_medications(entries: Iterable[TimelineEntry]) -> set[str]:
+    """Medication names the record gives a dose for anywhere.
+
+    The medication-state pattern takes any word after "hold", "stop", "start" and so on, so on
+    its own it reads "hold pending review" as a drug called "pending". Requiring that the record
+    dose the drug somewhere keeps those false facts out of the support check.
+    """
+    return {
+        fact.entity
+        for entry in entries
+        for fact in extract_entities(entry.content)
+        if fact.category is ConflictCategory.DOSE
+    }
+
+
+def _check_support(
+    claim: Claim, citations: list[Citation], known_medications: set[str], fail: Fail
+) -> None:
     """Check 4: every clinical fact the claim states must appear in, and agree with, its sources."""
     cited = " ".join(citation.quote for citation in citations)
     cited_words = set(_WORD.findall(cited.lower()))
     cited_compact = re.sub(r"\s+", "", cited.lower())
     cited_facts = extract_entities(cited)
     for fact in extract_entities(claim.text):
+        if fact.category is ConflictCategory.MEDICATION and fact.entity not in known_medications:
+            continue
         if fact.entity not in cited_words:
             fail(
                 CheckFailure.UNSUPPORTED_ENTITIES,
