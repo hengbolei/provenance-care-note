@@ -53,7 +53,7 @@ Branch: `feat/agent-mvp`. Design §17 week 1. Build framework-free parts first, 
       operations, WebSocket `agent.step` / `agent.draft` / `agent.done`
 - [x] 1.7 Commit path: accepted claims become a clinician-authored revision of an internal
       `agent_review` section; accepted highlights go through `create_highlight`
-- [ ] 1.8 Review panel in `static/app.js`: claims, clickable citations, accept / edit / reject,
+- [x] 1.8 Review panel in `static/app.js`: claims, clickable citations, accept / edit / reject,
       Commit
 - [ ] 1.9 Offline demo: `RecordedGateway` by default with a seed cassette; `docker-compose.yml`
       with app and Postgres
@@ -104,6 +104,8 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-18 | Review panel defaults: verified claims start as "include as written", unsupported ones as "leave out" with accept disabled; highlights start unchecked | One click commits what verified; anything unverified needs a deliberate edit |
+| 2026-10-18 | The panel polls the run every second while it is running and also refreshes on `agent.*` socket events; the active run id is kept in `sessionStorage` | Polling keeps progress working if the socket drops; the run survives a page reload |
 | 2026-10-18 | `agent_review` stays internal: it is a section, and sections are care-team only | Resolves the design §18 open question with its default, by construction rather than a flag |
 | 2026-10-18 | A claim that failed verification can be edited or rejected but not accepted as written; a highlight whose citation did not resolve cannot be accepted (422) | Keeps unverified model text out of the record unless a clinician rewrites it |
 | 2026-10-18 | Committed highlights are created as `moderate` and `needs_review`; the scorer sets priority | Design §10 keeps risk out of the model's hands; the scorer takes risk as input, so the clinician sets the final risk in the highlight workflow |

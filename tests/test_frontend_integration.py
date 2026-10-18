@@ -43,6 +43,13 @@ def test_patient_page_serves_accessible_app_shell_and_modules():
     assert 'id="patient-dashboard"' in page.text
     assert 'id="patient-action-list"' in page.text
     assert 'id="add-patient-entry"' in page.text
+    assert 'id="agent-review-card"' in page.text
+    assert 'id="agent-claim-list"' in page.text
+    assert 'id="agent-commit"' in page.text
+    assert "/patients/${context.patientId}/agent-runs" in api_module.text
+    assert "/agent-runs/${runId}/review" in api_module.text
+    assert "/agent-runs/${runId}/commit" in api_module.text
+    assert "/agent-runs/${runId}/discard" in api_module.text
 
 
 def test_patient_api_supplies_every_field_required_by_frontend():
