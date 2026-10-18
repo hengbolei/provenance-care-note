@@ -4,7 +4,7 @@ Status tracker for building the agent described in [AGENT_DESIGN.md](AGENT_DESIG
 design says *what* and *why*; this file says *in what order* and *where we are*. Update it in the
 same PR as the work it describes.
 
-Last updated: 2026-10-18 · Current phase: **Phase 1 — Minimal end-to-end loop**, ready to merge; next is Phase 2
+Last updated: 2026-10-18 · Current phase: **Phase 2 — Evaluation and observability** (not started)
 
 ## How we work
 
@@ -33,7 +33,9 @@ Merged in PR #3 (`e62d79c`).
 - [x] 0.4 `AgentActor` and `EntryRef`; SYSTEM writes rejected (`4ab4238`)
 - [x] fix: patients could create internal sections (`96f6aff`)
 
-## Phase 1 — Minimal end-to-end loop · ✅ done (pending merge)
+## Phase 1 — Minimal end-to-end loop · ✅ done
+
+Merged in PR #6 (`50572c9`). CI, including the Docker demo smoke test, passed on the merge.
 
 Branch: `feat/agent-mvp`. Design §17 week 1. Build framework-free parts first, LangGraph last.
 
@@ -65,7 +67,7 @@ Branch: `feat/agent-mvp`. Design §17 week 1. Build framework-free parts first, 
 citations all pass verification; Commit creates the `agent_review` revision, highlights and an
 intact audit chain; CI green.
 
-## Phase 2 — Evaluation and observability
+## Phase 2 — Evaluation and observability · ⏳ next
 
 Branch: `feat/agent-evals`. Design §17 week 2.
 
@@ -160,8 +162,8 @@ Departures from or refinements of the design, newest first.
 - `OpenAIGateway` is covered by mocked HTTP tests only; strict structured output has not yet been
   run against the live API. The first `record_demo_cassette.py --source openai` run will show
   whether the provider rejects any schema keyword.
-- The Docker demo is checked only by the CI `demo` job; it has not been run on a local Docker
-  install.
+- The Docker demo is checked by the CI `demo` job (it passed on PR #6); it has not been run on a
+  local Docker install.
 - Entity extraction (`services/entities.py`) only recognises a medication as a word followed by
   a dose or an action verb, which will cap recall, and reads any word after "hold", "start" and
   similar verbs as a drug ("hold pending"). The verifier filters this; the conflict detector does
