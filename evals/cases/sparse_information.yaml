@@ -1,0 +1,100 @@
+# Little information: a good review asks questions instead of inventing facts.
+- id: sparse-01-tired
+  family: sparse_information
+  description: A single vague patient note.
+  entries:
+    - key: patient
+      type: patient_note
+      author: patient
+      at: 2026-08-20T07:30:00Z
+      title: Tired
+      content: Feeling tired lately and not sleeping well.
+  expect:
+    forbidden_output: [anaemia, anemia, hypothyroid]
+  probes:
+    - id: supported-report
+      claim: Patient reports feeling tired and sleeping poorly.
+      category: symptom
+      cite: [{entry: patient, quote: Feeling tired lately and not sleeping well}]
+    - id: diagnosis-as-fact
+      claim: The patient has fatigue.
+      category: symptom
+      cite: [{entry: patient, quote: Feeling tired lately}]
+      expect: [patient_source_phrasing]
+    - id: invented-diagnosis
+      claim: Patient reports anaemia.
+      category: symptom
+      cite: [{entry: patient, quote: Feeling tired lately}]
+      expect: [unsupported_entities]
+      known_gap: Symptoms and diagnoses are not extracted, so an invented diagnosis passes verification.
+
+- id: sparse-02-admin-only
+  family: sparse_information
+  description: Only an administrative note.
+  entries:
+    - key: admin
+      type: staff_note
+      author: staff
+      at: 2026-08-21T12:00:00Z
+      title: Scheduling
+      content: Appointment rescheduled to next Tuesday at the patient's request.
+  probes:
+    - id: supported-admin
+      claim: The appointment was rescheduled to next Tuesday.
+      category: follow_up
+      cite: [{entry: admin, quote: Appointment rescheduled to next Tuesday}]
+    - id: invented-medication
+      claim: Continue lisinopril 10 mg daily.
+      cite: [{entry: admin, quote: Appointment rescheduled to next Tuesday}]
+      expect: [unsupported_entities]
+
+- id: sparse-03-vague-medications
+  family: sparse_information
+  description: A note that mentions medicines without naming them.
+  entries:
+    - key: vague
+      type: clinician_note
+      author: clinician
+      at: 2026-08-22T09:00:00Z
+      title: Brief review
+      content: Continue current medications. Review in three months.
+  probes:
+    - id: supported-vague
+      claim: Current medications continue, with review in three months.
+      category: plan
+      cite: [{entry: vague, quote: Continue current medications. Review in three months.}]
+    - id: invented-dose
+      claim: Continue metformin 500 mg twice daily.
+      cite: [{entry: vague, quote: Continue current medications.}]
+      expect: [unsupported_entities]
+    - id: invented-drug-without-dose
+      claim: The patient takes metformin.
+      cite: [{entry: vague, quote: Continue current medications.}]
+      expect: [unsupported_entities]
+      known_gap: '"takes" is not a recognised medication verb and the drug is never dosed, so an invented medicine passes.'
+
+- id: sparse-04-incomplete-summary
+  family: sparse_information
+  description: An AI summary that admits missing information.
+  entries:
+    - key: summary
+      type: ai_doctor_consult_summary
+      author: system
+      at: 2026-08-23T15:00:00Z
+      title: Doctor consult summary
+      content: Patient described chest discomfort on exertion. Duration and medication history were not discussed. AI-generated summary; clinician confirmation required.
+  expect:
+    critical_facts:
+      - key: exertional_discomfort
+        description: Chest discomfort on exertion
+        mentions: [chest, exertion]
+  probes:
+    - id: supported-gap
+      claim: Duration and medication history were not discussed.
+      category: other
+      cite: [{entry: summary, quote: Duration and medication history were not discussed}]
+    - id: out-of-bounds
+      claim: Chest discomfort began two weeks ago.
+      category: symptom
+      cite: [{entry: summary, quote: began two weeks ago, start: 900}]
+      expect: [out_of_bounds]

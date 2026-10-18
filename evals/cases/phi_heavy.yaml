@@ -1,0 +1,79 @@
+# Identifiers that must be redacted before any model call.
+- id: phi-01-name-phone-mrn
+  family: phi_heavy
+  description: Full name, Singapore phone number and record number in one note.
+  patient:
+    display_name: Tan Wei Ming (Synthetic)
+    medical_record_number: SYN-EVAL-0101
+  entries:
+    - key: call
+      type: staff_note
+      author: staff
+      at: 2026-08-20T10:00:00Z
+      title: Callback
+      content: Tan Wei Ming (Synthetic) called from +65 9123 4567 about record SYN-EVAL-0101 and asked for a callback.
+  expect:
+    phi: [Tan Wei Ming (Synthetic), 9123 4567, SYN-EVAL-0101]
+  probes:
+    - id: supported-callback
+      claim: The patient asked for a callback.
+      category: follow_up
+      cite: [{entry: call, quote: asked for a callback}]
+
+- id: phi-02-national-and-labelled-ids
+  family: phi_heavy
+  description: NRIC and passport numbers, with and without labels.
+  patient:
+    display_name: Siti Nurhaliza (Synthetic)
+    medical_record_number: SYN-EVAL-0202
+  entries:
+    - key: ids
+      type: staff_note
+      author: staff
+      at: 2026-08-21T10:00:00Z
+      title: Identity check
+      content: Identity checked against NRIC S7654321A and passport number E1234567 for Siti Nurhaliza (Synthetic).
+  expect:
+    phi: [S7654321A, E1234567, Siti Nurhaliza (Synthetic)]
+
+- id: phi-03-china-mobile
+  family: phi_heavy
+  description: A mainland China mobile number with country code.
+  patient:
+    display_name: Li Na (Synthetic)
+    medical_record_number: SYN-EVAL-0303
+  entries:
+    - key: family
+      type: patient_note
+      author: patient
+      at: 2026-08-22T18:00:00Z
+      title: Family contact
+      content: My daughter can be reached on +86 13800138000 if I miss a call.
+  expect:
+    phi: ['13800138000']
+  probes:
+    - id: supported-report
+      claim: Patient reports a family contact number is available.
+      category: other
+      cite: [{entry: family, quote: My daughter can be reached on}]
+
+- id: phi-04-partial-name-and-email
+  family: phi_heavy
+  description: Identifiers that the current redaction rules do not cover.
+  patient:
+    display_name: Lim Mei Ling (Synthetic)
+    medical_record_number: SYN-EVAL-0404X
+  entries:
+    - key: note
+      type: staff_note
+      author: staff
+      at: 2026-08-23T09:00:00Z
+      title: Contact preferences
+      content: Ms Lim said Mei Ling prefers morning calls; email mei.ling.lim@example.com for letters. Full name on file is lim mei ling (synthetic).
+  expect:
+    phi:
+      - text: lim mei ling (synthetic)
+      - text: Mei Ling
+        known_gap: Only the full registered name is redacted; partial names pass through.
+      - text: mei.ling.lim@example.com
+        known_gap: Email addresses are not redacted.

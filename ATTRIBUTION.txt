@@ -14,6 +14,7 @@ Development libraries
 ---------------------
 Pytest - MIT License - https://github.com/pytest-dev/pytest
 Ruff - MIT License - https://github.com/astral-sh/ruff
+PyYAML - MIT License - https://github.com/yaml/pyyaml
 Hatchling - MIT License - https://github.com/pypa/hatch
 
 Optional external services/models

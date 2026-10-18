@@ -75,7 +75,7 @@ No API key is available, so evaluation is split in two (see [Decisions](#decisio
 **pipeline** suite that needs no model and gates CI, and an **agent** suite that scores real
 model drafts from cassettes and reports "not recorded" until they exist.
 
-- [ ] 2.1 Eval case format and at least 30 cases in `evals/cases/*.yaml` across the design §13
+- [x] 2.1 Eval case format and at least 30 cases in `evals/cases/*.yaml` across the design §13
       families: each case is a synthetic record, the conflicts and identifiers it contains, the
       critical facts a review must cover, and probe claims with the verdict the verifier must
       reach (supported, fabricated citation, misquote, wrong dose, wrong polarity, patient-only
@@ -125,6 +125,7 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-18 | Eval cases mark anything the system is known to get wrong with a `known_gap` reason; reports show known gaps separately and they do not fail the gate | The nine gaps found while writing the 32 cases (brand vs generic names; past-tense "stopped" and "takes"; "and 20 mg" and "at 10 mg" dose parsing; "allergy with"; invented diagnoses and invented undosed drugs passing; partial names and email addresses not redacted) stay visible instead of being worded around |
 | 2026-10-18 | Evaluation has two suites: `pipeline` (no model; conflict detection, redaction and verifier accuracy on probe claims) gates CI, and `agent` scores model drafts from cassettes, reporting "not recorded" until live cassettes exist | Without an API key, scoring hand-written drafts would give good-looking numbers that measure nothing; the deterministic parts can be measured honestly now |
 | 2026-10-18 | The automatic revise loop moves from Phase 3 (3.3) to Phase 2 (2.3) | It is the first step where the model reacts to feedback from its environment, which is what makes this an agent rather than a fixed workflow |
 | 2026-10-18 | Budgets (old step 2.3) are marked done | They shipped with the graph and run service in Phase 1 |

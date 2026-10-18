@@ -1,0 +1,129 @@
+# Sources disagree; the review must attribute each fact correctly.
+- id: contra-01-patient-vs-clinician-hold
+  family: contradictory_sources
+  description: The clinician holds a beta blocker; the patient keeps taking it.
+  entries:
+    - key: hold
+      type: clinician_note
+      author: clinician
+      at: 2026-08-15T10:00:00Z
+      title: Slow heart rate
+      content: Heart rate 48. Hold metoprolol until the heart rate is reviewed on Thursday.
+    - key: patient
+      type: patient_note
+      author: patient
+      at: 2026-08-17T08:00:00Z
+      title: Morning tablets
+      content: I take metoprolol every morning as usual and feel fine.
+  expect:
+    conflicts:
+      - {category: medication, entity: metoprolol}
+    critical_facts:
+      - key: hold
+        description: Metoprolol on hold for slow heart rate
+        mentions: [metoprolol, hold]
+  probes:
+    - id: supported-attributed
+      claim: Patient reports still taking metoprolol every morning despite the hold.
+      cite: [{entry: patient, quote: I take metoprolol every morning as usual}]
+    - id: patient-claim-as-fact
+      claim: Metoprolol is taken every morning.
+      cite: [{entry: patient, quote: I take metoprolol every morning as usual}]
+      expect: [patient_source_phrasing]
+
+- id: contra-02-ai-summary-vs-clinician-dose
+  family: contradictory_sources
+  description: An AI consult summary and a clinician note record different statin doses.
+  entries:
+    - key: summary
+      type: ai_doctor_consult_summary
+      author: system
+      at: 2026-08-08T11:00:00Z
+      title: Doctor consult summary
+      content: Discussed atorvastatin 40 mg nightly for cholesterol. AI-generated summary; clinician confirmation required.
+    - key: clinician
+      type: clinician_note
+      author: clinician
+      at: 2026-08-09T09:00:00Z
+      title: Statin dose confirmed
+      content: Atorvastatin 20 mg nightly confirmed with the pharmacy.
+  expect:
+    conflicts:
+      - {category: dose, entity: atorvastatin}
+    critical_facts:
+      - key: statin_conflict
+        description: Atorvastatin recorded as 40 mg and 20 mg
+        mentions: [atorvastatin, 20 mg]
+  probes:
+    - id: supported-clinician
+      claim: Atorvastatin 20 mg nightly was confirmed with the pharmacy.
+      cite: [{entry: clinician, quote: Atorvastatin 20 mg nightly confirmed with the pharmacy}]
+    - id: wrong-source-dose
+      claim: Atorvastatin 40 mg nightly was confirmed with the pharmacy.
+      cite: [{entry: clinician, quote: Atorvastatin 20 mg nightly confirmed with the pharmacy}]
+      expect: [unsupported_entities]
+
+- id: contra-03-staff-vs-patient-allergy
+  family: contradictory_sources
+  description: The pharmacy lists an opioid allergy the patient disputes.
+  entries:
+    - key: staff
+      type: staff_note
+      author: staff
+      at: 2026-07-20T09:00:00Z
+      title: Allergy record
+      content: Allergic to codeine per the pharmacy record.
+    - key: patient
+      type: patient_note
+      author: patient
+      at: 2026-08-02T18:00:00Z
+      title: About my allergies
+      content: I am not allergic to codeine, I just felt sick once.
+  expect:
+    conflicts:
+      - {category: allergy, entity: codeine}
+    critical_facts:
+      - key: codeine_dispute
+        description: Codeine allergy disputed by the patient
+        mentions: [codeine]
+  probes:
+    - id: supported-staff
+      claim: Allergic to codeine per the pharmacy record.
+      category: allergy
+      cite: [{entry: staff, quote: Allergic to codeine per the pharmacy record}]
+    - id: supported-patient-report
+      claim: Patient states they are not allergic to codeine and felt sick once.
+      category: allergy
+      cite: [{entry: patient, quote: "I am not allergic to codeine, I just felt sick once"}]
+
+- id: contra-04-clinicians-disagree
+  family: contradictory_sources
+  description: One clinician continues aspirin, another stops it before dental work.
+  entries:
+    - key: gp
+      type: clinician_note
+      author: clinician
+      at: 2026-07-30T09:00:00Z
+      title: Cardiology follow-up
+      content: Continue aspirin 75 mg daily after the stent.
+    - key: dental
+      type: clinician_note
+      author: clinician
+      at: 2026-08-25T09:00:00Z
+      title: Dental extraction
+      content: Stop aspirin before the dental extraction on Monday.
+  expect:
+    conflicts:
+      - {category: medication, entity: aspirin}
+    critical_facts:
+      - key: aspirin_conflict
+        description: Aspirin continued after a stent but stopped for dental work
+        mentions: [aspirin, stent]
+  probes:
+    - id: supported-continue
+      claim: Continue aspirin 75 mg daily after the stent.
+      cite: [{entry: gp, quote: Continue aspirin 75 mg daily after the stent}]
+    - id: merged-sources
+      claim: Stop aspirin 75 mg after the stent.
+      cite: [{entry: dental, quote: Stop aspirin before the dental extraction}]
+      expect: [unsupported_entities]
