@@ -4,7 +4,7 @@ Status tracker for building the agent described in [AGENT_DESIGN.md](AGENT_DESIG
 design says *what* and *why*; this file says *in what order* and *where we are*. Update it in the
 same PR as the work it describes.
 
-Last updated: 2026-10-18 · Current phase: **Phase 2 — Evaluation, self-correction and observability**
+Last updated: 2026-10-18 · Current phase: **Phase 3 — Retrieval, safety and a second provider** (not started)
 
 ## How we work
 
@@ -67,7 +67,10 @@ Branch: `feat/agent-mvp`. Design §17 week 1. Build framework-free parts first, 
 citations all pass verification; Commit creates the `agent_review` revision, highlights and an
 intact audit chain; CI green.
 
-## Phase 2 — Evaluation, self-correction and observability · ✅ done (pending merge)
+## Phase 2 — Evaluation, self-correction and observability · ✅ done
+
+Merged in PR #9 (`09c5a74`). CI passed on the merge, including the first runs of the Postgres
+integration job, the app-restart check in the Docker demo and the evaluation gate.
 
 Branch: `feat/agent-evals`. Design §17 week 2, plus the revise loop from week 3. Plan revised in
 `c9d0169`.
@@ -103,7 +106,7 @@ cassettes and reports honestly when none are recorded; the revise loop is covere
 measured once live cassettes exist; a run survives a restart in the Docker demo; a trace is
 visible for a demo run.
 
-## Phase 3 — Retrieval, safety and a second provider
+## Phase 3 — Retrieval, safety and a second provider · ⏳ next
 
 Branch: `feat/agent-retrieval`. Design §17 week 3. Blocked on the storage decision below.
 
@@ -202,8 +205,8 @@ Departures from or refinements of the design, newest first.
 - `OpenAIGateway` is covered by mocked HTTP tests only; strict structured output has not yet been
   run against the live API. The first `record_demo_cassette.py --source openai` run will show
   whether the provider rejects any schema keyword.
-- The Docker demo is checked by the CI `demo` job (it passed on PR #6); it has not been run on a
-  local Docker install.
+- The Docker demo is checked by the CI `demo` job (it passed on PRs #6 and #9, including an app
+  restart on #9); it has not been run on a local Docker install.
 - Entity extraction (`services/entities.py`) only recognises a medication as a word followed by
   a dose or an action verb, which will cap recall, and reads any word after "hold", "start" and
   similar verbs as a drug ("hold pending"). The verifier filters this; the conflict detector does
