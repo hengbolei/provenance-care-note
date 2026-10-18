@@ -39,7 +39,7 @@ Branch: `feat/agent-mvp`. Design §17 week 1. Build framework-free parts first, 
 
 - [x] 1.1 `agent/state.py`: `Citation`, `Claim`, `DraftReview`, `CandidateHighlight`,
       `ClaimCheck`, `Budget`, `ReviewState`
-- [ ] 1.2 `agent/verify.py`: deterministic checks 1–6 from design §8, pure functions with dense
+- [x] 1.2 `agent/verify.py`: deterministic checks 1–6 from design §8, pure functions with dense
       unit tests (exists and in scope, in bounds, quote match with relocation, entity support,
       patient-source risk cap, conflict coverage)
 - [ ] 1.3 `agent/gateway.py`: `ModelGateway` protocol (`structured()`, `text()`);
@@ -105,6 +105,8 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-18 | Check 5 phrasing is enforced: claims resting only on patient-sourced text (patient notes and AI patient-session summaries) must contain a reporting cue such as "reports" or "states", else `patient_source_phrasing` | Design §8 requires reported phrasing; a deterministic cue list is checkable, and the revise loop can fix misses |
+| 2026-10-18 | Check 4 support: every medication, dose and allergy fact the claim states must appear in its cited text with the same dose and polarity; claims with no extractable facts pass on valid citations alone | Reuses `extract_entities`, so support is only as strong as extraction (see Known limitations) |
 | 2026-10-18 | Verification results are a `VerificationReport` (per-claim `ClaimCheck` plus uncovered conflict IDs) instead of `list[ClaimCheck]` | Conflict coverage (check 6) belongs to the whole draft, not to one claim |
 | 2026-10-18 | `CandidateHighlight` has no risk level or priority field, and model-output schemas forbid extra keys | Design §10: the deterministic scorer sets highlight risk and priority; the model cannot smuggle them in |
 | 2026-10-18 | Default budget: 60k tokens and $0.50 per run, beside the design's 12 steps, 2 revisions and 60 s | The design names token and cost ceilings without values; revisit with Phase 2 trace data |

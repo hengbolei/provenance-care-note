@@ -80,6 +80,7 @@ class CheckFailure(StrEnum):
     QUOTE_MISMATCH = "quote_mismatch"
     UNSUPPORTED_ENTITIES = "unsupported_entities"
     PATIENT_SOURCE_RISK = "patient_source_risk"
+    PATIENT_SOURCE_PHRASING = "patient_source_phrasing"
 
 
 class ClaimCheck(BaseModel):
