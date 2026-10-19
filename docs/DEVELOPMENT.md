@@ -93,8 +93,41 @@ The agent's model gateway is chosen with `CARENOTE_AGENT_GATEWAY`:
 | `recorded` (default) | Replays cassettes from `evals/cassettes/`; no key, no network |
 | `openai` | Live calls with `OPENAI_API_KEY` and `CARENOTE_OPENAI_MODEL` |
 | `anthropic` | Live calls with `ANTHROPIC_API_KEY` and `CARENOTE_ANTHROPIC_MODEL` |
+| `compatible` | Live calls to any OpenAI Chat Completions-compatible service (see below) |
 | `live` | Live calls to `CARENOTE_AGENT_PROVIDER` (`openai` by default) |
 | `record` | Live calls to `CARENOTE_AGENT_PROVIDER` that also write new cassettes |
+
+`CARENOTE_AGENT_PROVIDER` and `CARENOTE_AGENT_FALLBACK` take `openai`, `anthropic` or
+`compatible`.
+
+### OpenAI-compatible services
+
+`compatible` reaches hosted services and local servers that speak the Chat Completions API:
+
+| Setting | Meaning |
+| --- | --- |
+| `CARENOTE_COMPAT_BASE_URL` | API root, ending before `/chat/completions` |
+| `CARENOTE_COMPAT_MODEL` | Model name as that service spells it |
+| `CARENOTE_COMPAT_API_KEY` | Bearer key; optional for `localhost`, `127.0.0.1` and `host.docker.internal` |
+| `CARENOTE_COMPAT_STRUCTURED` | `json_schema` (default), `json_object` or `tools`: how the service returns structured output |
+
+Starting points (not tested here; check each provider's documentation for current model names
+and which structured-output mode it supports):
+
+| Service | Base URL | Suggested mode |
+| --- | --- | --- |
+| DeepSeek | `https://api.deepseek.com` | `json_object` |
+| Qwen (Alibaba Cloud Model Studio) | `https://dashscope.aliyuncs.com/compatible-mode/v1` | `json_object` |
+| Kimi (Moonshot) | `https://api.moonshot.cn/v1` | `json_object` |
+| GLM (Zhipu) | `https://open.bigmodel.cn/api/paas/v4` | `json_object` |
+| OpenRouter | `https://openrouter.ai/api/v1` | depends on the routed model |
+| Ollama (local) | `http://localhost:11434/v1` | `json_schema` |
+| vLLM (local) | `http://localhost:8001/v1` | `json_schema` |
+
+From the Docker demo, a server on the host is `http://host.docker.internal:<port>/v1`. Reasoning
+text in `<think>` tags and Markdown code fences are stripped before the reply is validated. A
+local server keeps the redacted record on the machine; any hosted service receives it and needs
+the same privacy and data-processing approval as the other providers.
 
 Set `CARENOTE_AGENT_FALLBACK` to the other provider to retry a model call there when the first
 provider fails (unreachable, server errors after retries, or output that breaks the schema). A

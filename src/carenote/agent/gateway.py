@@ -13,6 +13,8 @@ Adapters:
   retries on rate limits and server errors, and token usage on every result.
 - `AnthropicGateway` calls the Messages API; `structured()` forces a single tool call whose input
   schema is the output model, and the same retry and usage rules apply.
+- `OpenAICompatibleGateway` calls any Chat Completions service at a configurable base URL:
+  hosted ones such as DeepSeek, Qwen or Kimi, or a local Ollama or vLLM server.
 - `FallbackGateway` tries a primary gateway and, when its provider fails, a secondary one.
 - `RecordedGateway` replays responses from cassette files, so tests, CI and the offline demo need
   no API key. Given a live gateway it records new cassettes instead.
@@ -23,6 +25,7 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import re
 import time
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
@@ -206,13 +209,15 @@ class _HTTPGateway:
         self.sleep = sleep
         # (input, output) prices; cost stays unknown rather than guessed when not configured.
         self.usd_per_million_tokens = usd_per_million_tokens
+        self.url = self.URL
+        self.key_required = True
 
     def _post(self, headers: dict[str, str], body: dict[str, Any]) -> dict[str, Any]:
-        if not self.api_key:
+        if self.key_required and not self.api_key:
             raise ModelNotConfiguredError(f"{self.KEY_NAME} is not configured")
         for attempt in range(self.max_retries + 1):
             try:
-                response = self.client.post(self.URL, headers=headers, json=body)
+                response = self.client.post(self.url, headers=headers, json=body)
             except httpx.TransportError as exc:
                 if attempt == self.max_retries:
                     raise ExternalModelError("model provider is unreachable") from exc
@@ -240,8 +245,10 @@ def _json_or_error(response: httpx.Response) -> dict[str, Any]:
         raise ExternalModelError("external model returned invalid JSON") from exc
     if response.is_error:
         error = payload.get("error") if isinstance(payload, dict) else None
-        message = (error or {}).get("message", "external model request failed")
-        raise ExternalModelError(str(message))
+        # Most providers send {"error": {"message": ...}}; some local servers send a plain string.
+        if isinstance(error, dict):
+            error = error.get("message")
+        raise ExternalModelError(str(error or "external model request failed"))
     if not isinstance(payload, dict):
         raise ExternalModelError("external model returned an invalid payload")
     return payload
@@ -418,6 +425,166 @@ class AnthropicGateway(_HTTPGateway):
         return self._post(headers, body)
 
 
+_LOCAL_HOSTS = frozenset({"localhost", "127.0.0.1", "::1", "host.docker.internal"})
+# Reasoning models served through compatible APIs may put their reasoning in the content.
+_THINKING = re.compile(r"<think>.*?</think>", re.DOTALL)
+_FENCE = re.compile(r"^```(?:json)?\s*(.*?)\s*```$", re.DOTALL)
+STRUCTURED_MODES = ("json_schema", "json_object", "tools")
+
+
+class OpenAICompatibleGateway(_HTTPGateway):
+    """Any service that speaks OpenAI's Chat Completions API, at a configurable base URL.
+
+    One adapter covers hosted services (DeepSeek, Qwen, Kimi, GLM, OpenRouter, Azure and others)
+    and local servers (Ollama, vLLM, LM Studio). Services differ in how they return structured
+    output, so `structured_mode` picks one:
+
+    - `json_schema`: `response_format` with the strict schema, as OpenAI and recent servers do;
+    - `json_object`: JSON mode, with the schema given in the system message;
+    - `tools`: a forced function call whose parameters are the schema.
+
+    Whatever comes back is validated by Pydantic. A key is optional for a local server, which
+    keeps record text on the machine; any other host receives the redacted request, so it needs
+    the same approvals as the other providers.
+    """
+
+    KEY_NAME = "CARENOTE_COMPAT_API_KEY"
+
+    def __init__(
+        self,
+        base_url: str | None = None,
+        api_key: str | None = None,
+        model: str | None = None,
+        structured_mode: str | None = None,
+        client: httpx.Client | None = None,
+        max_retries: int = 2,
+        backoff_seconds: float = 1.0,
+        sleep: Callable[[float], None] = time.sleep,
+        usd_per_million_tokens: tuple[float, float] | None = None,
+    ) -> None:
+        super().__init__(
+            api_key if api_key is not None else settings.compat_api_key,
+            model or settings.compat_model or "",
+            client,
+            max_retries,
+            backoff_seconds,
+            sleep,
+            usd_per_million_tokens,
+        )
+        base = (base_url or settings.compat_base_url or "").rstrip("/")
+        self.structured_mode = structured_mode or settings.compat_structured
+        if self.structured_mode not in STRUCTURED_MODES:
+            raise ValueError(f"unknown structured mode: {self.structured_mode!r}")
+        self.url = f"{base}/chat/completions"
+        self.key_required = httpx.URL(base).host not in _LOCAL_HOSTS if base else True
+        self._base = base
+
+    def structured(self, request: ModelRequest, schema: type[T]) -> ModelResult[T]:
+        name = schema.__name__
+        system = request.instructions
+        extra: dict[str, Any]
+        if self.structured_mode == "json_schema":
+            extra = {
+                "response_format": {
+                    "type": "json_schema",
+                    "json_schema": {
+                        "name": name,
+                        "schema": strict_json_schema(schema),
+                        "strict": True,
+                    },
+                }
+            }
+        elif self.structured_mode == "json_object":
+            schema_text = json.dumps(schema.model_json_schema(), ensure_ascii=False)
+            system += (
+                f"\n\nRespond with one JSON object, and nothing else, that is a valid {name} "
+                f"matching this JSON schema:\n{schema_text}"
+            )
+            extra = {"response_format": {"type": "json_object"}}
+        else:
+            extra = {
+                "tools": [
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": name,
+                            "description": f"Return the {name}.",
+                            "parameters": schema.model_json_schema(),
+                        },
+                    }
+                ],
+                "tool_choice": {"type": "function", "function": {"name": name}},
+            }
+        payload = self._call(request, system, extra)
+        message = self._message(payload)
+        if self.structured_mode == "tools":
+            calls = [
+                call.get("function", {}).get("arguments")
+                for call in message.get("tool_calls") or []
+                if call.get("function", {}).get("name") == name
+            ]
+            if len(calls) != 1:
+                raise ExternalModelError(f"model did not return one {name}")
+            raw = calls[0] if isinstance(calls[0], str) else json.dumps(calls[0])
+        else:
+            raw = self._content(message)
+        try:
+            output = schema.model_validate_json(raw)
+        except ValidationError as exc:
+            raise ExternalModelError(f"model output does not match {name}") from exc
+        return ModelResult(output=output, model=self.model, usage=self._usage_of(payload))
+
+    def text(self, request: ModelRequest) -> ModelResult[str]:
+        payload = self._call(request, request.instructions, {})
+        return ModelResult(
+            output=self._content(self._message(payload)),
+            model=self.model,
+            usage=self._usage_of(payload),
+        )
+
+    def _call(self, request: ModelRequest, system: str, extra: dict[str, Any]) -> dict[str, Any]:
+        if not self._base or not self.model:
+            raise ModelNotConfiguredError(
+                "CARENOTE_COMPAT_BASE_URL and CARENOTE_COMPAT_MODEL are not configured"
+            )
+        body: dict[str, Any] = {
+            "model": self.model,
+            "max_tokens": request.max_output_tokens,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": request.input_text},
+            ],
+            **extra,
+        }
+        headers = {"Authorization": f"Bearer {self.api_key}"} if self.api_key else {}
+        return self._post(headers, body)
+
+    @staticmethod
+    def _message(payload: dict[str, Any]) -> dict[str, Any]:
+        choices = payload.get("choices") or []
+        if not choices or not isinstance(choices[0].get("message"), dict):
+            raise ExternalModelError("model returned no message")
+        return choices[0]["message"]
+
+    @staticmethod
+    def _content(message: dict[str, Any]) -> str:
+        text = _THINKING.sub("", str(message.get("content") or "")).strip()
+        fenced = _FENCE.match(text)
+        text = fenced.group(1) if fenced else text
+        if not text:
+            raise ExternalModelError("model returned no text")
+        return text
+
+    def _usage_of(self, payload: dict[str, Any]) -> Usage:
+        raw = payload.get("usage") or {}
+        return self._usage(
+            {
+                "input_tokens": raw.get("prompt_tokens"),
+                "output_tokens": raw.get("completion_tokens"),
+            }
+        )
+
+
 class FallbackGateway:
     """Calls `primary`; when its provider fails (`ExternalModelError`), calls `secondary` once.
 
@@ -539,6 +706,7 @@ class RecordedGateway:
 PROVIDERS: dict[str, Callable[[], ModelGateway]] = {
     "openai": OpenAIGateway,
     "anthropic": AnthropicGateway,
+    "compatible": OpenAICompatibleGateway,
 }
 
 
@@ -558,7 +726,7 @@ def live_gateway(provider: str | None = None, fallback: str | None = None) -> Mo
 def gateway_from_settings(mode: str | None = None) -> ModelGateway:
     """Build the gateway named by CARENOTE_AGENT_GATEWAY.
 
-    `recorded` replays cassettes; `openai` or `anthropic` call that provider; `live` calls
+    `recorded` replays cassettes; `openai`, `anthropic` or `compatible` call that provider; `live` calls
     CARENOTE_AGENT_PROVIDER; `record` makes live calls that also write cassettes. Live calls fall
     back to CARENOTE_AGENT_FALLBACK when it names another provider.
     """
