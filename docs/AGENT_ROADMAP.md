@@ -4,7 +4,7 @@ Status tracker for building the agent described in [AGENT_DESIGN.md](AGENT_DESIG
 design says *what* and *why*; this file says *in what order* and *where we are*. Update it in the
 same PR as the work it describes.
 
-Last updated: 2026-10-18 · Current phase: **Phase 3 — Retrieval, safety and a second provider** (not started)
+Last updated: 2026-10-19 · Current phase: **Phase 3 — Retrieval, safety and a second provider**
 
 ## How we work
 
@@ -106,19 +106,33 @@ cassettes and reports honestly when none are recorded; the revise loop is covere
 measured once live cassettes exist; a run survives a restart in the Docker demo; a trace is
 visible for a demo run.
 
-## Phase 3 — Retrieval, safety and a second provider · ⏳ next
+## Phase 3 — Retrieval, safety and a second provider · 🚧 in progress
 
-Branch: `feat/agent-retrieval`. Design §17 week 3. Blocked on the storage decision below.
+Branch: `feat/agent-retrieval`. Design §17 week 3.
 
-- [ ] 3.0 Decide the retrieval storage model (see [Open questions](#open-questions))
-- [ ] 3.1 Embedding index with clinic scope; hybrid search with reciprocal rank fusion
-- [ ] 3.2 `plan` and `retrieve` nodes
+Retrieval keeps the encrypted snapshot and runs in application memory over one patient's
+entries, instead of the in-database `tsvector` / pgvector search in design §9 (see
+[Decisions](#decisions)). It starts lexical and deterministic, so the pipeline suite can measure
+it with no model; embeddings come last and are optional.
+
+- [x] 3.0 Retrieval storage model decided: keep the snapshot, retrieve in memory
+- [ ] 3.1 `retrieval/` module behind a storage-agnostic `Retriever` interface: BM25 over the
+      patient's redacted entries, query expansion from a medication synonym and brand/generic
+      table; hits are `Span`s with offsets, so they are valid citations; the pipeline suite
+      reports retrieval recall of each case's key entries
+- [ ] 3.2 `plan` and `retrieve` nodes: the model proposes queries, retrieval adds the matching
+      entries to the context beside the most recent ones, within a context budget; long-timeline
+      cases get every key entry into the model-bound payload
 - [x] 3.3 `revise` loop: moved to step 2.3
 - [ ] 3.4 Prompt-injection defences and eval cases
 - [ ] 3.5 Second provider adapter with fallback
+- [ ] 3.6 Optional local embeddings (an extra, off by default) behind the same interface, fused
+      with BM25 by reciprocal rank fusion; vectors are held in memory only; kept only if the
+      eval suite shows a gain over 3.1
 
-**Exit criteria**: 0 injection failures; critical-finding recall ≥ 90% on timelines of 50+
-entries.
+**Exit criteria**: 0 injection failures; every key entry of the long-timeline cases reaches the
+model-bound payload; critical-finding recall ≥ 90% on timelines of 50+ entries once live
+cassettes exist.
 
 ## Later
 
@@ -132,6 +146,9 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-19 | Retrieval keeps the encrypted per-clinic snapshot and searches in application memory, scoped to one patient; no `tsvector`, pgvector or per-row entry table (design §9 option (b)) | Retrieval only ever searches one patient's timeline, tens to hundreds of entries, where a database index gains nothing; a per-row search column or embeddings would put derived clinical text in clear at rest while redaction still has known gaps; one code path serves the in-memory and Postgres repositories |
+| 2026-10-19 | Retrieval sits behind a storage-agnostic `Retriever` interface; moving entries to per-row storage (option (a)) is deferred to a separate persistence refactor | Option (a) is only needed for scale or multiple app processes, which the snapshot model limits anyway; doing it inside a retrieval step would mix two large changes |
+| 2026-10-19 | Retrieval is lexical first (BM25 plus a synonym and brand/generic table); embeddings are an optional later step using a local model, not an API | Deterministic and offline, so CI and the pipeline suite can measure it with no API key; the synonym table also targets the brand vs generic known gap |
 | 2026-10-18 | Each run is one OpenTelemetry trace whose trace ID is the run ID | Spans from separate graph segments, and from before and after a restart, join one trace; audit events already carry the run ID, so they join without changing the hash-chained audit schema |
 | 2026-10-18 | Spans carry IDs, node names, durations, model names, prompt versions and token counts only, never record, claim or quote text | Traces leave the clinical boundary to an external collector, so they must hold nothing that needs redaction |
 | 2026-10-18 | The panel's run timeline comes from metadata-only steps stored on the run (`agent_runs.timeline`), not from the trace backend | It works with no collector configured and survives restarts with the run |
@@ -185,19 +202,13 @@ Departures from or refinements of the design, newest first.
 | 2026-10-17 | Agent tools **read as the principal clinician**; the `AgentActor` (Role.SYSTEM) is write-denied | Every service read already denies SYSTEM; reading as the clinician reuses their exact scope instead of adding agent-specific permissions |
 | 2026-10-17 | Redaction offset mapping moved from a risk (design §18) to a Phase 0 prerequisite | Citations cannot be verified without it |
 
-## Open questions
-
-- **Retrieval storage (blocks Phase 3).** `PostgresCareNoteRepository` stores one encrypted
-  snapshot per clinic and searches in memory, so the in-database `tsvector` / pgvector search in
-  design §9 cannot index anything. Options: (a) move entries to per-row storage with encrypted
-  content plus a redacted search column or embeddings; (b) keep the snapshot and run vector
-  search in application memory.
-
 ## Known limitations
 
 - The draft prompt receives only the 40 most recent entries. In 3 of the 4 long-timeline eval
-  cases an earlier key entry never reaches the model (see `evals/REPORT.md`); Phase 3 retrieval
-  addresses this.
+  cases an earlier key entry never reaches the model (see `evals/REPORT.md`); steps 3.1 and 3.2
+  address this.
+- Clinical data stays one encrypted snapshot per clinic, loaded whole into each app process, so
+  retrieval scales with that snapshot; per-row storage is deferred (see [Decisions](#decisions)).
 - Commit writes the section, then each highlight; a failure part-way leaves the earlier writes in
   place and marks the run failed. Decisions are validated first to make this unlikely.
 - Without `CARENOTE_DATABASE_URL`, runs and checkpoints live in memory and a restart loses them;
