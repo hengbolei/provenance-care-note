@@ -37,6 +37,11 @@ services:
       CARENOTE_AGENT_FALLBACK: ${CARENOTE_AGENT_FALLBACK:-}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      # compatible: any Chat Completions service, e.g. http://host.docker.internal:11434/v1.
+      CARENOTE_COMPAT_BASE_URL: ${CARENOTE_COMPAT_BASE_URL:-}
+      CARENOTE_COMPAT_MODEL: ${CARENOTE_COMPAT_MODEL:-}
+      CARENOTE_COMPAT_API_KEY: ${CARENOTE_COMPAT_API_KEY:-}
+      CARENOTE_COMPAT_STRUCTURED: ${CARENOTE_COMPAT_STRUCTURED:-json_schema}
       # Set to an OTLP/HTTP collector (e.g. Langfuse or Jaeger) to export agent traces.
       OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
     ports:

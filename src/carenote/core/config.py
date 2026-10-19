@@ -15,8 +15,15 @@ class Settings:
     openai_model: str = os.getenv("CARENOTE_OPENAI_MODEL", "gpt-5-mini")
     anthropic_api_key: str | None = os.getenv("ANTHROPIC_API_KEY")
     anthropic_model: str = os.getenv("CARENOTE_ANTHROPIC_MODEL", "claude-sonnet-5-5")
-    # recorded: replay cassettes only (default, no key needed); openai or anthropic: live calls to
-    # that provider; live: live calls to agent_provider; record: live calls that write cassettes.
+    # Any OpenAI Chat Completions-compatible service, hosted or local (e.g. Ollama, vLLM).
+    compat_base_url: str | None = os.getenv("CARENOTE_COMPAT_BASE_URL")
+    compat_api_key: str | None = os.getenv("CARENOTE_COMPAT_API_KEY")
+    compat_model: str | None = os.getenv("CARENOTE_COMPAT_MODEL")
+    # json_schema, json_object or tools: how the service returns structured output.
+    compat_structured: str = os.getenv("CARENOTE_COMPAT_STRUCTURED", "json_schema")
+    # recorded: replay cassettes only (default, no key needed); openai, anthropic or compatible:
+    # live calls to that provider; live: live calls to agent_provider; record: live calls that
+    # also write cassettes.
     agent_gateway: str = os.getenv("CARENOTE_AGENT_GATEWAY", "recorded")
     agent_provider: str = os.getenv("CARENOTE_AGENT_PROVIDER", "openai")
     # The provider to try when the live one fails; empty for no fallback.

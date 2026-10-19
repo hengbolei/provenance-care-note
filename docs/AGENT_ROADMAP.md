@@ -164,6 +164,8 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-19 | One `OpenAICompatibleGateway` (provider `compatible`) covers hosted Chat Completions services and local servers, with `CARENOTE_COMPAT_STRUCTURED` choosing `json_schema`, `json_object` or `tools` | Many services speak this API but differ in structured-output support; one adapter with a mode gives many models without a client per vendor, and a local server keeps the redacted record on the machine |
+| 2026-10-19 | The compatible adapter needs no key for `localhost`, `127.0.0.1`, `::1` or `host.docker.internal`, strips `<think>` reasoning and code fences, and accepts a plain-string `error` | Local servers often run without auth; reasoning models and JSON mode wrap their output in ways the schema validation would otherwise reject |
 | 2026-10-19 | Local embeddings (step 3.6) are deferred | BM25 with synonyms meets every retrieval and context gate; an embedding model adds a dependency and offline-CI cost with no measured gain |
 | 2026-10-19 | The second provider is Anthropic's Messages API, called over HTTP like OpenAI, with structured output as a forced call to one tool whose input schema is the output model | No new SDK dependency; tool forcing is the provider's established way to get schema-shaped output, and Pydantic validates the result as for OpenAI |
 | 2026-10-19 | The fallback triggers only on `ExternalModelError` (unreachable, errors after retries, output that breaks the schema), not on a missing key or cassette | Falling back on configuration errors would hide them; the result's `fallback_from` and the trace attribute keep a fallback visible |
@@ -248,8 +250,9 @@ Departures from or refinements of the design, newest first.
   place and marks the run failed. Decisions are validated first to make this unlikely.
 - Without `CARENOTE_DATABASE_URL`, runs and checkpoints live in memory and a restart loses them;
   with Postgres they persist (step 2.4).
-- `OpenAIGateway` and `AnthropicGateway` are covered by mocked HTTP tests only; neither has been
-  run against its live API. The first `record_demo_cassette.py --source openai` (or
+- `OpenAIGateway`, `AnthropicGateway` and `OpenAICompatibleGateway` are covered by mocked HTTP
+  tests only; none has been run against a live API, and the compatible services' suggested
+  modes in `docs/DEVELOPMENT.md` are unverified. The first `record_demo_cassette.py --source openai` (or
   `--source anthropic`) run will show whether the provider rejects any schema keyword.
 - The Docker demo is checked by the CI `demo` job (it passed on PRs #6 and #9, including an app
   restart on #9); it has not been run on a local Docker install.

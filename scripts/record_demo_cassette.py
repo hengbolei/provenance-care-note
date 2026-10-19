@@ -3,6 +3,7 @@
     python scripts/record_demo_cassette.py              # curated draft, no API key needed
     python scripts/record_demo_cassette.py --source openai   # live model; needs OPENAI_API_KEY
     python scripts/record_demo_cassette.py --source anthropic   # needs ANTHROPIC_API_KEY
+    python scripts/record_demo_cassette.py --source compatible  # needs CARENOTE_COMPAT_* settings
 
 The curated source is a hand-written draft that cites the seed record exactly. It is labelled
 as curated in the cassette's model field, so it is never mistaken for model output. Re-record
@@ -207,7 +208,9 @@ def _cassettes(directory: Path) -> list[Path]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--source", choices=["curated", "openai", "anthropic"], default="curated")
+    parser.add_argument(
+        "--source", choices=["curated", "openai", "anthropic", "compatible"], default="curated"
+    )
     parser.add_argument("--directory", type=Path, default=CASSETTE_DIR)
     args = parser.parse_args()
 
