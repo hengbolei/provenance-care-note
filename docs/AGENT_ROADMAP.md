@@ -106,7 +106,7 @@ cassettes and reports honestly when none are recorded; the revise loop is covere
 measured once live cassettes exist; a run survives a restart in the Docker demo; a trace is
 visible for a demo run.
 
-## Phase 3 — Retrieval, safety and a second provider · 🚧 in progress
+## Phase 3 — Retrieval, safety and a second provider · ✅ done (pending merge)
 
 Branch: `feat/agent-retrieval`. Design §17 week 3.
 
@@ -115,38 +115,45 @@ entries, instead of the in-database `tsvector` / pgvector search in design §9 (
 [Decisions](#decisions)). It starts lexical and deterministic, so the pipeline suite can measure
 it with no model; embeddings come last and are optional.
 
-- [x] 3.0 Retrieval storage model decided: keep the snapshot, retrieve in memory
+- [x] 3.0 Retrieval storage model decided: keep the snapshot, retrieve in memory (`70eebaa`)
 - [x] 3.1 `retrieval/` module behind a storage-agnostic `Retriever` interface: BM25 over the
       sentence passages of the patient's entries, with a synonym table (brand and generic
       names, spellings, abbreviations) and one-way drug-class expansion; hits are `Span`s with
       offsets, so they are valid citations; replaces `repositories/search.py`; the pipeline
-      suite gates retrieval recall of each case's key entries in the top 10
+      suite gates retrieval recall of each case's key entries in the top 10 (`8766a9f`)
 - [x] 3.2 `plan` and `retrieve` nodes: three standing questions, one per conflicting medicine and
       up to six from the model (`plan_v1`); `retrieve` searches the whole record per question and
       swaps conflicting entries and the best older hits into up to half of the 40-entry window;
       the draft (`draft_v2`) sees every question; the pipeline suite now gates that every key
-      entry of every case reaches the draft payload (was 90.6%)
+      entry of every case reaches the draft payload (was 90.6%) (`ceaa85b`)
 - [x] 3.3 `revise` loop: moved to step 2.3
 - [x] 3.4 Prompt-injection defences and eval cases: redaction neutralises tag-like `<` (same
       length, offsets unchanged) and `ModelRequest` refuses text that still has it; a narrow
       detector marks entries that address an assistant (`instruction_like="true"`, prompts
       `plan_v2`, `draft_v3`, `revise_v2`); open questions and highlights that repeat a flagged
       passage are withheld and counted; the panel shows both; four new cases (36 in all) and
-      pipeline gates for detection, false flags and framing
+      pipeline gates for detection, false flags and framing (`2c0105a`)
 - [x] 3.5 Second provider adapter with fallback: `AnthropicGateway` (Messages API, structured
       output as a forced tool call) beside `OpenAIGateway` on shared retry and error handling;
       `FallbackGateway` retries a call on the other provider when the first fails; settings
       `CARENOTE_AGENT_PROVIDER` and `CARENOTE_AGENT_FALLBACK`; tested with mocked HTTP only
-- [ ] 3.6 Optional local embeddings (an extra, off by default) behind the same interface, fused
-      with BM25 by reciprocal rank fusion; vectors are held in memory only; kept only if the
-      eval suite shows a gain over 3.1
+      (`4ede248`)
+- [x] 3.6 Optional local embeddings: deferred to [Later](#later). BM25 with the synonym table
+      already meets every retrieval and context gate, so there is no gain for the eval suite to
+      measure yet
 
 **Exit criteria**: 0 injection failures; every key entry of the long-timeline cases reaches the
 model-bound payload; critical-finding recall ≥ 90% on timelines of 50+ entries once live
 cassettes exist.
 
+Status: every key entry reaches the draft payload (100%), and the deterministic injection gates
+pass (detection 100%, false flags 0, framing breaks 0). Injection failures and critical-finding
+recall are model metrics: the agent suite reports them only once live cassettes are recorded.
+
 ## Later
 
+- Local embeddings fused with BM25 (formerly 3.6), when an eval case shows wording that the
+  synonym table cannot reach, such as multi-word lay terms ("blood thinner")
 - Expose tools as an MCP server
 - Streaming token output
 - Per-claim LLM-judge flag in the review panel
@@ -157,6 +164,7 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-19 | Local embeddings (step 3.6) are deferred | BM25 with synonyms meets every retrieval and context gate; an embedding model adds a dependency and offline-CI cost with no measured gain |
 | 2026-10-19 | The second provider is Anthropic's Messages API, called over HTTP like OpenAI, with structured output as a forced call to one tool whose input schema is the output model | No new SDK dependency; tool forcing is the provider's established way to get schema-shaped output, and Pydantic validates the result as for OpenAI |
 | 2026-10-19 | The fallback triggers only on `ExternalModelError` (unreachable, errors after retries, output that breaks the schema), not on a missing key or cassette | Falling back on configuration errors would hide them; the result's `fallback_from` and the trace attribute keep a fallback visible |
 | 2026-10-19 | Cassettes stay provider-agnostic: keyed by the request, storing the model that answered | A draft recorded through either provider, or through a fallback, replays the same way |
