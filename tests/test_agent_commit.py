@@ -7,7 +7,14 @@ from fastapi.testclient import TestClient
 from carenote.agent.commit import AGENT_REVIEW_SECTION, commit_review
 from carenote.agent.gateway import ModelResult
 from carenote.agent.runs import AgentCommitRequest, AgentRunService
-from carenote.agent.state import CandidateHighlight, Citation, Claim, ClaimDecision, RunStatus
+from carenote.agent.state import (
+    CandidateHighlight,
+    Citation,
+    Claim,
+    ClaimDecision,
+    ReviewPlan,
+    RunStatus,
+)
 from carenote.api import routes
 from carenote.core.identity import session_service
 from carenote.data.seed import DEMO_CLINIC_ID, DEMO_CLINICIAN_ID, DEMO_PATIENT_ID, seed_demo_data
@@ -31,6 +38,8 @@ class GatewayWithUnsupportedItems(ScriptedGateway):
 
     def structured(self, request, schema):
         result = super().structured(request, schema)
+        if schema is ReviewPlan:
+            return result
         draft = result.output
         good = draft.claims[0].citations[0]
         bad = Citation(entry_id=good.entry_id, start=0, end=10, quote="stop lisinopril tonight")

@@ -4,7 +4,7 @@ Status tracker for building the agent described in [AGENT_DESIGN.md](AGENT_DESIG
 design says *what* and *why*; this file says *in what order* and *where we are*. Update it in the
 same PR as the work it describes.
 
-Last updated: 2026-10-18 · Current phase: **Phase 3 — Retrieval, safety and a second provider** (not started)
+Last updated: 2026-10-19 · Current phase: **Phase 3 — Retrieval, safety and a second provider**
 
 ## How we work
 
@@ -106,22 +106,54 @@ cassettes and reports honestly when none are recorded; the revise loop is covere
 measured once live cassettes exist; a run survives a restart in the Docker demo; a trace is
 visible for a demo run.
 
-## Phase 3 — Retrieval, safety and a second provider · ⏳ next
+## Phase 3 — Retrieval, safety and a second provider · ✅ done (pending merge)
 
-Branch: `feat/agent-retrieval`. Design §17 week 3. Blocked on the storage decision below.
+Branch: `feat/agent-retrieval`. Design §17 week 3.
 
-- [ ] 3.0 Decide the retrieval storage model (see [Open questions](#open-questions))
-- [ ] 3.1 Embedding index with clinic scope; hybrid search with reciprocal rank fusion
-- [ ] 3.2 `plan` and `retrieve` nodes
+Retrieval keeps the encrypted snapshot and runs in application memory over one patient's
+entries, instead of the in-database `tsvector` / pgvector search in design §9 (see
+[Decisions](#decisions)). It starts lexical and deterministic, so the pipeline suite can measure
+it with no model; embeddings come last and are optional.
+
+- [x] 3.0 Retrieval storage model decided: keep the snapshot, retrieve in memory (`70eebaa`)
+- [x] 3.1 `retrieval/` module behind a storage-agnostic `Retriever` interface: BM25 over the
+      sentence passages of the patient's entries, with a synonym table (brand and generic
+      names, spellings, abbreviations) and one-way drug-class expansion; hits are `Span`s with
+      offsets, so they are valid citations; replaces `repositories/search.py`; the pipeline
+      suite gates retrieval recall of each case's key entries in the top 10 (`8766a9f`)
+- [x] 3.2 `plan` and `retrieve` nodes: three standing questions, one per conflicting medicine and
+      up to six from the model (`plan_v1`); `retrieve` searches the whole record per question and
+      swaps conflicting entries and the best older hits into up to half of the 40-entry window;
+      the draft (`draft_v2`) sees every question; the pipeline suite now gates that every key
+      entry of every case reaches the draft payload (was 90.6%) (`ceaa85b`)
 - [x] 3.3 `revise` loop: moved to step 2.3
-- [ ] 3.4 Prompt-injection defences and eval cases
-- [ ] 3.5 Second provider adapter with fallback
+- [x] 3.4 Prompt-injection defences and eval cases: redaction neutralises tag-like `<` (same
+      length, offsets unchanged) and `ModelRequest` refuses text that still has it; a narrow
+      detector marks entries that address an assistant (`instruction_like="true"`, prompts
+      `plan_v2`, `draft_v3`, `revise_v2`); open questions and highlights that repeat a flagged
+      passage are withheld and counted; the panel shows both; four new cases (36 in all) and
+      pipeline gates for detection, false flags and framing (`2c0105a`)
+- [x] 3.5 Second provider adapter with fallback: `AnthropicGateway` (Messages API, structured
+      output as a forced tool call) beside `OpenAIGateway` on shared retry and error handling;
+      `FallbackGateway` retries a call on the other provider when the first fails; settings
+      `CARENOTE_AGENT_PROVIDER` and `CARENOTE_AGENT_FALLBACK`; tested with mocked HTTP only
+      (`4ede248`)
+- [x] 3.6 Optional local embeddings: deferred to [Later](#later). BM25 with the synonym table
+      already meets every retrieval and context gate, so there is no gain for the eval suite to
+      measure yet
 
-**Exit criteria**: 0 injection failures; critical-finding recall ≥ 90% on timelines of 50+
-entries.
+**Exit criteria**: 0 injection failures; every key entry of the long-timeline cases reaches the
+model-bound payload; critical-finding recall ≥ 90% on timelines of 50+ entries once live
+cassettes exist.
+
+Status: every key entry reaches the draft payload (100%), and the deterministic injection gates
+pass (detection 100%, false flags 0, framing breaks 0). Injection failures and critical-finding
+recall are model metrics: the agent suite reports them only once live cassettes are recorded.
 
 ## Later
 
+- Local embeddings fused with BM25 (formerly 3.6), when an eval case shows wording that the
+  synonym table cannot reach, such as multi-word lay terms ("blood thinner")
 - Expose tools as an MCP server
 - Streaming token output
 - Per-claim LLM-judge flag in the review panel
@@ -132,6 +164,25 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-19 | Local embeddings (step 3.6) are deferred | BM25 with synonyms meets every retrieval and context gate; an embedding model adds a dependency and offline-CI cost with no measured gain |
+| 2026-10-19 | The second provider is Anthropic's Messages API, called over HTTP like OpenAI, with structured output as a forced call to one tool whose input schema is the output model | No new SDK dependency; tool forcing is the provider's established way to get schema-shaped output, and Pydantic validates the result as for OpenAI |
+| 2026-10-19 | The fallback triggers only on `ExternalModelError` (unreachable, errors after retries, output that breaks the schema), not on a missing key or cassette | Falling back on configuration errors would hide them; the result's `fallback_from` and the trace attribute keep a fallback visible |
+| 2026-10-19 | Cassettes stay provider-agnostic: keyed by the request, storing the model that answered | A draft recorded through either provider, or through a fallback, replays the same way |
+| 2026-10-19 | Tag-like markup in model-bound text becomes `‹` inside `PHIRedactionGateway.redact`, and `ModelRequest` refuses a `RedactionResult` that still contains it | Every model input already passes through redaction, so no caller can forget the guard; one character for one keeps the offset map and citation checks exact |
+| 2026-10-19 | Instruction-like entries are flagged by narrow regular expressions aimed at text that addresses an assistant or the output, not by a model | Deterministic and testable; the eval cases gate false flags at 0, and one indirect injection is a known gap rather than a looser pattern |
+| 2026-10-19 | Open questions and highlight suggestions sharing four consecutive words with a flagged passage are withheld; claims are not filtered | These texts are never verified against citations, while every claim already is; the run reports what was withheld by position and source entry, without its text |
+| 2026-10-19 | The agent suite's injection metric still counts any forbidden text anywhere in the draft, including unverified claims | A draft that obeys an injection is a failure even when verification would keep it out of the record |
+| 2026-10-19 | `plan` always adds three standing questions (medication changes, allergies, follow-ups) and one per conflicting medicine to the model's questions | Retrieval must not depend on the model asking well; the standing questions alone bring every key entry of the eval cases into the draft |
+| 2026-10-19 | Older retrieved entries may take at most half of the context window; conflicting entries go first, then hits round-robin by rank across questions | Keeps the most recent entries the review also needs, and gives every question its best hit before any second best |
+| 2026-10-19 | Questions reach the draft as `<question source=...>` data and the prompt treats them as untrusted | A model question was written after reading record content, so an injection could shape it |
+| 2026-10-19 | Default step budget rises from 12 to 14 | `plan` and `retrieve` are two more automated steps; the worst case (two automatic and two clinician revisions) is now 14 |
+| 2026-10-19 | Without a recorded plan the pipeline suite continues with an empty model plan, and its context check reads the draft request only | The suite measures deterministic retrieval with no model; the plan request is still checked for identifier leaks |
+| 2026-10-19 | BM25 uses `b = 0` (no length normalisation), and equal scores fall back to recency | Passages are single sentences, so length says little about relevance; recency keeps the old keyword search's tie order |
+| 2026-10-19 | Retrieval searches the entries' original text; the agent's `search_entries` tool maps hits to redacted offsets as before | Redaction placeholders would otherwise match queries, and the model's queries come from redacted text, so they cannot name an identifier it was never shown |
+| 2026-10-19 | Eval cases gain `expect.retrieval` (query plus entries that must be in the top 10), gated at 100% | Measures retrieval with no model; one known gap ("blood thinner") marks that multi-word lay terms are not mapped |
+| 2026-10-19 | Retrieval keeps the encrypted per-clinic snapshot and searches in application memory, scoped to one patient; no `tsvector`, pgvector or per-row entry table (design §9 option (b)) | Retrieval only ever searches one patient's timeline, tens to hundreds of entries, where a database index gains nothing; a per-row search column or embeddings would put derived clinical text in clear at rest while redaction still has known gaps; one code path serves the in-memory and Postgres repositories |
+| 2026-10-19 | Retrieval sits behind a storage-agnostic `Retriever` interface; moving entries to per-row storage (option (a)) is deferred to a separate persistence refactor | Option (a) is only needed for scale or multiple app processes, which the snapshot model limits anyway; doing it inside a retrieval step would mix two large changes |
+| 2026-10-19 | Retrieval is lexical first (BM25 plus a synonym and brand/generic table); embeddings are an optional later step using a local model, not an API | Deterministic and offline, so CI and the pipeline suite can measure it with no API key; the synonym table also targets the brand vs generic known gap |
 | 2026-10-18 | Each run is one OpenTelemetry trace whose trace ID is the run ID | Spans from separate graph segments, and from before and after a restart, join one trace; audit events already carry the run ID, so they join without changing the hash-chained audit schema |
 | 2026-10-18 | Spans carry IDs, node names, durations, model names, prompt versions and token counts only, never record, claim or quote text | Traces leave the clinical boundary to an external collector, so they must hold nothing that needs redaction |
 | 2026-10-18 | The panel's run timeline comes from metadata-only steps stored on the run (`agent_runs.timeline`), not from the trace backend | It works with no collector configured and survives restarts with the run |
@@ -185,26 +236,21 @@ Departures from or refinements of the design, newest first.
 | 2026-10-17 | Agent tools **read as the principal clinician**; the `AgentActor` (Role.SYSTEM) is write-denied | Every service read already denies SYSTEM; reading as the clinician reuses their exact scope instead of adding agent-specific permissions |
 | 2026-10-17 | Redaction offset mapping moved from a risk (design §18) to a Phase 0 prerequisite | Citations cannot be verified without it |
 
-## Open questions
-
-- **Retrieval storage (blocks Phase 3).** `PostgresCareNoteRepository` stores one encrypted
-  snapshot per clinic and searches in memory, so the in-database `tsvector` / pgvector search in
-  design §9 cannot index anything. Options: (a) move entries to per-row storage with encrypted
-  content plus a redacted search column or embeddings; (b) keep the snapshot and run vector
-  search in application memory.
-
 ## Known limitations
 
-- The draft prompt receives only the 40 most recent entries. In 3 of the 4 long-timeline eval
-  cases an earlier key entry never reaches the model (see `evals/REPORT.md`); Phase 3 retrieval
-  addresses this.
+- The draft prompt receives at most 40 entries: the most recent, with up to 20 swapped for older
+  retrieved evidence. A record whose relevant history needs more than that, or whose wording
+  the synonym table does not cover, can still leave evidence out; the plan's questions only help
+  if retrieval finds their words.
+- Clinical data stays one encrypted snapshot per clinic, loaded whole into each app process, so
+  retrieval scales with that snapshot; per-row storage is deferred (see [Decisions](#decisions)).
 - Commit writes the section, then each highlight; a failure part-way leaves the earlier writes in
   place and marks the run failed. Decisions are validated first to make this unlikely.
 - Without `CARENOTE_DATABASE_URL`, runs and checkpoints live in memory and a restart loses them;
   with Postgres they persist (step 2.4).
-- `OpenAIGateway` is covered by mocked HTTP tests only; strict structured output has not yet been
-  run against the live API. The first `record_demo_cassette.py --source openai` run will show
-  whether the provider rejects any schema keyword.
+- `OpenAIGateway` and `AnthropicGateway` are covered by mocked HTTP tests only; neither has been
+  run against its live API. The first `record_demo_cassette.py --source openai` (or
+  `--source anthropic`) run will show whether the provider rejects any schema keyword.
 - The Docker demo is checked by the CI `demo` job (it passed on PRs #6 and #9, including an app
   restart on #9); it has not been run on a local Docker install.
 - Entity extraction (`services/entities.py`) only recognises a medication as a word followed by

@@ -5,6 +5,20 @@ from typing import ClassVar
 
 from pydantic import BaseModel, Field
 
+# A "<" that opens something tag-like ("<entry", "</conflict"). Model inputs frame record data in
+# tags, so record text must not be able to open or close one.
+_MARKUP = re.compile(r"<(?=\s*/?\s*[A-Za-z_])")
+MARKUP_GUARD = "‹"  # "‹": one character like "<", so every offset is unchanged
+
+
+def neutralise_markup(text: str) -> str:
+    """Replace each tag-opening "<" with "‹". "BP <90" and "eGFR < 30" are left alone."""
+    return _MARKUP.sub(MARKUP_GUARD, text)
+
+
+def has_markup(text: str) -> bool:
+    return _MARKUP.search(text) is not None
+
 
 class RedactedSpan(BaseModel):
     """One replacement, located in both the original and the redacted text."""
@@ -132,7 +146,8 @@ class PHIRedactionGateway:
             redacted_length += len(placeholder)
             cursor = end
         pieces.append(text[cursor:])
-        return RedactionResult(text="".join(pieces), counts=counts, spans=spans)
+        # Redacted text is model-bound, so it also cannot forge the tags that frame record data.
+        return RedactionResult(text=neutralise_markup("".join(pieces)), counts=counts, spans=spans)
 
     def prepare_for_llm(self, text: str, known_names: Iterable[str] = ()) -> str:
         """Return only redacted text so callers cannot accidentally bypass the boundary."""

@@ -907,9 +907,13 @@ function agentRunSummary(run) {
   if (report.uncovered_conflict_ids.length) {
     parts.push(t("agent.summaryUncovered", { count: report.uncovered_conflict_ids.length }));
   }
+  const flagged = report.instruction_like_entry_ids?.length || 0;
+  const withheld = report.withheld?.length || 0;
+  if (flagged) parts.push(t("agent.summaryInstructionLike", { count: flagged }));
+  if (withheld) parts.push(t("agent.summaryWithheld", { count: withheld }));
   return {
     text: parts.join(" · "),
-    warning: unsupported > 0 || report.uncovered_conflict_ids.length > 0,
+    warning: unsupported > 0 || report.uncovered_conflict_ids.length > 0 || flagged > 0,
   };
 }
 

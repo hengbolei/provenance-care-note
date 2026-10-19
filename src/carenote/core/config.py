@@ -13,9 +13,14 @@ class Settings:
     encryption_key: str | None = os.getenv("CARENOTE_ENCRYPTION_KEY")
     openai_api_key: str | None = os.getenv("OPENAI_API_KEY")
     openai_model: str = os.getenv("CARENOTE_OPENAI_MODEL", "gpt-5-mini")
-    # recorded: replay cassettes only (default, no key needed); openai: live calls;
-    # record: live calls that also write cassettes.
+    anthropic_api_key: str | None = os.getenv("ANTHROPIC_API_KEY")
+    anthropic_model: str = os.getenv("CARENOTE_ANTHROPIC_MODEL", "claude-sonnet-5-5")
+    # recorded: replay cassettes only (default, no key needed); openai or anthropic: live calls to
+    # that provider; live: live calls to agent_provider; record: live calls that write cassettes.
     agent_gateway: str = os.getenv("CARENOTE_AGENT_GATEWAY", "recorded")
+    agent_provider: str = os.getenv("CARENOTE_AGENT_PROVIDER", "openai")
+    # The provider to try when the live one fails; empty for no fallback.
+    agent_fallback: str = os.getenv("CARENOTE_AGENT_FALLBACK", "")
     audit_retention_days: int = int(os.getenv("CARENOTE_AUDIT_RETENTION_DAYS", "2555"))
     public_base_url: str = os.getenv("CARENOTE_PUBLIC_BASE_URL", "http://127.0.0.1:8000")
 

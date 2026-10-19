@@ -46,6 +46,12 @@ def test_long_timeline_cases_have_at_least_fifty_entries():
             assert len(case.build_entries()) >= 50, case.id
 
 
+def test_long_timeline_cases_check_retrieval_of_their_key_entries():
+    for case in CASES:
+        if case.family is Family.LONG_TIMELINE:
+            assert case.expect.retrieval, case.id
+
+
 def test_probes_exercise_every_verifier_failure_and_supported_claims():
     expected = Counter(
         failure for case in CASES for probe in case.probes for failure in probe.expect
@@ -58,7 +64,8 @@ def test_probes_exercise_every_verifier_failure_and_supported_claims():
 
 def test_known_gaps_always_explain_themselves():
     for case in CASES:
-        gaps = [item.known_gap for item in case.expect.conflicts + case.expect.phi]
+        expectations = case.expect.conflicts + case.expect.phi + case.expect.retrieval
+        gaps = [item.known_gap for item in expectations]
         gaps += [probe.known_gap for probe in case.probes]
         for gap in gaps:
             assert gap is None or len(gap.strip()) >= 20, case.id
@@ -100,6 +107,12 @@ def test_an_unknown_entry_is_only_allowed_when_the_probe_expects_it():
         EvalCase.model_validate(_case(probes=[probe]))
 
     EvalCase.model_validate(_case(probes=[probe | {"expect": ["unknown_entry"]}]))
+
+
+def test_a_retrieval_query_must_name_known_entries():
+    query = {"query": "aspirin", "entries": ["ghost"]}
+    with pytest.raises(ValidationError, match="unknown entries"):
+        EvalCase.model_validate(_case(expect={"retrieval": [query]}))
 
 
 def test_entry_keys_and_unknown_fields_are_rejected():

@@ -1,11 +1,14 @@
 """LangGraph state machine for the Clinical Review Agent (design §6).
 
-    load_context → check_conflicts → draft → verify ──→ human_review ─┬→ commit
-                                       ↑      ↑   │                     ├→ discard
-                                       │      └ revise (failures)       │
-                                       └──────── redraft (clinician instruction)
+    load_context → check_conflicts → plan → retrieve → draft → verify ──→ human_review ─┬→ commit
+                                                         ↑      ↑   │                     ├→ discard
+                                                         │      └ revise (failures)       │
+                                                         └──────── redraft (clinician instruction)
 
-Only `draft` and `revise` call a model; every other node is deterministic. When verification
+Only `plan`, `draft` and `revise` call a model; every other node is deterministic. `plan` adds the
+model's questions to standing ones and one per deterministic conflict; `retrieve` searches the
+whole record for each question and swaps the best older hits, and every conflicting entry, into the
+most-recent context window, so evidence outside the window still reaches the draft. When verification
 fails, `revise` sends the verifier's reasons back to the model and the corrected draft is verified
 again, at most `max_auto_revisions` times; anything still failing is shown to the clinician as
 unsupported. The run pauses at `human_review` with a LangGraph `interrupt`, so its state is
@@ -31,6 +34,7 @@ from langgraph.graph.state import CompiledStateGraph
 from langgraph.types import interrupt
 
 from carenote.agent.gateway import DataTag, ModelGateway, ModelRequest, Usage
+from carenote.agent.injection import flagged_passages, withhold_echoes
 from carenote.agent.prompts import load_prompt
 from carenote.agent.state import (
     Budget,
@@ -42,10 +46,14 @@ from carenote.agent.state import (
     ClaimDecision,
     DraftReview,
     HighlightDecision,
+    QuestionSource,
     ReviewDecisions,
+    ReviewPlan,
+    ReviewQuestion,
     ReviewState,
     RunStatus,
     VerificationReport,
+    WithheldItem,
 )
 from carenote.agent.tools import ReviewTools
 from carenote.agent.tracing import RunTracer, TimelineStep, TracingGateway, timeline_step
@@ -64,9 +72,33 @@ from carenote.domain.models import (
 )
 from carenote.services.care_notes import CareNoteService
 
-PROMPT_VERSION = "draft_v1"
-REVISE_PROMPT_VERSION = "revise_v1"
+PROMPT_VERSION = "draft_v3"
+PLAN_PROMPT_VERSION = "plan_v2"
+REVISE_PROMPT_VERSION = "revise_v2"
 MAX_CONTEXT_ENTRIES = 40
+# Hits kept per question, and the share of the context window older retrieved entries may take.
+RETRIEVE_K = 5
+MAX_RETRIEVED_SHARE = 0.5
+MAX_CONFLICT_QUESTIONS = 6
+
+# Asked on every run, so retrieval works even when the model asks nothing useful.
+STANDING_QUESTIONS = (
+    ReviewQuestion(
+        question="Which medications were started, stopped, held or changed?",
+        query="started stopped hold held increased reduced changed switched continue dose",
+        source=QuestionSource.STANDING,
+    ),
+    ReviewQuestion(
+        question="Which allergies or reactions are recorded?",
+        query="allergy reaction rash swelling anaphylaxis intolerance",
+        source=QuestionSource.STANDING,
+    ),
+    ReviewQuestion(
+        question="Which follow-ups, referrals or tests are planned or outstanding?",
+        query="follow arrange referral booked repeat recheck pending outstanding",
+        source=QuestionSource.STANDING,
+    ),
+)
 
 Committer = Callable[[ReviewState, ReviewTools], None]
 
@@ -89,12 +121,15 @@ CHECKPOINT_TYPES = (
     EntryRef,
     EntryType,
     HighlightDecision,
+    QuestionSource,
     ReviewDecisions,
+    ReviewQuestion,
     RiskLevel,
     Role,
     RunStatus,
     Span,
     VerificationReport,
+    WithheldItem,
 )
 
 
@@ -205,6 +240,81 @@ def build_review_graph(
     def check_conflicts(state: ReviewState) -> dict[str, Any]:
         return {"conflicts": deps.tools_for(state).detect_conflicts()}
 
+    def plan(state: ReviewState) -> dict[str, Any]:
+        """Standing and conflict questions, plus what the model asks after reading the recent record."""
+        tools = deps.tools_for(state)
+        names = tools.known_names()
+        # Two conflicts about the same medicine ask one question.
+        known = {
+            item.question: item
+            for item in (
+                *STANDING_QUESTIONS,
+                *(
+                    ReviewQuestion(
+                        question=f"What does the record say about {conflict.entity}?",
+                        query=conflict.entity,
+                        source=QuestionSource.CONFLICT,
+                    )
+                    for conflict in state["conflicts"][:MAX_CONFLICT_QUESTIONS]
+                ),
+            )
+        }
+        inputs = record_inputs(state)
+        for item in known.values():
+            inputs += [
+                DataTag.open("standing_question"),
+                tools.redactor.redact(item.question, names),
+                DataTag.close("standing_question"),
+            ]
+        result = model.structured(
+            ModelRequest(
+                purpose="agent_plan",
+                instructions=load_prompt(PLAN_PROMPT_VERSION),
+                inputs=inputs,
+                safety_subject=str(state["actor"].principal.id),
+            ),
+            ReviewPlan,
+        )
+        questions = dict(known)
+        for item in result.output.questions:
+            questions.setdefault(
+                item.question,
+                ReviewQuestion(
+                    question=item.question, query=item.query, source=QuestionSource.MODEL
+                ),
+            )
+        return {
+            "questions": list(questions.values()),
+            "budget": _charge(state["budget"], result.usage),
+        }
+
+    def retrieve(state: ReviewState) -> dict[str, Any]:
+        """Search the whole record per question and widen the context with what is found."""
+        tools = deps.tools_for(state)
+        entries = tools.context_entries()
+        evidence = {
+            item.question: tools.search_entries(item.query, k=RETRIEVE_K)
+            for item in state["questions"]
+        }
+        # Conflicting entries first, then hits round-robin by rank, so every question's best hit
+        # is kept before any question's second best.
+        found = [entry_id for conflict in state["conflicts"] for entry_id in conflict.entry_ids]
+        for rank in range(RETRIEVE_K):
+            found += [spans[rank].entry_id for spans in evidence.values() if rank < len(spans)]
+        recent = [ref.entry_id for ref in state["context"]]
+        older = [
+            entry_id
+            for entry_id in dict.fromkeys(found)
+            if entry_id not in recent and entry_id in entries
+        ][: int(deps.max_context_entries * MAX_RETRIEVED_SHARE)]
+        chosen = recent[: deps.max_context_entries - len(older)] + older
+        context = sorted(
+            (EntryRef.from_entry(entries[entry_id]) for entry_id in chosen),
+            key=lambda ref: ref.timestamp,
+            reverse=True,
+        )
+        return {"evidence": evidence, "context": context}
+
     def record_inputs(state: ReviewState) -> list[Any]:
         """The redacted record, framed as data: entries, then deterministic conflicts."""
         tools = deps.tools_for(state)
@@ -212,6 +322,7 @@ def build_review_graph(
         inputs: list[Any] = []
         for ref in state["context"]:
             tools.read_entry(ref.entry_id)
+            flags = {"instruction_like": True} if _flagged(tools, ref.entry_id) else {}
             inputs += [
                 DataTag.open(
                     "entry",
@@ -220,6 +331,7 @@ def build_review_graph(
                     author=ref.author_role,
                     at=ref.timestamp,
                     internal=ref.internal,
+                    **flags,
                 ),
                 tools.redactions[ref.entry_id],
                 DataTag.close("entry"),
@@ -236,6 +348,12 @@ def build_review_graph(
         tools = deps.tools_for(state)
         names = tools.known_names()
         inputs = record_inputs(state)
+        for item in state["questions"]:
+            inputs += [
+                DataTag.open("question", source=item.source),
+                tools.redactor.redact(item.question, names),
+                DataTag.close("question"),
+            ]
         budget = state["budget"]
         decisions = state["decisions"]
         if decisions is not None and decisions.action == "revise":
@@ -313,9 +431,18 @@ def build_review_graph(
     def verify(state: ReviewState) -> dict[str, Any]:
         tools = deps.tools_for(state)
         entries = tools.context_entries()
-        draft_review = state["draft"] or DraftReview(claims=[])
+        flagged = {
+            ref.entry_id: passages
+            for ref in state["context"]
+            if (passages := _flagged(tools, ref.entry_id))
+        }
+        draft_review, withheld = withhold_echoes(state["draft"] or DraftReview(claims=[]), flagged)
         report = verify_draft(draft_review, entries, state["conflicts"], tools.redactions)
+        report = report.model_copy(
+            update={"instruction_like_entry_ids": list(flagged), "withheld": withheld}
+        )
         return {
+            "draft": draft_review,
             "verification": report,
             "initial_verification": state.get("initial_verification") or report,
             "highlight_citations": [
@@ -394,10 +521,11 @@ def build_review_graph(
     # Automated work counts against the step budget; review, commit and discard do not. Every node
     # but the review pause is traced.
     prompts = {
+        "plan": lambda state: PLAN_PROMPT_VERSION,
         "draft": lambda state: state["prompt_version"],
         "revise": lambda state: REVISE_PROMPT_VERSION,
     }
-    for node in (load_context, check_conflicts, draft, verify, revise):
+    for node in (load_context, check_conflicts, plan, retrieve, draft, verify, revise):
         graph.add_node(node.__name__, counted(traced(node, prompts.get(node.__name__))))
     for node in (commit, discard, stop):
         graph.add_node(node.__name__, traced(node))
@@ -406,7 +534,9 @@ def build_review_graph(
     graph.add_edge(START, "load_context")
     for source, target in (
         ("load_context", "check_conflicts"),
-        ("check_conflicts", "draft"),
+        ("check_conflicts", "plan"),
+        ("plan", "retrieve"),
+        ("retrieve", "draft"),
         ("draft", "verify"),
         ("revise", "verify"),
     ):
@@ -418,6 +548,11 @@ def build_review_graph(
     for terminal in ("commit", "discard", "stop"):
         graph.add_edge(terminal, END)
     return graph.compile(checkpointer=checkpointer or InMemorySaver(serde=checkpoint_serializer()))
+
+
+def _flagged(tools: ReviewTools, entry_id: UUID) -> list[str]:
+    """Instruction-like passages of an entry, in the redacted text the model sees."""
+    return flagged_passages(tools.redacted(entry_id).text)
 
 
 def _charge(budget: Budget, usage: Usage) -> Budget:

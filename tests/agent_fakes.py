@@ -1,16 +1,28 @@
 """Shared fakes for agent tests."""
 
 from carenote.agent.gateway import ModelResult, Usage
+from carenote.agent.state import ReviewPlan
 
 
 class ScriptedGateway:
     """Drafts claims from the entry text it is shown, the way a well-behaved model would."""
 
-    def __init__(self, tokens=(900, 300)):
+    def __init__(self, tokens=(900, 300), plan_questions=()):
         self.requests = []
+        self.plan_requests = []
         self.tokens = tokens
+        # (question, query) pairs the planning call returns; it costs no tokens.
+        self.plan_questions = plan_questions
 
     def structured(self, request, schema):
+        if schema is ReviewPlan:
+            self.plan_requests.append(request)
+            questions = [{"question": q, "query": query} for q, query in self.plan_questions]
+            return ModelResult(
+                output=ReviewPlan.model_validate({"questions": questions}),
+                model="scripted",
+                usage=Usage(),
+            )
         self.requests.append(request)
         claims = []
         highlights = []

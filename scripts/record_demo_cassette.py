@@ -2,10 +2,11 @@
 
     python scripts/record_demo_cassette.py              # curated draft, no API key needed
     python scripts/record_demo_cassette.py --source openai   # live model; needs OPENAI_API_KEY
+    python scripts/record_demo_cassette.py --source anthropic   # needs ANTHROPIC_API_KEY
 
 The curated source is a hand-written draft that cites the seed record exactly. It is labelled
 as curated in the cassette's model field, so it is never mistaken for model output. Re-record
-whenever the draft prompt, the seed data or the request framing changes; the replay test fails
+whenever a prompt, the seed data or the request framing changes; the replay test fails
 until you do. The script refuses to write a cassette whose draft does not pass verification.
 """
 
@@ -25,11 +26,12 @@ from carenote.agent.gateway import (
     DataTag,
     ModelRequest,
     ModelResult,
-    OpenAIGateway,
     RecordedGateway,
     Usage,
+    live_gateway,
 )
 from carenote.agent.graph import GraphDeps, build_review_graph, initial_state
+from carenote.agent.state import ReviewPlan
 from carenote.data.seed import (
     DEMO_CLINIC_ID,
     DEMO_CLINICIAN_ID,
@@ -133,10 +135,22 @@ HIGHLIGHTS = [
 ]
 
 
+# (question, search words) the curated plan asks beyond the standing questions.
+PLAN = [
+    ("Which lisinopril dose is the patient taking now?", "lisinopril dose"),
+    ("Has the blood pressure check been completed?", "blood pressure check"),
+]
+
+
 class CuratedDemoGateway:
-    """Builds the curated draft from the exact entry text in the request it receives."""
+    """Builds the curated plan and draft from the exact entry text in the request it receives."""
 
     def structured(self, request: ModelRequest, schema):
+        if schema is ReviewPlan:
+            plan = {"questions": [{"question": q, "query": query} for q, query in PLAN]}
+            return ModelResult(
+                output=schema.model_validate(plan), model=CURATED_MODEL, usage=Usage()
+            )
         entries = _entries_by_type(request)
 
         def cite(entry_type: str, quote: str) -> dict:
@@ -187,14 +201,18 @@ def _entries_by_type(request: ModelRequest) -> dict[str, tuple[UUID, str]]:
     return found
 
 
+def _cassettes(directory: Path) -> list[Path]:
+    return [*directory.glob("agent_plan-*.json"), *directory.glob("agent_draft-*.json")]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--source", choices=["curated", "openai"], default="curated")
+    parser.add_argument("--source", choices=["curated", "openai", "anthropic"], default="curated")
     parser.add_argument("--directory", type=Path, default=CASSETTE_DIR)
     args = parser.parse_args()
 
-    live = CuratedDemoGateway() if args.source == "curated" else OpenAIGateway()
-    for stale in args.directory.glob("agent_draft-*.json"):
+    live = CuratedDemoGateway() if args.source == "curated" else live_gateway(args.source, "")
+    for stale in _cassettes(args.directory):
         stale.unlink()
     repository = InMemoryCareNoteRepository()
     seed_demo_data(repository)
@@ -218,7 +236,7 @@ def main() -> int:
         mark = "ok  " if check.verified else "FAIL"
         print(f"{mark} claim {check.claim_index}: {'; '.join(check.detail) or 'verified'}")
     if not report.passed:
-        for stale in args.directory.glob("agent_draft-*.json"):
+        for stale in _cassettes(args.directory):
             stale.unlink()
         print("Draft did not pass verification; no cassette written.", file=sys.stderr)
         return 1

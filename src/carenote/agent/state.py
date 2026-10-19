@@ -2,11 +2,11 @@
 
 Two kinds of type live here:
 
-- **Model output** (`Citation`, `Claim`, `CandidateHighlight`, `DraftReview`): what the model must
-  return through structured output. Every model forbids extra keys and bounds its lengths, so a
-  response that does not fit is rejected before anything reads it.
-- **Run state** (`ClaimCheck`, `VerificationReport`, `Budget`, `ReviewDecisions`, `ReviewState`):
-  what the graph carries between nodes. Only deterministic code writes these.
+- **Model output** (`Citation`, `Claim`, `CandidateHighlight`, `DraftReview`, `PlanQuestion`,
+  `ReviewPlan`): what the model must return through structured output. Every model forbids extra
+  keys and bounds its lengths, so a response that does not fit is rejected before anything reads it.
+- **Run state** (`ReviewQuestion`, `ClaimCheck`, `WithheldItem`, `VerificationReport`, `Budget`,
+  `ReviewDecisions`, `ReviewState`): what the graph carries between nodes. Only deterministic code writes these.
 """
 
 from __future__ import annotations
@@ -24,6 +24,7 @@ MAX_CLAIMS = 20
 MAX_CITATIONS_PER_CLAIM = 5
 MAX_CANDIDATE_HIGHLIGHTS = 10
 MAX_OPEN_QUESTIONS = 10
+MAX_PLAN_QUESTIONS = 6
 
 
 class _ModelOutput(BaseModel):
@@ -72,6 +73,31 @@ class DraftReview(_ModelOutput):
     )
 
 
+class PlanQuestion(_ModelOutput):
+    """A question the review should answer, with the search words that find its evidence."""
+
+    question: str = Field(min_length=1, max_length=200)
+    query: str = Field(min_length=1, max_length=120)
+
+
+class ReviewPlan(_ModelOutput):
+    questions: list[PlanQuestion] = Field(default_factory=list, max_length=MAX_PLAN_QUESTIONS)
+
+
+class QuestionSource(StrEnum):
+    STANDING = "standing"
+    CONFLICT = "conflict"
+    MODEL = "model"
+
+
+class ReviewQuestion(BaseModel):
+    """A question the run retrieves evidence for: standing, from a conflict, or from the model."""
+
+    question: str
+    query: str
+    source: QuestionSource
+
+
 class CheckFailure(StrEnum):
     """Why a citation or claim failed verification (design §8, checks 1–5)."""
 
@@ -95,10 +121,22 @@ class ClaimCheck(BaseModel):
         return not self.failures
 
 
+class WithheldItem(BaseModel):
+    """Draft text removed because it repeats an instruction-like passage; the text is not kept."""
+
+    kind: Literal["open_question", "highlight"]
+    # Position in the draft as the model returned it.
+    index: int = Field(ge=0)
+    entry_id: UUID
+
+
 class VerificationReport(BaseModel):
     checks: list[ClaimCheck] = Field(default_factory=list)
     # Deterministic conflicts no verified claim mentions (design §8, check 6).
     uncovered_conflict_ids: list[UUID] = Field(default_factory=list)
+    # Context entries whose text addresses the assistant, and draft text withheld for echoing them.
+    instruction_like_entry_ids: list[UUID] = Field(default_factory=list)
+    withheld: list[WithheldItem] = Field(default_factory=list)
 
     @property
     def unsupported(self) -> list[ClaimCheck]:
@@ -113,7 +151,7 @@ class Budget(BaseModel):
     """Per-run ceilings (design §10) and what the run has used so far."""
 
     # Steps count automated nodes only; time a clinician spends reviewing is not a step.
-    max_steps: int = Field(default=12, ge=1)
+    max_steps: int = Field(default=14, ge=1)
     # Clinician-requested redrafts, and automatic fixes of verifier failures, are budgeted apart.
     max_revisions: int = Field(default=2, ge=0)
     max_auto_revisions: int = Field(default=2, ge=0)
@@ -223,7 +261,8 @@ class ReviewState(TypedDict):
     model: str | None
     context: list[EntryRef]
     conflicts: list[Conflict]
-    questions: list[str]
+    # Questions the run retrieved evidence for, and the redacted spans found for each question.
+    questions: list[ReviewQuestion]
     evidence: dict[str, list[Span]]
     draft: DraftReview | None
     verification: VerificationReport | None

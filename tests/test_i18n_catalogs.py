@@ -59,6 +59,8 @@ DYNAMIC_KEYS = {
     "agent.node": [
         "load_context",
         "check_conflicts",
+        "plan",
+        "retrieve",
         "draft",
         "verify",
         "revise",

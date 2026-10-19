@@ -6,7 +6,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from carenote.agent.gateway import CASSETTE_DIR, OpenAIGateway, RecordedGateway
+from carenote.agent.gateway import CASSETTE_DIR, RecordedGateway, live_gateway
 from carenote.evals.cases import CASE_DIR, load_cases
 from carenote.evals.report import render
 from carenote.evals.suites import evaluate
@@ -22,14 +22,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--record",
         action="store_true",
-        help="call the live model and record a cassette for every case (needs OPENAI_API_KEY)",
+        help="call the live provider (CARENOTE_AGENT_PROVIDER, with CARENOTE_AGENT_FALLBACK) and "
+        "record a cassette for every case; needs that provider's API key",
     )
     parser.add_argument("--cases", type=Path, default=CASE_DIR)
     parser.add_argument("--cassettes", type=Path, default=CASSETTE_DIR)
     args = parser.parse_args(argv)
 
     if args.record:
-        live = OpenAIGateway()
+        live = live_gateway()
 
         def factory():
             return RecordedGateway(args.cassettes, record_with=live)

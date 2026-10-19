@@ -86,17 +86,14 @@ def test_start_runs_to_review_with_audit_and_events(repository):
 
     assert view.status is RunStatus.AWAITING_REVIEW
     assert view.verification.passed
-    assert view.budget.steps == 4
+    assert view.budget.steps == 6
     assert view.highlight_citations[0].quote == "Hold morning lisinopril"
     operations = _operations(repository, view.run_id)
     assert operations[0] == "agent_run_started"
     assert operations[-1] == "agent_draft_proposed"
     assert "agent_tool_called" in operations
     assert [event["type"] for event in events] == [
-        "agent.step",
-        "agent.step",
-        "agent.step",
-        "agent.step",
+        *["agent.step"] * 6,
         "agent.draft",
         "agent.done",
     ]
@@ -263,7 +260,7 @@ def test_api_runs_a_review_to_the_review_step(client):
     body = fetched.json()
     assert body["status"] == "awaiting_review"
     assert len(body["draft"]["claims"]) == 2
-    assert body["budget"]["steps"] == 4
+    assert body["budget"]["steps"] == 6
 
     commit = client.post(
         f"/api/agent-runs/{run_id}/commit", headers=_headers(CLINICIAN), json={"claims": []}
