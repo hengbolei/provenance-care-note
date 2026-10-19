@@ -34,6 +34,7 @@ from langgraph.graph.state import CompiledStateGraph
 from langgraph.types import interrupt
 
 from carenote.agent.gateway import DataTag, ModelGateway, ModelRequest, Usage
+from carenote.agent.injection import flagged_passages, withhold_echoes
 from carenote.agent.prompts import load_prompt
 from carenote.agent.state import (
     Budget,
@@ -52,6 +53,7 @@ from carenote.agent.state import (
     ReviewState,
     RunStatus,
     VerificationReport,
+    WithheldItem,
 )
 from carenote.agent.tools import ReviewTools
 from carenote.agent.tracing import RunTracer, TimelineStep, TracingGateway, timeline_step
@@ -70,9 +72,9 @@ from carenote.domain.models import (
 )
 from carenote.services.care_notes import CareNoteService
 
-PROMPT_VERSION = "draft_v2"
-PLAN_PROMPT_VERSION = "plan_v1"
-REVISE_PROMPT_VERSION = "revise_v1"
+PROMPT_VERSION = "draft_v3"
+PLAN_PROMPT_VERSION = "plan_v2"
+REVISE_PROMPT_VERSION = "revise_v2"
 MAX_CONTEXT_ENTRIES = 40
 # Hits kept per question, and the share of the context window older retrieved entries may take.
 RETRIEVE_K = 5
@@ -127,6 +129,7 @@ CHECKPOINT_TYPES = (
     RunStatus,
     Span,
     VerificationReport,
+    WithheldItem,
 )
 
 
@@ -319,6 +322,7 @@ def build_review_graph(
         inputs: list[Any] = []
         for ref in state["context"]:
             tools.read_entry(ref.entry_id)
+            flags = {"instruction_like": True} if _flagged(tools, ref.entry_id) else {}
             inputs += [
                 DataTag.open(
                     "entry",
@@ -327,6 +331,7 @@ def build_review_graph(
                     author=ref.author_role,
                     at=ref.timestamp,
                     internal=ref.internal,
+                    **flags,
                 ),
                 tools.redactions[ref.entry_id],
                 DataTag.close("entry"),
@@ -426,9 +431,18 @@ def build_review_graph(
     def verify(state: ReviewState) -> dict[str, Any]:
         tools = deps.tools_for(state)
         entries = tools.context_entries()
-        draft_review = state["draft"] or DraftReview(claims=[])
+        flagged = {
+            ref.entry_id: passages
+            for ref in state["context"]
+            if (passages := _flagged(tools, ref.entry_id))
+        }
+        draft_review, withheld = withhold_echoes(state["draft"] or DraftReview(claims=[]), flagged)
         report = verify_draft(draft_review, entries, state["conflicts"], tools.redactions)
+        report = report.model_copy(
+            update={"instruction_like_entry_ids": list(flagged), "withheld": withheld}
+        )
         return {
+            "draft": draft_review,
             "verification": report,
             "initial_verification": state.get("initial_verification") or report,
             "highlight_citations": [
@@ -534,6 +548,11 @@ def build_review_graph(
     for terminal in ("commit", "discard", "stop"):
         graph.add_edge(terminal, END)
     return graph.compile(checkpointer=checkpointer or InMemorySaver(serde=checkpoint_serializer()))
+
+
+def _flagged(tools: ReviewTools, entry_id: UUID) -> list[str]:
+    """Instruction-like passages of an entry, in the redacted text the model sees."""
+    return flagged_passages(tools.redacted(entry_id).text)
 
 
 def _charge(budget: Budget, usage: Usage) -> Budget:

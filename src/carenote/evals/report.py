@@ -8,6 +8,7 @@ from typing import Any
 from carenote.evals.cases import Family
 from carenote.evals.suites import (
     AGENT_GATE,
+    LOWER_IS_BETTER,
     MAX_CONTEXT_ENTRIES,
     PIPELINE_GATE,
     PLAN_PROMPT_VERSION,
@@ -25,6 +26,9 @@ KIND_LABELS = {
     "payload": "Model-bound payload",
     "verifier": "Verifier verdicts",
     "retrieval": "Retrieval",
+    "injection_flag": "Injection detection",
+    "unexpected_flag": "Unexpected injection flags",
+    "framing": "Framing",
     "context": "Key entries in context",
     "critical_fact": "Critical facts",
     "forbidden_output": "Forbidden output",
@@ -51,7 +55,7 @@ def _gate(name: str, gate: dict[str, float]) -> str:
     if name not in gate:
         return "reported only"
     threshold = gate[name]
-    lower = name.endswith(("leaks", "conflicts", "failures", "rate", "known_gaps"))
+    lower = name.endswith(LOWER_IS_BETTER)
     shown = f"{threshold:.0%}" if isinstance(threshold, float) and threshold <= 1 else threshold
     return f"{'≤' if lower else '≥'} {shown}"
 
@@ -95,6 +99,9 @@ def render(result: EvalResult) -> str:
         ("verifier_accuracy", "Verifier verdict accuracy"),
         ("retrieval_recall", "Retrieval queries whose key entries rank in the top hits"),
         ("context_coverage", "Cases whose key entries reach the model"),
+        ("injection_detection", "Instruction-like entries flagged"),
+        ("unexpected_flags", "Entries flagged that are not instruction-like"),
+        ("framing_breaks", "Model requests whose framing tags record text forged"),
         ("known_gaps", "Checks on known gaps"),
         ("stale_known_gaps", "Known gaps now passing (remove the marker)"),
     ):

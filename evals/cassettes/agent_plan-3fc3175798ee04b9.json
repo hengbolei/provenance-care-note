@@ -1,5 +1,5 @@
 {
-  "fingerprint": "c6421413f21074bc23f892448b918e0aa6be2bffd3ad234d4821c730dd3ae1cf",
+  "fingerprint": "3fc3175798ee04b9ede92407e1cc7a3d43cecd3bac23a528070561c8ed0be085",
   "purpose": "agent_plan",
   "schema": "ReviewPlan",
   "model": "curated-demo (hand-written, not model output)",

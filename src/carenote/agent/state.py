@@ -5,8 +5,8 @@ Two kinds of type live here:
 - **Model output** (`Citation`, `Claim`, `CandidateHighlight`, `DraftReview`, `PlanQuestion`,
   `ReviewPlan`): what the model must return through structured output. Every model forbids extra
   keys and bounds its lengths, so a response that does not fit is rejected before anything reads it.
-- **Run state** (`ReviewQuestion`, `ClaimCheck`, `VerificationReport`, `Budget`, `ReviewDecisions`,
-  `ReviewState`): what the graph carries between nodes. Only deterministic code writes these.
+- **Run state** (`ReviewQuestion`, `ClaimCheck`, `WithheldItem`, `VerificationReport`, `Budget`,
+  `ReviewDecisions`, `ReviewState`): what the graph carries between nodes. Only deterministic code writes these.
 """
 
 from __future__ import annotations
@@ -121,10 +121,22 @@ class ClaimCheck(BaseModel):
         return not self.failures
 
 
+class WithheldItem(BaseModel):
+    """Draft text removed because it repeats an instruction-like passage; the text is not kept."""
+
+    kind: Literal["open_question", "highlight"]
+    # Position in the draft as the model returned it.
+    index: int = Field(ge=0)
+    entry_id: UUID
+
+
 class VerificationReport(BaseModel):
     checks: list[ClaimCheck] = Field(default_factory=list)
     # Deterministic conflicts no verified claim mentions (design §8, check 6).
     uncovered_conflict_ids: list[UUID] = Field(default_factory=list)
+    # Context entries whose text addresses the assistant, and draft text withheld for echoing them.
+    instruction_like_entry_ids: list[UUID] = Field(default_factory=list)
+    withheld: list[WithheldItem] = Field(default_factory=list)
 
     @property
     def unsupported(self) -> list[ClaimCheck]:

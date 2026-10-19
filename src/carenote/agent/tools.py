@@ -216,6 +216,10 @@ class ReviewTools:
         self._record("propose_highlight", entry_id=citation.entry_id, result_count=1)
         return len(self.proposed) - 1
 
+    def redacted(self, entry_id: UUID) -> RedactionResult:
+        """The entry's redacted text as the model sees it; not a tool call, so not recorded."""
+        return self._redact_entry(self._entry(entry_id))
+
     # Context for verification
 
     def context_entries(self) -> dict[UUID, TimelineEntry]:

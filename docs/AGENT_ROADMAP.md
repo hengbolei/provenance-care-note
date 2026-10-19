@@ -127,7 +127,12 @@ it with no model; embeddings come last and are optional.
       the draft (`draft_v2`) sees every question; the pipeline suite now gates that every key
       entry of every case reaches the draft payload (was 90.6%)
 - [x] 3.3 `revise` loop: moved to step 2.3
-- [ ] 3.4 Prompt-injection defences and eval cases
+- [x] 3.4 Prompt-injection defences and eval cases: redaction neutralises tag-like `<` (same
+      length, offsets unchanged) and `ModelRequest` refuses text that still has it; a narrow
+      detector marks entries that address an assistant (`instruction_like="true"`, prompts
+      `plan_v2`, `draft_v3`, `revise_v2`); open questions and highlights that repeat a flagged
+      passage are withheld and counted; the panel shows both; four new cases (36 in all) and
+      pipeline gates for detection, false flags and framing
 - [ ] 3.5 Second provider adapter with fallback
 - [ ] 3.6 Optional local embeddings (an extra, off by default) behind the same interface, fused
       with BM25 by reciprocal rank fusion; vectors are held in memory only; kept only if the
@@ -149,6 +154,10 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-19 | Tag-like markup in model-bound text becomes `‹` inside `PHIRedactionGateway.redact`, and `ModelRequest` refuses a `RedactionResult` that still contains it | Every model input already passes through redaction, so no caller can forget the guard; one character for one keeps the offset map and citation checks exact |
+| 2026-10-19 | Instruction-like entries are flagged by narrow regular expressions aimed at text that addresses an assistant or the output, not by a model | Deterministic and testable; the eval cases gate false flags at 0, and one indirect injection is a known gap rather than a looser pattern |
+| 2026-10-19 | Open questions and highlight suggestions sharing four consecutive words with a flagged passage are withheld; claims are not filtered | These texts are never verified against citations, while every claim already is; the run reports what was withheld by position and source entry, without its text |
+| 2026-10-19 | The agent suite's injection metric still counts any forbidden text anywhere in the draft, including unverified claims | A draft that obeys an injection is a failure even when verification would keep it out of the record |
 | 2026-10-19 | `plan` always adds three standing questions (medication changes, allergies, follow-ups) and one per conflicting medicine to the model's questions | Retrieval must not depend on the model asking well; the standing questions alone bring every key entry of the eval cases into the draft |
 | 2026-10-19 | Older retrieved entries may take at most half of the context window; conflicting entries go first, then hits round-robin by rank across questions | Keeps the most recent entries the review also needs, and gives every question its best hit before any second best |
 | 2026-10-19 | Questions reach the draft as `<question source=...>` data and the prompt treats them as untrusted | A model question was written after reading record content, so an injection could shape it |

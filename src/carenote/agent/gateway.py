@@ -32,7 +32,7 @@ import httpx
 from pydantic import BaseModel, ValidationError
 
 from carenote.core.config import settings
-from carenote.privacy.redaction import RedactionResult
+from carenote.privacy.redaction import RedactionResult, has_markup
 
 T = TypeVar("T", bound=BaseModel)
 R = TypeVar("R")
@@ -115,6 +115,8 @@ class ModelRequest:
                 raise TypeError(
                     "model inputs must be RedactionResult or DataTag; redact record text first"
                 )
+            if isinstance(item, RedactionResult) and has_markup(item.text):
+                raise ValueError("model input text must not contain tag-like markup")
 
     @property
     def input_text(self) -> str:
