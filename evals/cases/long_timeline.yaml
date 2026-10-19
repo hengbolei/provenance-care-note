@@ -30,6 +30,13 @@
       - key: apixaban_conflict
         description: Apixaban prescribed 5 mg but labelled 2.5 mg
         mentions: [apixaban, 5 mg, 2.5 mg]
+    retrieval:
+      - {query: apixaban dose, entries: [start, label]}
+      - {query: Eliquis, entries: [start, label]}
+      - {query: anticoagulant, entries: [start, label]}
+      - query: blood thinner
+        entries: [start]
+        known_gap: Multi-word lay terms such as "blood thinner" are not mapped to drugs or classes.
   probes:
     - id: supported-label
       claim: The pharmacy label reads apixaban 2.5 mg twice daily.
@@ -62,6 +69,10 @@
       - key: cefalexin_allergy
         description: Cefalexin allergy with lip swelling
         mentions: [cefalexin]
+    retrieval:
+      - {query: cefalexin allergy, entries: [reaction]}
+      - {query: cephalexin, entries: [reaction]}
+      - {query: antibiotic reactions, entries: [reaction]}
   probes:
     - id: supported-allergy
       claim: Allergic to cefalexin after lip swelling with the first dose.
@@ -108,6 +119,11 @@
       - key: repeat_bloods
         description: Repeat kidney function in 48 hours
         mentions: [48 hours]
+    retrieval:
+      - {query: furosemide, entries: [listed, hold]}
+      - {query: Lasix, entries: [listed, hold]}
+      - {query: diuretic, entries: [listed, hold]}
+      - {query: renal function, entries: [hold]}
   probes:
     - id: supported-hold
       claim: Furosemide is on hold, with kidney function to repeat in 48 hours.
@@ -146,6 +162,9 @@
       - key: referral_unbooked
         description: Colonoscopy referral not booked
         mentions: [colonoscopy]
+    retrieval:
+      - {query: colonoscopy referral, entries: [plan, pending]}
+      - {query: hemoglobin, entries: [plan]}
   probes:
     - id: supported-pending
       claim: The colonoscopy referral has not been booked.

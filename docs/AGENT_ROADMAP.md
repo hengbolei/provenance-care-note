@@ -116,10 +116,11 @@ entries, instead of the in-database `tsvector` / pgvector search in design §9 (
 it with no model; embeddings come last and are optional.
 
 - [x] 3.0 Retrieval storage model decided: keep the snapshot, retrieve in memory
-- [ ] 3.1 `retrieval/` module behind a storage-agnostic `Retriever` interface: BM25 over the
-      patient's redacted entries, query expansion from a medication synonym and brand/generic
-      table; hits are `Span`s with offsets, so they are valid citations; the pipeline suite
-      reports retrieval recall of each case's key entries
+- [x] 3.1 `retrieval/` module behind a storage-agnostic `Retriever` interface: BM25 over the
+      sentence passages of the patient's entries, with a synonym table (brand and generic
+      names, spellings, abbreviations) and one-way drug-class expansion; hits are `Span`s with
+      offsets, so they are valid citations; replaces `repositories/search.py`; the pipeline
+      suite gates retrieval recall of each case's key entries in the top 10
 - [ ] 3.2 `plan` and `retrieve` nodes: the model proposes queries, retrieval adds the matching
       entries to the context beside the most recent ones, within a context budget; long-timeline
       cases get every key entry into the model-bound payload
@@ -146,6 +147,9 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-19 | BM25 uses `b = 0` (no length normalisation), and equal scores fall back to recency | Passages are single sentences, so length says little about relevance; recency keeps the old keyword search's tie order |
+| 2026-10-19 | Retrieval searches the entries' original text; the agent's `search_entries` tool maps hits to redacted offsets as before | Redaction placeholders would otherwise match queries, and the model's queries come from redacted text, so they cannot name an identifier it was never shown |
+| 2026-10-19 | Eval cases gain `expect.retrieval` (query plus entries that must be in the top 10), gated at 100% | Measures retrieval with no model; one known gap ("blood thinner") marks that multi-word lay terms are not mapped |
 | 2026-10-19 | Retrieval keeps the encrypted per-clinic snapshot and searches in application memory, scoped to one patient; no `tsvector`, pgvector or per-row entry table (design §9 option (b)) | Retrieval only ever searches one patient's timeline, tens to hundreds of entries, where a database index gains nothing; a per-row search column or embeddings would put derived clinical text in clear at rest while redaction still has known gaps; one code path serves the in-memory and Postgres repositories |
 | 2026-10-19 | Retrieval sits behind a storage-agnostic `Retriever` interface; moving entries to per-row storage (option (a)) is deferred to a separate persistence refactor | Option (a) is only needed for scale or multiple app processes, which the snapshot model limits anyway; doing it inside a retrieval step would mix two large changes |
 | 2026-10-19 | Retrieval is lexical first (BM25 plus a synonym and brand/generic table); embeddings are an optional later step using a local model, not an API | Deterministic and offline, so CI and the pipeline suite can measure it with no API key; the synonym table also targets the brand vs generic known gap |

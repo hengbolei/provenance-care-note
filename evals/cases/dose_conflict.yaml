@@ -133,6 +133,9 @@
       - key: two_doses
         description: Metformin recorded at 500 mg and as Glucophage 850 mg
         mentions: [500 mg, 850 mg]
+    retrieval:
+      - {query: metformin dose, entries: [generic, brand]}
+      - {query: Glucophage, entries: [generic, brand]}
   probes:
     - id: supported-brand
       claim: Glucophage 850 mg twice daily continues.

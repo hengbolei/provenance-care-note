@@ -3,6 +3,7 @@
 - **pipeline** needs no model. It scores deterministic conflict detection, redaction of each case's
   record, the verifier's verdict on every probe claim, and the exact payload the agent would send to
   a model: identifiers that leak into it and key entries that fall outside the context window.
+  It also checks that retrieval ranks each case's key entries among the top hits for its queries.
 - **agent** scores real model drafts replayed from cassettes: citation validity, unsupported
   claims, critical-fact recall, conflict coverage, injection resistance and token use. Cases with
   no cassette are reported as not recorded rather than scored.
@@ -41,6 +42,7 @@ from carenote.domain.models import Actor, AgentActor, Role
 from carenote.evals.cases import EVAL_CLINIC_ID, EvalCase, Family
 from carenote.privacy.redaction import PHIRedactionGateway
 from carenote.repositories.memory import InMemoryCareNoteRepository
+from carenote.retrieval import BM25Retriever
 from carenote.services.care_notes import CareNoteService
 from carenote.services.conflicts import DeterministicConflictDetector
 
@@ -50,6 +52,8 @@ EVAL_CLINICIAN = Actor(
     clinic_id=EVAL_CLINIC_ID,
 )
 EVAL_NOW = datetime(2026, 9, 1, tzinfo=UTC)
+# Hits a retrieval query may return; the expected entries must all be among them.
+RETRIEVAL_K = 10
 
 # Gate for the pipeline suite: deterministic code must meet every non-gap expectation exactly.
 PIPELINE_GATE = {
@@ -58,6 +62,7 @@ PIPELINE_GATE = {
     "redaction_leaks": 0,
     "payload_leaks": 0,
     "verifier_accuracy": 1.0,
+    "retrieval_recall": 1.0,
     "stale_known_gaps": 0,
 }
 # Gate for the agent suite (design §13 v1 targets), applied only to recorded cases.
@@ -159,6 +164,7 @@ def run_case(case: EvalCase, gateway: ModelGateway) -> CaseRun:
 def pipeline_checks(cases: list[EvalCase], runs: dict[str, CaseRun]) -> list[Check]:
     detector = DeterministicConflictDetector()
     redactor = PHIRedactionGateway()
+    retriever = BM25Retriever()
     checks: list[Check] = []
     for case in cases:
         entries = case.build_entries()
@@ -232,6 +238,21 @@ def pipeline_checks(cases: list[EvalCase], runs: dict[str, CaseRun]) -> list[Che
                     probe.known_gap,
                     detail=f"expected {sorted(probe.expect) or ['supported']}, "
                     f"got {sorted(got) or ['supported']}",
+                )
+            )
+
+        for item in case.expect.retrieval:
+            hits = {hit.entry_id for hit in retriever.search(entries, item.query, RETRIEVAL_K)}
+            missed = [key for key in item.entries if case.entry_id(key) not in hits]
+            checks.append(
+                Check(
+                    case.id,
+                    case.family,
+                    "retrieval",
+                    item.query,
+                    not missed,
+                    item.known_gap,
+                    detail=f"not in the top {RETRIEVAL_K}: {', '.join(missed)}" if missed else "",
                 )
             )
 
@@ -350,6 +371,7 @@ def pipeline_metrics(checks: list[Check]) -> dict[str, Any]:
         "redaction_leaks": failures(checks, "redaction"),
         "payload_leaks": failures(checks, "payload"),
         "verifier_accuracy": rate(checks, "verifier"),
+        "retrieval_recall": rate(checks, "retrieval"),
         "context_coverage": rate(checks, "context"),
         "known_gaps": sum(1 for check in checks if check.known_gap),
         "stale_known_gaps": sum(1 for check in checks if check.known_gap and check.passed),
@@ -420,6 +442,7 @@ __all__ = [
     "MAX_CONTEXT_ENTRIES",
     "PIPELINE_GATE",
     "PROMPT_VERSION",
+    "RETRIEVAL_K",
     "REVISE_PROMPT_VERSION",
     "Check",
     "EvalResult",

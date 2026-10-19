@@ -24,6 +24,7 @@ def test_pipeline_suite_passes_its_gate_on_the_committed_cases(result):
     assert result.gate() == []
     assert metrics["conflict_recall"] == 1.0
     assert metrics["verifier_accuracy"] == 1.0
+    assert metrics["retrieval_recall"] == 1.0
     assert metrics["payload_leaks"] == 0
     assert metrics["stale_known_gaps"] == 0
     assert metrics["known_gaps"] > 0
@@ -150,6 +151,19 @@ def test_a_known_gap_that_starts_passing_fails_the_gate():
 
     assert result.pipeline_metrics["stale_known_gaps"] == 1
     assert any("stale_known_gaps" in problem for problem in result.gate())
+
+
+def test_a_retrieval_query_that_misses_its_entry_fails_the_gate():
+    case = next(case for case in CASES if case.id == "long-02-buried-allergy")
+    query = case.expect.retrieval[0].model_copy(update={"query": "colonoscopy"})
+    missing = case.model_copy(
+        update={"expect": case.expect.model_copy(update={"retrieval": [query]})}
+    )
+
+    result = evaluate([missing])
+
+    assert result.pipeline_metrics["retrieval_recall"] == 0.0
+    assert any("retrieval_recall" in problem for problem in result.gate())
 
 
 def test_cli_check_exit_code_follows_the_gate(tmp_path, capsys):

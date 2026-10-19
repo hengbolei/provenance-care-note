@@ -11,6 +11,7 @@ from carenote.evals.suites import (
     MAX_CONTEXT_ENTRIES,
     PIPELINE_GATE,
     PROMPT_VERSION,
+    RETRIEVAL_K,
     REVISE_PROMPT_VERSION,
     Check,
     EvalResult,
@@ -22,6 +23,7 @@ KIND_LABELS = {
     "redaction": "Redaction",
     "payload": "Model-bound payload",
     "verifier": "Verifier verdicts",
+    "retrieval": "Retrieval",
     "context": "Key entries in context",
     "critical_fact": "Critical facts",
     "forbidden_output": "Forbidden output",
@@ -69,15 +71,16 @@ def render(result: EvalResult) -> str:
         ),
         (
             f"- Prompts: `{PROMPT_VERSION}`, `{REVISE_PROMPT_VERSION}` · context window: "
-            f"{MAX_CONTEXT_ENTRIES} entries"
+            f"{MAX_CONTEXT_ENTRIES} entries · retrieval: top {RETRIEVAL_K} passages"
         ),
         f"- Gate: **{'pass' if not gate else 'FAIL'}**"
         + ("" if not gate else " — " + "; ".join(gate)),
         "",
         "## Pipeline suite (no model)",
         "",
-        "Deterministic conflict detection, redaction, the citation verifier on probe claims, and the",
-        "exact payload the agent would send to a model. Known gaps are excluded from the rates.",
+        "Deterministic conflict detection, redaction, the citation verifier on probe claims,",
+        "retrieval of key entries, and the exact payload the agent would send to a model. Known gaps",
+        "are excluded from the rates.",
         "",
         "| Metric | Value | Gate |",
         "| --- | --- | --- |",
@@ -88,6 +91,7 @@ def render(result: EvalResult) -> str:
         ("redaction_leaks", "Identifiers left after redaction"),
         ("payload_leaks", "Identifiers in model-bound payloads"),
         ("verifier_accuracy", "Verifier verdict accuracy"),
+        ("retrieval_recall", "Retrieval queries whose key entries rank in the top hits"),
         ("context_coverage", "Cases whose key entries reach the model"),
         ("known_gaps", "Checks on known gaps"),
         ("stale_known_gaps", "Known gaps now passing (remove the marker)"),

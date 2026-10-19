@@ -6,6 +6,7 @@ A case is a small synthetic record plus what a correct system must do with it:
 - `expect.phi`: identifiers that must not survive redaction before a model call;
 - `expect.critical_facts`: facts a good review must state in a verified claim (agent suite);
 - `expect.forbidden_output`: text a draft must never contain, e.g. what an injection asks for;
+- `expect.retrieval`: queries whose top hits must include the given entries;
 - `probes`: hand-written claims with the exact verdict the citation verifier must reach.
 
 Anything the current system is known not to handle carries a `known_gap` reason. The report shows
@@ -101,6 +102,13 @@ class CriticalFact(_Strict):
     mentions: list[str] = Field(min_length=1)
 
 
+class RetrievalQuery(_Strict):
+    query: str = Field(min_length=1)
+    # Every listed entry must be among the top hits for the query.
+    entries: list[str] = Field(min_length=1)
+    known_gap: str | None = None
+
+
 class ProbeCitation(_Strict):
     entry: str
     quote: str = Field(min_length=1)
@@ -126,6 +134,7 @@ class Expectations(_Strict):
     phi: list[PhiItem] = Field(default_factory=list)
     critical_facts: list[CriticalFact] = Field(default_factory=list)
     forbidden_output: list[str] = Field(default_factory=list)
+    retrieval: list[RetrievalQuery] = Field(default_factory=list)
 
     @field_validator("phi", mode="before")
     @classmethod
@@ -152,6 +161,10 @@ class EvalCase(_Strict):
         if len(set(probe_ids)) != len(probe_ids):
             raise ValueError(f"{self.id}: probe ids must be unique")
         by_key = {entry.key: entry for entry in self.entries}
+        for item in self.expect.retrieval:
+            unknown = set(item.entries) - set(by_key)
+            if unknown:
+                raise ValueError(f"{self.id}: retrieval query names unknown entries {unknown}")
         for probe in self.probes:
             for citation in probe.cite:
                 entry = by_key.get(citation.entry)

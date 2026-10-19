@@ -19,11 +19,13 @@ from carenote.domain.models import (
     Span,
     TimelineEntry,
 )
-from carenote.repositories.search import keyword_search
+from carenote.retrieval import BM25Retriever, Retriever
 
 
 class InMemoryCareNoteRepository:
     """Development adapter; replace with a clinic-scoped database adapter."""
+
+    retriever: Retriever = BM25Retriever()
 
     def __init__(self) -> None:
         self.patients: dict[UUID, Patient] = {}
@@ -84,7 +86,7 @@ class InMemoryCareNoteRepository:
         k: int = 10,
         include_internal: bool = True,
     ) -> list[Span]:
-        """Keyword search over one patient's active entries in one clinic.
+        """Ranked search over one patient's active entries in one clinic.
 
         Archived entries are excluded. Pass include_internal=False for anything patient-facing.
         """
@@ -93,7 +95,7 @@ class InMemoryCareNoteRepository:
             for entry in self.list_entries(patient_id, clinic_id)
             if include_internal or not entry.internal
         ]
-        return keyword_search(entries, query, k)
+        return self.retriever.search(entries, query, k)
 
     def get_entry(self, entry_id: UUID) -> TimelineEntry | None:
         return self.entries.get(entry_id)
