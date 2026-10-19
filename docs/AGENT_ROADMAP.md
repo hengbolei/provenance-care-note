@@ -121,9 +121,11 @@ it with no model; embeddings come last and are optional.
       names, spellings, abbreviations) and one-way drug-class expansion; hits are `Span`s with
       offsets, so they are valid citations; replaces `repositories/search.py`; the pipeline
       suite gates retrieval recall of each case's key entries in the top 10
-- [ ] 3.2 `plan` and `retrieve` nodes: the model proposes queries, retrieval adds the matching
-      entries to the context beside the most recent ones, within a context budget; long-timeline
-      cases get every key entry into the model-bound payload
+- [x] 3.2 `plan` and `retrieve` nodes: three standing questions, one per conflicting medicine and
+      up to six from the model (`plan_v1`); `retrieve` searches the whole record per question and
+      swaps conflicting entries and the best older hits into up to half of the 40-entry window;
+      the draft (`draft_v2`) sees every question; the pipeline suite now gates that every key
+      entry of every case reaches the draft payload (was 90.6%)
 - [x] 3.3 `revise` loop: moved to step 2.3
 - [ ] 3.4 Prompt-injection defences and eval cases
 - [ ] 3.5 Second provider adapter with fallback
@@ -147,6 +149,11 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-19 | `plan` always adds three standing questions (medication changes, allergies, follow-ups) and one per conflicting medicine to the model's questions | Retrieval must not depend on the model asking well; the standing questions alone bring every key entry of the eval cases into the draft |
+| 2026-10-19 | Older retrieved entries may take at most half of the context window; conflicting entries go first, then hits round-robin by rank across questions | Keeps the most recent entries the review also needs, and gives every question its best hit before any second best |
+| 2026-10-19 | Questions reach the draft as `<question source=...>` data and the prompt treats them as untrusted | A model question was written after reading record content, so an injection could shape it |
+| 2026-10-19 | Default step budget rises from 12 to 14 | `plan` and `retrieve` are two more automated steps; the worst case (two automatic and two clinician revisions) is now 14 |
+| 2026-10-19 | Without a recorded plan the pipeline suite continues with an empty model plan, and its context check reads the draft request only | The suite measures deterministic retrieval with no model; the plan request is still checked for identifier leaks |
 | 2026-10-19 | BM25 uses `b = 0` (no length normalisation), and equal scores fall back to recency | Passages are single sentences, so length says little about relevance; recency keeps the old keyword search's tie order |
 | 2026-10-19 | Retrieval searches the entries' original text; the agent's `search_entries` tool maps hits to redacted offsets as before | Redaction placeholders would otherwise match queries, and the model's queries come from redacted text, so they cannot name an identifier it was never shown |
 | 2026-10-19 | Eval cases gain `expect.retrieval` (query plus entries that must be in the top 10), gated at 100% | Measures retrieval with no model; one known gap ("blood thinner") marks that multi-word lay terms are not mapped |
@@ -208,9 +215,10 @@ Departures from or refinements of the design, newest first.
 
 ## Known limitations
 
-- The draft prompt receives only the 40 most recent entries. In 3 of the 4 long-timeline eval
-  cases an earlier key entry never reaches the model (see `evals/REPORT.md`); steps 3.1 and 3.2
-  address this.
+- The draft prompt receives at most 40 entries: the most recent, with up to 20 swapped for older
+  retrieved evidence. A record whose relevant history needs more than that, or whose wording
+  the synonym table does not cover, can still leave evidence out; the plan's questions only help
+  if retrieval finds their words.
 - Clinical data stays one encrypted snapshot per clinic, loaded whole into each app process, so
   retrieval scales with that snapshot; per-row storage is deferred (see [Decisions](#decisions)).
 - Commit writes the section, then each highlight; a failure part-way leaves the earlier writes in

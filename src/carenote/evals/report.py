@@ -10,6 +10,7 @@ from carenote.evals.suites import (
     AGENT_GATE,
     MAX_CONTEXT_ENTRIES,
     PIPELINE_GATE,
+    PLAN_PROMPT_VERSION,
     PROMPT_VERSION,
     RETRIEVAL_K,
     REVISE_PROMPT_VERSION,
@@ -70,7 +71,8 @@ def render(result: EvalResult) -> str:
             "families"
         ),
         (
-            f"- Prompts: `{PROMPT_VERSION}`, `{REVISE_PROMPT_VERSION}` · context window: "
+            f"- Prompts: `{PLAN_PROMPT_VERSION}`, `{PROMPT_VERSION}`, `{REVISE_PROMPT_VERSION}` · "
+            "context window: "
             f"{MAX_CONTEXT_ENTRIES} entries · retrieval: top {RETRIEVAL_K} passages"
         ),
         f"- Gate: **{'pass' if not gate else 'FAIL'}**"

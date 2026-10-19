@@ -10,7 +10,7 @@ from carenote.agent.gateway import DataTag, ModelResult
 from carenote.agent.graph import REVISE_PROMPT_VERSION, GraphDeps, build_review_graph, initial_state
 from carenote.agent.prompts import load_prompt
 from carenote.agent.runs import AgentRunService
-from carenote.agent.state import Budget, Citation, Claim, RunStatus
+from carenote.agent.state import Budget, Citation, Claim, ReviewPlan, RunStatus
 from carenote.data.seed import (
     DEMO_CLINIC_ID,
     DEMO_CLINICIAN_ID,
@@ -48,6 +48,8 @@ class RevisingModel(ScriptedGateway):
 
     def structured(self, request, schema):
         result = super().structured(request, schema)
+        if schema is ReviewPlan:
+            return result
         draft = result.output
         claims = list(draft.claims)
         if self.drop_conflict_claims and request.purpose == "agent_draft":
@@ -112,7 +114,7 @@ def test_a_failing_draft_is_revised_and_then_verifies(service):
     assert state["verification"].passed
     assert state["budget"].auto_revisions == 1
     # load_context, check_conflicts, draft, verify, revise, verify
-    assert state["budget"].steps == 6
+    assert state["budget"].steps == 8
 
 
 def test_the_revise_request_carries_the_verifiers_findings_as_redacted_data(service):

@@ -3,10 +3,11 @@ from pathlib import Path
 import pytest
 
 from carenote.agent.gateway import ModelResult, RecordedGateway, Usage
+from carenote.agent.state import ReviewPlan
 from carenote.evals.cases import Family, load_cases
 from carenote.evals.report import render
 from carenote.evals.run import REPORT_PATH, main
-from carenote.evals.suites import evaluate
+from carenote.evals.suites import MAX_CONTEXT_ENTRIES, evaluate
 
 CASES = load_cases()
 
@@ -34,18 +35,22 @@ def test_payload_is_captured_even_without_a_cassette(result):
     run = result.runs["inject-04-exfiltrate-identifiers"]
 
     assert not run.recorded
-    [request] = run.requests
-    assert "91234567" not in request.input_text
-    assert "[REDACTED_PHONE]" in request.input_text
+    assert not run.planned
+    assert [request.purpose for request in run.requests] == ["agent_plan", "agent_draft"]
+    for request in run.requests:
+        assert "91234567" not in request.input_text
+        assert "[REDACTED_PHONE]" in request.input_text
 
 
-def test_long_timelines_report_key_entries_outside_the_context_window(result):
-    missing = {
-        check.case_id for check in result.pipeline if check.kind == "context" and not check.passed
-    }
+def test_retrieval_brings_older_key_entries_of_long_timelines_into_the_draft(result):
+    case = next(case for case in CASES if case.id == "long-01-apixaban-dose")
+    newest = sorted(case.build_entries(), key=lambda entry: entry.timestamp)[-MAX_CONTEXT_ENTRIES:]
+    [draft] = result.runs[case.id].draft_requests
 
-    assert missing
-    assert all(case_id.startswith("long-") for case_id in missing)
+    # The apixaban start is older than the most-recent window, yet the draft sees it.
+    assert case.entry_id("start") not in {entry.id for entry in newest}
+    assert str(case.entry_id("start")) in draft.input_text
+    assert not [check for check in result.pipeline if check.kind == "context" and not check.passed]
 
 
 def test_agent_suite_reports_not_recorded_instead_of_scoring(result):
@@ -74,6 +79,8 @@ class _QuotingModel:
         self.misquote_first_draft = misquote_first_draft
 
     def structured(self, request, schema):
+        if schema is ReviewPlan:
+            return ModelResult(output=ReviewPlan(), model="quoting-test-model", usage=Usage(0, 0))
         claims = []
         entry_id = None
         for item in request.inputs:

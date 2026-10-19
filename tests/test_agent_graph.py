@@ -82,8 +82,8 @@ def test_run_drafts_verifies_and_pauses_for_human_review(service):
     assert {conflict.entity for conflict in state["conflicts"]} == {"lisinopril"}
     assert state["verification"].passed, [c.detail for c in state["verification"].checks]
     assert state["highlight_citations"][0].quote == "Hold morning lisinopril"
-    # load_context, check_conflicts, draft, verify; human_review counts once it completes.
-    assert state["budget"].steps == 4
+    # load_context, check_conflicts, plan, retrieve, draft, verify; human_review does not count.
+    assert state["budget"].steps == 6
     assert (state["budget"].input_tokens, state["budget"].output_tokens) == (900, 300)
     assert committer.calls == []
 

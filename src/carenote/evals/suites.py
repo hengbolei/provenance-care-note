@@ -3,6 +3,8 @@
 - **pipeline** needs no model. It scores deterministic conflict detection, redaction of each case's
   record, the verifier's verdict on every probe claim, and the exact payload the agent would send to
   a model: identifiers that leak into it and key entries that fall outside the context window.
+  With no recorded plan the run continues on the standing and conflict questions alone, so the
+  context check measures deterministic retrieval.
   It also checks that retrieval ranks each case's key entries among the top hits for its queries.
 - **agent** scores real model drafts replayed from cassettes: citation validity, unsupported
   claims, critical-fact recall, conflict coverage, injection resistance and token use. Cases with
@@ -26,17 +28,20 @@ from carenote.agent.gateway import (
     CassetteMissingError,
     ModelGateway,
     ModelRequest,
+    ModelResult,
     RecordedGateway,
+    Usage,
 )
 from carenote.agent.graph import (
     MAX_CONTEXT_ENTRIES,
+    PLAN_PROMPT_VERSION,
     PROMPT_VERSION,
     REVISE_PROMPT_VERSION,
     GraphDeps,
     build_review_graph,
     initial_state,
 )
-from carenote.agent.state import DraftReview, VerificationReport
+from carenote.agent.state import DraftReview, ReviewPlan, VerificationReport
 from carenote.agent.verify import verify_draft
 from carenote.domain.models import Actor, AgentActor, Role
 from carenote.evals.cases import EVAL_CLINIC_ID, EvalCase, Family
@@ -63,6 +68,7 @@ PIPELINE_GATE = {
     "payload_leaks": 0,
     "verifier_accuracy": 1.0,
     "retrieval_recall": 1.0,
+    "context_coverage": 1.0,
     "stale_known_gaps": 0,
 }
 # Gate for the agent suite (design §13 v1 targets), applied only to recorded cases.
@@ -100,15 +106,31 @@ class CaseRun:
     usage: dict[str, int | float] = field(default_factory=dict)
     model: str | None = None
     recorded: bool = False
+    # Whether the model's plan came from a cassette; without one, only standing questions ran.
+    planned: bool = False
+
+    @property
+    def draft_requests(self) -> list[ModelRequest]:
+        return [request for request in self.requests if request.purpose == "agent_draft"]
 
 
 class _CapturingGateway:
+    """Keeps every request; a missing plan cassette becomes an empty plan so drafting proceeds."""
+
     def __init__(self, inner: ModelGateway) -> None:
         self.inner = inner
         self.requests: list[ModelRequest] = []
+        self.planned = False
 
     def structured(self, request: ModelRequest, schema):
         self.requests.append(request)
+        if schema is ReviewPlan:
+            try:
+                result = self.inner.structured(request, schema)
+            except CassetteMissingError:
+                return ModelResult(output=ReviewPlan(), model="none", usage=Usage())
+            self.planned = True
+            return result
         return self.inner.structured(request, schema)
 
     def text(self, request: ModelRequest):
@@ -140,7 +162,9 @@ def run_case(case: EvalCase, gateway: ModelGateway) -> CaseRun:
             config,
         )
     except CassetteMissingError:
+        run.planned = capturing.planned
         return run
+    run.planned = capturing.planned
     values = graph.get_state(config).values
     budget = values["budget"]
     run.recorded = True
@@ -257,7 +281,7 @@ def pipeline_checks(cases: list[EvalCase], runs: dict[str, CaseRun]) -> list[Che
             )
 
         # Entries a review depends on: everything the case wrote by hand (not filler).
-        shown = payload
+        shown = "\n".join(request.input_text for request in runs[case.id].draft_requests)
         missing = [item.key for item in case.entries if str(case.entry_id(item.key)) not in shown]
         checks.append(
             Check(
@@ -441,6 +465,7 @@ __all__ = [
     "AGENT_GATE",
     "MAX_CONTEXT_ENTRIES",
     "PIPELINE_GATE",
+    "PLAN_PROMPT_VERSION",
     "PROMPT_VERSION",
     "RETRIEVAL_K",
     "REVISE_PROMPT_VERSION",

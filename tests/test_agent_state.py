@@ -115,7 +115,7 @@ def test_budget_reports_the_first_ceiling_exceeded():
     budget = Budget(started_at=START)
     assert budget.exceeded(START) is None
 
-    assert "step" in Budget(started_at=START, steps=13).exceeded(START)
+    assert "step" in Budget(started_at=START, steps=15).exceeded(START)
     assert "token" in Budget(started_at=START, input_tokens=50_000, output_tokens=10_001).exceeded(
         START
     )

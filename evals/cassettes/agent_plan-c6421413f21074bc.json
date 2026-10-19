@@ -1,0 +1,23 @@
+{
+  "fingerprint": "c6421413f21074bc23f892448b918e0aa6be2bffd3ad234d4821c730dd3ae1cf",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "curated-demo (hand-written, not model output)",
+  "usage": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "Which lisinopril dose is the patient taking now?",
+        "query": "lisinopril dose"
+      },
+      {
+        "question": "Has the blood pressure check been completed?",
+        "query": "blood pressure check"
+      }
+    ]
+  }
+}
