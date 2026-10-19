@@ -92,7 +92,14 @@ The agent's model gateway is chosen with `CARENOTE_AGENT_GATEWAY`:
 | --- | --- |
 | `recorded` (default) | Replays cassettes from `evals/cassettes/`; no key, no network |
 | `openai` | Live calls with `OPENAI_API_KEY` and `CARENOTE_OPENAI_MODEL` |
-| `record` | Live calls that also write new cassettes |
+| `anthropic` | Live calls with `ANTHROPIC_API_KEY` and `CARENOTE_ANTHROPIC_MODEL` |
+| `live` | Live calls to `CARENOTE_AGENT_PROVIDER` (`openai` by default) |
+| `record` | Live calls to `CARENOTE_AGENT_PROVIDER` that also write new cassettes |
+
+Set `CARENOTE_AGENT_FALLBACK` to the other provider to retry a model call there when the first
+provider fails (unreachable, server errors after retries, or output that breaks the schema). A
+missing API key is not a provider failure and is never hidden by the fallback. The run view and
+trace name the model that answered; the trace also records `carenote.fallback_from`.
 
 Cassettes are keyed by a hash of the prompt, the redacted input and the output schema, so
 changing the draft prompt, the seed data or how requests are framed makes the replay test

@@ -2,6 +2,7 @@
 
     python scripts/record_demo_cassette.py              # curated draft, no API key needed
     python scripts/record_demo_cassette.py --source openai   # live model; needs OPENAI_API_KEY
+    python scripts/record_demo_cassette.py --source anthropic   # needs ANTHROPIC_API_KEY
 
 The curated source is a hand-written draft that cites the seed record exactly. It is labelled
 as curated in the cassette's model field, so it is never mistaken for model output. Re-record
@@ -25,9 +26,9 @@ from carenote.agent.gateway import (
     DataTag,
     ModelRequest,
     ModelResult,
-    OpenAIGateway,
     RecordedGateway,
     Usage,
+    live_gateway,
 )
 from carenote.agent.graph import GraphDeps, build_review_graph, initial_state
 from carenote.agent.state import ReviewPlan
@@ -206,11 +207,11 @@ def _cassettes(directory: Path) -> list[Path]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--source", choices=["curated", "openai"], default="curated")
+    parser.add_argument("--source", choices=["curated", "openai", "anthropic"], default="curated")
     parser.add_argument("--directory", type=Path, default=CASSETTE_DIR)
     args = parser.parse_args()
 
-    live = CuratedDemoGateway() if args.source == "curated" else OpenAIGateway()
+    live = CuratedDemoGateway() if args.source == "curated" else live_gateway(args.source, "")
     for stale in _cassettes(args.directory):
         stale.unlink()
     repository = InMemoryCareNoteRepository()

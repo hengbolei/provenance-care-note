@@ -144,6 +144,11 @@ class RunTracer:
                     "gen_ai.usage.output_tokens": result.usage.output_tokens,
                     "carenote.cached": result.cached,
                     **({"carenote.prompt": step.prompt} if step and step.prompt else {}),
+                    **(
+                        {"carenote.fallback_from": result.fallback_from}
+                        if result.fallback_from
+                        else {}
+                    ),
                 }
             )
         if step is not None:

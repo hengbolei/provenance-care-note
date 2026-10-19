@@ -31,9 +31,12 @@ services:
       CARENOTE_DATABASE_URL: postgresql://carenote:carenote-demo-only@postgres:5432/carenote
       CARENOTE_ENCRYPTION_KEY: demo-only-encryption-key-change-me
       CARENOTE_TOKEN_SECRET: demo-only-token-secret-change-me
-      # recorded: replay evals/cassettes; set to openai with OPENAI_API_KEY for live drafts.
+      # recorded: replay evals/cassettes; set to openai or anthropic with its API key for live
+      # drafts, and CARENOTE_AGENT_FALLBACK to the other provider to fall back on errors.
       CARENOTE_AGENT_GATEWAY: ${CARENOTE_AGENT_GATEWAY:-recorded}
+      CARENOTE_AGENT_FALLBACK: ${CARENOTE_AGENT_FALLBACK:-}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       # Set to an OTLP/HTTP collector (e.g. Langfuse or Jaeger) to export agent traces.
       OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
     ports:

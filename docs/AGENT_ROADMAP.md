@@ -133,7 +133,10 @@ it with no model; embeddings come last and are optional.
       `plan_v2`, `draft_v3`, `revise_v2`); open questions and highlights that repeat a flagged
       passage are withheld and counted; the panel shows both; four new cases (36 in all) and
       pipeline gates for detection, false flags and framing
-- [ ] 3.5 Second provider adapter with fallback
+- [x] 3.5 Second provider adapter with fallback: `AnthropicGateway` (Messages API, structured
+      output as a forced tool call) beside `OpenAIGateway` on shared retry and error handling;
+      `FallbackGateway` retries a call on the other provider when the first fails; settings
+      `CARENOTE_AGENT_PROVIDER` and `CARENOTE_AGENT_FALLBACK`; tested with mocked HTTP only
 - [ ] 3.6 Optional local embeddings (an extra, off by default) behind the same interface, fused
       with BM25 by reciprocal rank fusion; vectors are held in memory only; kept only if the
       eval suite shows a gain over 3.1
@@ -154,6 +157,9 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-19 | The second provider is Anthropic's Messages API, called over HTTP like OpenAI, with structured output as a forced call to one tool whose input schema is the output model | No new SDK dependency; tool forcing is the provider's established way to get schema-shaped output, and Pydantic validates the result as for OpenAI |
+| 2026-10-19 | The fallback triggers only on `ExternalModelError` (unreachable, errors after retries, output that breaks the schema), not on a missing key or cassette | Falling back on configuration errors would hide them; the result's `fallback_from` and the trace attribute keep a fallback visible |
+| 2026-10-19 | Cassettes stay provider-agnostic: keyed by the request, storing the model that answered | A draft recorded through either provider, or through a fallback, replays the same way |
 | 2026-10-19 | Tag-like markup in model-bound text becomes `‹` inside `PHIRedactionGateway.redact`, and `ModelRequest` refuses a `RedactionResult` that still contains it | Every model input already passes through redaction, so no caller can forget the guard; one character for one keeps the offset map and citation checks exact |
 | 2026-10-19 | Instruction-like entries are flagged by narrow regular expressions aimed at text that addresses an assistant or the output, not by a model | Deterministic and testable; the eval cases gate false flags at 0, and one indirect injection is a known gap rather than a looser pattern |
 | 2026-10-19 | Open questions and highlight suggestions sharing four consecutive words with a flagged passage are withheld; claims are not filtered | These texts are never verified against citations, while every claim already is; the run reports what was withheld by position and source entry, without its text |
@@ -234,9 +240,9 @@ Departures from or refinements of the design, newest first.
   place and marks the run failed. Decisions are validated first to make this unlikely.
 - Without `CARENOTE_DATABASE_URL`, runs and checkpoints live in memory and a restart loses them;
   with Postgres they persist (step 2.4).
-- `OpenAIGateway` is covered by mocked HTTP tests only; strict structured output has not yet been
-  run against the live API. The first `record_demo_cassette.py --source openai` run will show
-  whether the provider rejects any schema keyword.
+- `OpenAIGateway` and `AnthropicGateway` are covered by mocked HTTP tests only; neither has been
+  run against its live API. The first `record_demo_cassette.py --source openai` (or
+  `--source anthropic`) run will show whether the provider rejects any schema keyword.
 - The Docker demo is checked by the CI `demo` job (it passed on PRs #6 and #9, including an app
   restart on #9); it has not been run on a local Docker install.
 - Entity extraction (`services/entities.py`) only recognises a medication as a word followed by
