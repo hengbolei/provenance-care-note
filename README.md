@@ -4,220 +4,197 @@
 
 [![CI](https://github.com/hengbolei/provenance-care-note/actions/workflows/ci.yml/badge.svg)](https://github.com/hengbolei/provenance-care-note/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A provenance-first longitudinal care note prototype for a single synthetic patient. The project
-helps clinical staff understand urgent information quickly while keeping AI-generated content,
-human-authored notes, source evidence, and access boundaries explicit.
+A provenance-first care record with a **Clinical Review Agent**. Every claim the agent drafts
+cites an exact span of the record and passes deterministic verification. Nothing reaches the
+record until a clinician accepts it.
 
-> This repository contains synthetic demonstration data only. It is not a medical device and is
-> not ready for production use.
+> Synthetic demonstration data only. This is a research prototype, not a medical device, and not
+> ready for clinical use.
 
-## Current capabilities
+## How a review works
 
-- An interface in English, Simplified Chinese and Traditional Chinese, chosen from the top bar
-  and remembered per browser. Clinical record text, server messages and model output stay in the
-  language they were written in.
-- A Clinical Review Agent (LangGraph) that drafts a patient review in which every claim cites an
-  exact span of the record, verifies each citation deterministically, and stops for a clinician
-  to accept, edit or reject each claim before anything is saved. See
-  [the design](docs/AGENT_DESIGN.md) and [the roadmap](docs/AGENT_ROADMAP.md).
-- An evaluation suite of 32 golden cases with a CI gate; current results, including known gaps,
-  are in the [evaluation report](evals/REPORT.md).
-- A 10-second Glance view with deterministic explainable priority factors, risk reasons,
-  suggested actions, and review states.
-- Narrow medication, dose, and allergy conflict detection with explicit clinician precedence or
-  needs-review states.
-- An actionable highlight workflow with care-role assignment, open/in-progress/completed states,
-  disposition notes, optimistic concurrency checks, and metadata-only audit events.
-- A longitudinal timeline containing patient, staff, clinician, and three distinct AI-scribed
-  entry types.
-- Role-authored manual timeline notes whose server-generated author and entry type cannot be
-  forged by the browser.
-- Clinician-created highlights from an exact selected source span, with risk reason, suggested
-  action, priority, assignment, and audit metadata.
-- Exact highlight provenance pointers that resolve to an entry and character span, then continue
-  to an original synthetic message or transcript span.
-- Exact source-span highlighting in the timeline and signed clinician/staff/patient demo sessions.
-- Server-side clinic scope, role ownership, and patient self-access checks.
-- Patient-facing filtering that excludes internal highlights and raw AI-scribed entries.
-- A patient-facing dashboard with explicitly published clinician-confirmed guidance, action
-  progress, and a form for adding patient-authored symptom or question updates.
-- Deterministic section versioning, audit metadata, revert behavior, and optimistic concurrency
-  checks.
-- Internal care-team comments bound to entries, sections, or exact spans, with reply links, role
-  mentions, assignment, resolve/reopen, optimistic locking, and complete revision snapshots.
-- Editable clinician plan with API-backed revision history, arbitrary-version comparison, and
-  revert controls, plus complete Highlight revision snapshots.
-- An in-page metadata-only audit trail for note creation, comments/replies, resolve/reopen,
-  highlight assignment/completion/review, plan edits, and reverts.
-- A tested PHI redaction gateway used by the optional external text-summary adapter.
-- Deterministic synthetic data for repeatable demonstrations and tests.
-- Responsive, English-only web interface with loading, empty, forbidden, not-found, and error
-  states.
-- Signed, expiring sessions with HttpOnly cookies, logout revocation, PostgreSQL-backed accounts
-  and clinic memberships, and no interactive `system` identity.
-- Optional encrypted PostgreSQL snapshots with forced clinic RLS, encrypted cold-entry archives,
-  hash-chained audit events, request-log minimization, and a TLS reverse-proxy baseline.
-- WebSocket presence and automatic record refresh, arbitrary Comment/Highlight snapshot A/B
-  comparison, and a bounded reviewed-outcome priority adjustment that controls for exposure.
-- Optional OpenAI Responses API summary ingestion and audio transcription. The gateway redacts
-  known identifiers, requests non-storage, preserves original sources internally, and fails closed
-  when no API key is configured.
+```mermaid
+flowchart LR
+    A[Load context] --> B[Check conflicts]
+    B --> C[Plan questions]
+    C --> D[Retrieve evidence]
+    D --> E[Draft with citations]
+    E --> F{Verify citations}
+    F -- failures --> G[Revise] --> F
+    F -- verified --> H[Clinician review]
+    H -- accept / edit / reject --> I[Commit]
+    H -- redraft --> E
+    H --> J[Discard]
+```
 
-## Technology
+1. **Deterministic first.** Medication, dose and allergy conflicts are found by code and must be
+   mentioned in the draft. The model cannot dismiss them or set risk levels.
+2. **Plan and retrieve.** Standing questions, one per conflict and a few from the model are
+   searched across the whole record (BM25 with brand/generic and spelling synonyms). Older
+   evidence therefore reaches the draft even on long timelines.
+3. **Cite and verify.** Each claim must quote the record. Code checks that the entry exists, the
+   span is in bounds, the quote matches, the medication, dose and allergy facts agree with the
+   source, and patient-reported text is phrased as reported. Failures go back to the model with
+   the reasons, at most twice; anything still unsupported is shown as such.
+4. **Clinician decides.** The run pauses. A clinician accepts, edits or rejects each claim and
+   highlight. Commit writes an internal `agent_review` section revision as that clinician; the
+   agent itself cannot write.
 
-- Python 3.11+
-- FastAPI and Uvicorn
-- Pydantic domain models
-- Vanilla HTML, CSS, and JavaScript
-- Pytest and Ruff
-- PostgreSQL/psycopg and Fernet authenticated encryption (optional production adapter)
+## Highlights
 
-Development defaults to an in-memory repository. Setting `CARENOTE_DATABASE_URL` selects the
-encrypted PostgreSQL adapter and runs the RLS migration.
+**Agent safety and privacy**
+
+- Everything sent to a model is PHI-redacted first, and the request type refuses unredacted text.
+  Offset maps let citations in redacted text resolve back to the original.
+- Record text is framed as data and cannot forge framing tags. Instruction-like entries ("ignore
+  previous instructions", "SYSTEM: …") are flagged, and suggestions that repeat them are withheld.
+- Each run has budgets for steps, revisions, tokens, cost and time, and stops with a partial
+  draft and a visible reason when one is reached.
+
+**Operations**
+
+- Runs are checkpointed in PostgreSQL with Fernet-encrypted state and clinic-scoped RLS, so they
+  survive an app restart.
+- Each run is one OpenTelemetry trace that carries IDs and counts only, never record text. The
+  review panel shows a metadata-only run timeline.
+- Model providers are OpenAI and Anthropic, with fallback to the other provider on errors. A
+  recorded mode replays cassettes, so the demo, tests and CI need no API key.
+
+**Evaluation**
+
+- 36 synthetic cases across 8 families: medication changes, dose conflicts, new allergies,
+  contradictory sources, sparse information, long timelines, prompt injection and PHI-heavy text.
+- The **pipeline** suite needs no model and gates CI. It covers conflict recall, redaction and
+  payload leaks, verifier accuracy, retrieval recall, key entries reaching the model, injection
+  detection and framing.
+- The **agent** suite scores real model drafts from cassettes and reports "not recorded" instead
+  of inventing scores. Current results and known gaps are in the
+  [evaluation report](evals/REPORT.md), which CI regenerates and checks.
+
+**Care record**
+
+- A 10-second Glance view with explainable priority factors, risk reasons and suggested actions.
+- A longitudinal timeline of patient, staff, clinician and AI-scribed entries. Highlights and
+  comments point to exact character spans and on to the original message or transcript.
+- Highlight workflow with care-role assignment and open, in-progress and completed states. Care
+  team comments support replies, mentions and resolve/reopen.
+- Versioned sections and plans with history, any-version comparison, revert and optimistic
+  concurrency checks.
+- A patient-facing dashboard that shows only clinician-confirmed, published guidance and lets the
+  patient add symptom updates or questions.
+- An interface in English, Simplified Chinese and Traditional Chinese.
+
+**Security baseline**
+
+- Clinic scope, role ownership and patient self-access are enforced on the server.
+- Signed, expiring HttpOnly sessions.
+- Optional encrypted PostgreSQL snapshots with forced row-level security, plus encrypted cold
+  archives.
+- Hash-chained audit events and metadata-only request logs.
 
 ## Quick start
 
-Create a virtual environment and install the application with development dependencies:
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
-```
-
-Start the development server with automatic reload:
-
-```powershell
-.\.venv\Scripts\python.exe -m uvicorn carenote.main:app --reload
-```
-
-Open:
-
-- Application: `http://127.0.0.1:8000`
-- Interactive API documentation: `http://127.0.0.1:8000/docs`
-- Health endpoint: `http://127.0.0.1:8000/api/health`
-
-## Offline demo with Docker
+### Docker demo (no API key)
 
 ```bash
 docker compose up --build
 ```
 
-This starts the app on encrypted PostgreSQL with the synthetic seed patient. Sign in as
-`clinician` / `clinician-demo-2026` and use **Prepare review** in the care-team workspace. The
-review agent replays a recorded draft from `evals/cassettes/`, so no API key or model call is
-needed; the panel names the draft's source. The recorded seed draft is hand-written to show the
-workflow and is labelled as such, not presented as model output. Set
-`CARENOTE_AGENT_GATEWAY=openai` and `OPENAI_API_KEY` to draft with a live model instead.
+Open `http://127.0.0.1:8000`, sign in as `clinician` / `clinician-demo-2026` and click
+**Prepare review**. The agent replays the recorded seed draft from `evals/cassettes/`. That draft
+is hand-written to show the workflow and is labelled as such in the panel; it is never presented
+as model output.
 
-`python scripts/smoke_demo.py` signs in, runs a review and commits it against a running demo;
-CI runs it against the Docker stack on every change.
+### Local development
 
-## Synthetic demo identity
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+.\.venv\Scripts\python.exe -m uvicorn carenote.main:app --reload
+```
 
-The UI uses a server login and a signed, expiring HttpOnly session cookie. Development-only
-accounts are `patient`, `staff`, `clinician`, and `admin`; their passwords follow
-`<username>-demo-2026`. Actor IDs and role/clinic headers are never accepted from the browser.
-When PostgreSQL is configured, accounts, active memberships, and hashed session IDs are persisted.
+- Application: `http://127.0.0.1:8000`
+- API documentation: `http://127.0.0.1:8000/docs`
+
+Development uses an in-memory repository. Setting `CARENOTE_DATABASE_URL` selects encrypted
+PostgreSQL. The demo accounts are `patient`, `staff`, `clinician` and `admin`, with passwords
+`<username>-demo-2026`. They are development-only and synthetic.
+
+### Live models
+
+`CARENOTE_AGENT_GATEWAY` selects how the agent calls a model:
+
+| Value | Behaviour |
+| --- | --- |
+| `recorded` (default) | Replays cassettes; no key, no network |
+| `openai` / `anthropic` | Live calls; needs `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` |
+| `live` | Live calls to `CARENOTE_AGENT_PROVIDER` |
+| `record` | Live calls that also record cassettes |
+
+`CARENOTE_AGENT_FALLBACK` names a second provider to try when the first one fails. Models,
+fallback rules and recording are covered in [Development](docs/DEVELOPMENT.md#clinical-review-agent).
+Run `python evals/run_evals.py --record` to record live drafts and score the agent suite.
 
 ## Verification
 
-Run the complete automated test suite:
-
 ```powershell
-.\.venv\Scripts\python.exe -m pytest -q
-```
-
-Run static and formatting checks:
-
-```powershell
+.\.venv\Scripts\python.exe -m pytest -q                 # unit, API, agent and eval tests
 .\.venv\Scripts\ruff.exe check .
-.\.venv\Scripts\ruff.exe format --check src tests scripts
-node --check src/carenote/static/api.js
-node --check src/carenote/static/app.js
-node --check src/carenote/static/service-worker.js
-.\.venv\Scripts\python.exe scripts\benchmark_glance.py --iterations 1000 --warmup 100
+.\.venv\Scripts\python.exe evals/run_evals.py --check   # evaluation gate
 ```
 
-The required acceptance scenarios are organized in:
-
-- `tests/test_rbac_scope.py`
-- `tests/test_revision_history.py`
-- `tests/test_highlight_provenance.py`
-- `tests/test_concurrent_edits.py`
-
-Additional tests cover the synthetic dataset, patient API, and frontend/API contract.
-The current local baseline is 45 passing tests.
-
-## Architecture and trust boundaries
-
-HTTP requests enter through the API layer and then pass to the service layer, where clinic scope,
-role ownership, authorship, concurrency, and provenance rules are enforced. Repository adapters
-handle persistence. The browser UI is not a security boundary.
-
-Highlights contain a `risk_reason`, `suggested_action`, review status, and a
-`provenance_pointer`. The repository rejects pointers that do not resolve to the same patient's
-timeline or whose character span lies outside the source entry.
-
-See `docs/ARCHITECTURE.md` for the current architecture and production direction.
-
-## Security and privacy status
-
-Implemented in the prototype:
-
-- Synthetic data only.
-- Server-side clinic scope and role ownership checks.
-- Patient self-access restriction.
-- Patient response filtering for internal and raw AI content.
-- Full section snapshots and diffs, with a separate metadata-only audit event stream.
-- Deterministic PHI redaction gateway used before optional external text-summary requests.
-- Signed session tokens, expiration/revocation, PostgreSQL account/membership schema, and forced
-  clinic RLS policies.
-- Authenticated encryption of PostgreSQL clinical snapshots and cold archives; hash-chained audit
-  events with database anchors; metadata-only request logs and retention maintenance.
-- Optional, fail-closed external model and transcription adapters; no call occurs without an
-  explicitly configured project API key.
-- Reproducible Glance benchmark: 1.535 ms warm-path P95 in the latest recorded local run.
-
-Required before production:
-
-- Validate the PostgreSQL adapter and RLS policies against the target managed PostgreSQL service.
-- Connect TLS certificates, a managed key/secret service, immutable audit export, legal holds,
-  backup/restore, and operational retention scheduling.
-- Replace the local password provisioning workflow with the organization's identity provider,
-  MFA/SSO, recovery, and account lifecycle process.
-- Repeat Glance load testing with a production-like database, network, concurrency, and
-  representative dataset; the local in-memory result is not a capacity claim.
-
-No external LLM call occurs by default. `OPENAI_API_KEY` explicitly enables the model boundary;
-real clinical use still requires organizational privacy, retention, and validation approval.
+CI runs these on Python 3.11 and 3.12. It also runs PostgreSQL integration tests against a real
+database, and a Docker job that signs in, runs a review, restarts the app, resumes the run and
+commits it.
 
 ## Project layout
 
 ```text
 src/carenote/
-├── api/           HTTP routes and response handling
-├── core/          Application configuration
-├── data/          Deterministic synthetic seed data
-├── domain/        Domain models and API contracts
+├── agent/         Review graph, tools, verifier, model gateways, prompts, tracing, persistence
+├── retrieval/     BM25 retrieval and the synonym table
+├── evals/         Evaluation case format, suites and report
+├── api/           HTTP routes
+├── services/      Use cases, policy enforcement, conflict detection, entity extraction
+├── repositories/  In-memory and encrypted PostgreSQL adapters
 ├── privacy/       PHI redaction boundary
-├── repositories/  Persistence adapters
-├── services/      Use cases and policy enforcement
-└── static/        Patient web interface
-tests/             Automated acceptance and integration tests
-docs/              Architecture and development documentation
+├── domain/        Domain models and API contracts
+├── data/          Deterministic synthetic seed data
+├── core/          Configuration, identity, security
+└── static/        Web interface (vanilla JS, three languages)
+evals/             Cases (YAML), cassettes and the generated report
+migrations/        PostgreSQL schema and row-level security
+scripts/           Demo cassette recording, Docker smoke test, Glance benchmark
+tests/             Automated tests
+docs/              Design, roadmap, architecture and operations
 ```
+
+## Status and limitations
+
+- **No live model has been evaluated yet.** The OpenAI and Anthropic adapters are tested with
+  mocked HTTP only, so model metrics such as critical-finding recall and injection resistance
+  appear once live cassettes are recorded.
+- **Scale.** Each clinic's data is one encrypted snapshot loaded into memory, which suits a small
+  deployment. Per-row storage is a planned separate refactor.
+- **Known gaps** are listed in the [evaluation report](evals/REPORT.md) instead of being worded
+  around. Examples: brand and generic names are not linked in conflict detection, partial names
+  and email addresses are not redacted, and multi-word lay terms are not searched.
+- Production use would need an organisational identity provider, managed keys, validated
+  PostgreSQL RLS, and privacy and clinical approval. See
+  [Production security](docs/PRODUCTION_SECURITY.md).
 
 ## Documentation
 
+- [Clinical Review Agent design](docs/AGENT_DESIGN.md): goals, graph, tools, verification and evaluation
+- [Agent roadmap](docs/AGENT_ROADMAP.md): phases, progress and every design decision
+- [Evaluation](evals/README.md) and [current report](evals/REPORT.md)
 - [Architecture](docs/ARCHITECTURE.md): layers, trust boundaries and production direction
-- [Technical brief](docs/TECHNICAL_BRIEF.md): product thesis, scope and design choices
-- [Development](docs/DEVELOPMENT.md): requirements, setup, tests and operation
-- [Production security](docs/PRODUCTION_SECURITY.md): required configuration and secret handling
+- [Technical brief](docs/TECHNICAL_BRIEF.md): product thesis and scope
+- [Development](docs/DEVELOPMENT.md): setup, configuration, tests and operation
+- [Production security](docs/PRODUCTION_SECURITY.md): required configuration and secrets
 - [Performance](docs/PERFORMANCE.md): Glance warm-path measurements
-- [Clinical Review Agent design](docs/AGENT_DESIGN.md): proposed multi-step review agent
-- [Agent roadmap](docs/AGENT_ROADMAP.md): build phases, progress and decisions
 - [Attribution](ATTRIBUTION.txt): third-party licences
 
 ## License
 
-Licensed under the MIT License. See `LICENSE`.
+MIT. See [LICENSE](LICENSE).
