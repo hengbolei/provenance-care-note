@@ -4,7 +4,7 @@ Status tracker for building the agent described in [AGENT_DESIGN.md](AGENT_DESIG
 design says *what* and *why*; this file says *in what order* and *where we are*. Update it in the
 same PR as the work it describes.
 
-Last updated: 2026-10-19 · Current phase: **Phase 3 — Retrieval, safety and a second provider**
+Last updated: 2026-10-20 · Current phase: all planned phases done; next work is under [Later](#later)
 
 ## How we work
 
@@ -106,7 +106,10 @@ cassettes and reports honestly when none are recorded; the revise loop is covere
 measured once live cassettes exist; a run survives a restart in the Docker demo; a trace is
 visible for a demo run.
 
-## Phase 3 — Retrieval, safety and a second provider · ✅ done (pending merge)
+## Phase 3 — Retrieval, safety and a second provider · ✅ done
+
+Merged in PR #11 (`d3d844e`). CI passed on the merge, including the Postgres integration job,
+the Docker demo with an app restart, and the evaluation gate.
 
 Branch: `feat/agent-retrieval`. Design §17 week 3.
 

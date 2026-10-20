@@ -4,182 +4,154 @@
 
 [![CI](https://github.com/hengbolei/provenance-care-note/actions/workflows/ci.yml/badge.svg)](https://github.com/hengbolei/provenance-care-note/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-一个以溯源为核心的纵向护理记录原型，面向单个合成患者。它帮助临床人员快速掌握紧急信息，同时让
-AI 生成内容、人工撰写的记录、原始证据和访问边界都清晰可见。
+一个以溯源为核心的护理记录系统，内置**临床审阅 Agent**。Agent 起草的每一句话都引用病历中的精确原文片段，并通过确定性校验；只有临床医生确认后，内容才会写入记录。
 
-> 本仓库只包含合成的演示数据。它不是医疗器械，也尚未达到生产可用的程度。
+> 本仓库只包含合成的演示数据。这是研究原型，不是医疗器械，也不能用于临床。
 
-## 当前功能
+## 一次审阅如何进行
 
-- 32 个评测用例和 CI 评测门槛；最新结果（包括已知缺口）见[评测报告](evals/REPORT.md)。
-- 界面支持英文、简体中文和繁体中文，可在顶栏切换，浏览器会记住选择。病历原文、服务端消息和模型输出保持原有语言，不做翻译。
-- 10 秒速览（Glance）视图：确定性、可解释的优先级因子，以及风险原因、建议操作和审核状态。
-- 范围明确的药物、剂量和过敏冲突检测，冲突时要么明确以临床医生意见为准，要么标记为待审核。
-- 可执行的重点事项（highlight）工作流：按护理角色分派，支持待处理/进行中/已完成状态、处置备注、乐观并发检查和仅含元数据的审计事件。
-- 纵向时间线，包含患者、护理人员、临床医生记录，以及三种不同的 AI 记录类型。
-- 按角色撰写的手动时间线记录，作者和记录类型由服务端生成，浏览器无法伪造。
-- 临床医生可以从精确选中的原文片段创建重点事项，并附带风险原因、建议操作、优先级、分派和审计元数据。
-- 精确的重点事项溯源指针：先定位到具体记录和字符区间，再继续追溯到原始的合成消息或转录片段。
-- 时间线中的原文片段精确高亮，以及带签名的临床医生/护理人员/患者演示会话。
-- 服务端的诊所范围、角色归属和患者本人访问检查。
-- 面向患者的内容过滤，排除内部重点事项和未经审核的 AI 记录。
-- 患者端仪表盘：展示经临床医生确认并明确发布的指导、行动进度，并提供表单让患者补充症状或提问。
-- 确定性的分区版本管理、审计元数据、回滚功能和乐观并发检查。
-- 护理团队内部评论，可绑定到记录、分区或精确片段，支持回复、角色提及、分派、解决/重新打开、乐观锁和完整的修订快照。
-- 可编辑的诊疗计划，带有 API 支持的修订历史、任意版本对比和回滚，以及完整的重点事项修订快照。
-- 页面内仅含元数据的审计轨迹，覆盖记录创建、评论与回复、解决/重新打开、重点事项分派/完成/审核、计划编辑和回滚。
-- 经过测试的 PHI 脱敏网关，供可选的外部文本摘要适配器使用。
-- 确定性的合成数据，用于可重复的演示和测试。
-- 响应式的英文 Web 界面，包含加载中、空数据、无权限、未找到和错误等状态。
-- 带签名、会过期的会话：HttpOnly Cookie、登出即吊销、基于 PostgreSQL 的账户与诊所成员关系，并且不存在可交互登录的 `system` 身份。
-- 可选的加密 PostgreSQL 快照，强制启用诊所级行级安全（RLS），加密的冷数据归档，哈希链式审计事件，请求日志最小化，以及 TLS 反向代理基线配置。
-- WebSocket 在线状态与记录自动刷新，评论/重点事项任意快照的 A/B 对比，以及考虑曝光偏差、有上限的审核结果优先级调整。
-- 可选的 OpenAI Responses API 摘要导入和音频转录。网关会脱敏已知标识符、要求服务端不存储数据、在内部保留原始来源，并且在未配置 API 密钥时默认拒绝调用。
+```mermaid
+flowchart LR
+    A[加载上下文] --> B[检查冲突]
+    B --> C[规划问题]
+    C --> D[检索证据]
+    D --> E[带引用起草]
+    E --> F{核对引用}
+    F -- 未通过 --> G[自动修正] --> F
+    F -- 通过 --> H[医生审阅]
+    H -- 接受 / 修改 / 拒绝 --> I[写入]
+    H -- 重新起草 --> E
+    H --> J[放弃]
+```
 
-## 技术栈
+1. **确定性优先。** 药物、剂量和过敏冲突由代码检出，草稿必须提到它们。模型不能忽略冲突，也不能决定风险等级。
+2. **规划与检索。** 几个固定问题、每个冲突各一个问题，再加上模型补充的几个问题，都会在整份病历里检索。检索用 BM25，并配有商品名、通用名和拼写变体的同义词表。所以即使时间线很长，较早的证据也能进入草稿。
+3. **引用与核对。** 每句话都必须引用原文。代码会检查：记录是否存在，位置是否越界，引文是否和原文一致，药物、剂量和过敏信息是否和原文相符，以及患者自述的内容是否用了转述措辞。没通过的内容连同原因交回模型修正，最多两轮；仍不成立的标为"未获支持"。
+4. **医生决定。** 运行会暂停，由临床医生对每条陈述和每个重点事项选择接受、修改或拒绝。写入时以该医生的身份生成一个内部 `agent_review` 分区的新修订；Agent 本身没有写权限。
 
-- Python 3.11+
-- FastAPI 和 Uvicorn
-- Pydantic 领域模型
-- 原生 HTML、CSS 和 JavaScript
-- Pytest 和 Ruff
-- PostgreSQL/psycopg 与 Fernet 认证加密（可选的生产适配器）
+## 亮点
 
-开发环境默认使用内存存储。设置 `CARENOTE_DATABASE_URL` 后会切换到加密的 PostgreSQL 适配器，并执行 RLS 迁移。
+**Agent 的安全与隐私**
+
+- 发给模型的内容一律先做 PHI 脱敏，请求类型本身就拒绝未脱敏的文本。位置映射让脱敏文本里的引用能对回原文。
+- 病历文本作为数据框起来，无法伪造结构标签。针对助手的指令性文字（如"ignore previous instructions"、"SYSTEM: …"）会被标出，复述它们的建议会被拦下。
+- 每次运行都有步数、修订次数、token、费用和时间上限。触顶时运行停止，保留已完成的部分草稿，并显示停止原因。
+
+**运维**
+
+- 运行状态保存在 PostgreSQL 中，状态用 Fernet 加密，并按诊所做行级隔离，所以应用重启后可以接着跑。
+- 每次运行对应一条 OpenTelemetry 追踪，只包含 ID 和计数，不含病历文本。审阅面板会显示一条只含元数据的运行时间线。
+- 模型提供方支持 OpenAI 和 Anthropic，出错时可以回退到另一家。回放模式会重放录制的结果，所以演示、测试和 CI 都不需要 API key。
+
+**评测**
+
+- 36 个合成用例，分 8 类：用药变化、剂量冲突、新过敏、来源矛盾、信息稀少、长时间线、提示注入和标识符密集的文本。
+- **pipeline** 评测不需要模型，作为 CI 门槛。它覆盖冲突检出、脱敏和模型输入中的标识符泄露、校验结论正确率、检索召回、关键记录是否送达模型、注入识别和标签完整性。
+- **agent** 评测用录制的真实模型草稿打分；没有录制时如实显示"未录制"，不编造分数。最新结果和已知缺口见[评测报告](evals/REPORT.md)，CI 会重新生成并核对这份报告。
+
+**护理记录**
+
+- 10 秒速览（Glance）视图，带可解释的优先级因子、风险原因和建议操作。
+- 纵向时间线，包含患者、护理人员、临床医生和 AI 记录的条目。重点事项和评论都指向精确的字符区间，并能继续追溯到原始的消息或转录片段。
+- 重点事项工作流：按护理角色分派，有待处理、进行中、已完成三种状态。护理团队评论支持回复、提及和解决或重新打开。
+- 分区和诊疗计划都有版本管理：修订历史、任意版本对比、回滚和乐观并发检查。
+- 患者端仪表盘只显示经临床医生确认并发布的指导，患者可以补充症状或提问。
+- 界面支持英文、简体中文和繁体中文。
+
+**安全基线**
+
+- 诊所范围、角色归属和患者本人访问的检查都在服务端执行。
+- 会话带签名、会过期，使用 HttpOnly Cookie。
+- 可选的加密 PostgreSQL 快照，强制启用行级安全，另有加密的冷数据归档。
+- 审计事件按哈希链串联，请求日志只记录元数据。
 
 ## 快速开始
 
-创建虚拟环境，并安装应用及开发依赖：
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
-```
-
-启动带自动重载的开发服务器：
-
-```powershell
-.\.venv\Scripts\python.exe -m uvicorn carenote.main:app --reload
-```
-
-然后打开：
-
-- 应用：`http://127.0.0.1:8000`
-- 交互式 API 文档：`http://127.0.0.1:8000/docs`
-- 健康检查：`http://127.0.0.1:8000/api/health`
-
-## 用 Docker 离线演示
+### Docker 演示（不需要 API key）
 
 ```bash
 docker compose up --build
 ```
 
-这会以加密 PostgreSQL 和合成种子病人启动应用。用 `clinician` / `clinician-demo-2026` 登录，在医护工作区点
-**Prepare review**。审阅 Agent 会回放 `evals/cassettes/` 里录制好的草稿，不需要 API key，也不会调用模型；
-面板会显示草稿的来源。种子草稿是为演示流程手写的，并如实标注，不会冒充模型输出。若要用真实模型起草，设置
-`CARENOTE_AGENT_GATEWAY=openai` 和 `OPENAI_API_KEY`。
+打开 `http://127.0.0.1:8000`，用 `clinician` / `clinician-demo-2026` 登录，点 **生成审阅**（英文界面里是 **Prepare review**）。Agent 会回放 `evals/cassettes/` 里录制好的种子草稿。这份草稿是为演示流程手写的，面板上会如实标注，不会冒充模型输出。
 
-`python scripts/smoke_demo.py` 会对运行中的演示登录、发起审阅并提交；CI 在每次改动时都会对 Docker 环境跑一遍。
+### 本地开发
 
-## 合成演示账户
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+.\.venv\Scripts\python.exe -m uvicorn carenote.main:app --reload
+```
 
-界面使用服务端登录和带签名、会过期的 HttpOnly 会话 Cookie。仅限开发环境的账户有 `patient`、`staff`、
-`clinician` 和 `admin`，密码格式为 `<用户名>-demo-2026`。服务端从不接受浏览器传来的用户 ID 或角色/诊所请求头。
-配置 PostgreSQL 后，账户、有效成员关系和哈希后的会话 ID 都会持久化保存。
+- 应用：`http://127.0.0.1:8000`
+- API 文档：`http://127.0.0.1:8000/docs`
+
+开发环境默认使用内存存储；设置 `CARENOTE_DATABASE_URL` 后改用加密 PostgreSQL。演示账户有 `patient`、`staff`、`clinician` 和 `admin`，密码格式是 `<用户名>-demo-2026`。这些账户只用于开发环境，数据均为合成数据。
+
+### 使用真实模型
+
+`CARENOTE_AGENT_GATEWAY` 决定 Agent 如何调用模型：
+
+| 取值 | 行为 |
+| --- | --- |
+| `recorded`（默认） | 回放录制结果，不需要 key，不联网 |
+| `openai` / `anthropic` | 实时调用；需要 `OPENAI_API_KEY` 或 `ANTHROPIC_API_KEY` |
+| `live` | 实时调用 `CARENOTE_AGENT_PROVIDER` 指定的提供方 |
+| `record` | 实时调用的同时录制结果 |
+
+`CARENOTE_AGENT_FALLBACK` 指定第一家提供方出错时改用的另一家。模型、回退规则和录制方法见[开发文档](docs/DEVELOPMENT.md#clinical-review-agent)。运行 `python evals/run_evals.py --record` 可以录制真实草稿，并为 agent 评测打分。
 
 ## 验证
 
-运行完整的自动化测试：
-
 ```powershell
-.\.venv\Scripts\python.exe -m pytest -q
-```
-
-运行静态检查和格式检查：
-
-```powershell
+.\.venv\Scripts\python.exe -m pytest -q                 # 单元、API、Agent 和评测测试
 .\.venv\Scripts\ruff.exe check .
-.\.venv\Scripts\ruff.exe format --check src tests scripts
-node --check src/carenote/static/api.js
-node --check src/carenote/static/app.js
-node --check src/carenote/static/service-worker.js
-.\.venv\Scripts\python.exe scripts\benchmark_glance.py --iterations 1000 --warmup 100
+.\.venv\Scripts\python.exe evals/run_evals.py --check   # 评测门槛
 ```
 
-核心验收场景位于：
-
-- `tests/test_rbac_scope.py`
-- `tests/test_revision_history.py`
-- `tests/test_highlight_provenance.py`
-- `tests/test_concurrent_edits.py`
-
-其他测试覆盖合成数据集、患者 API 以及前端与 API 的契约。当前本地基线为 45 个测试全部通过。
-
-## 架构与信任边界
-
-HTTP 请求先进入 API 层，再交给服务层；诊所范围、角色归属、作者身份、并发和溯源规则都在服务层强制执行。
-存储适配器负责持久化。浏览器界面不是安全边界。
-
-每个重点事项都包含 `risk_reason`、`suggested_action`、审核状态和 `provenance_pointer`。
-如果指针无法解析到同一患者的时间线，或字符区间超出了原始记录的范围，存储层会直接拒绝。
-
-当前架构和生产化方向见 `docs/ARCHITECTURE.md`。
-
-## 安全与隐私现状
-
-原型中已实现：
-
-- 只使用合成数据。
-- 服务端的诊所范围和角色归属检查。
-- 患者只能访问本人数据。
-- 面向患者的响应会过滤内部内容和未经审核的 AI 内容。
-- 完整的分区快照与差异对比，另有一条独立的、仅含元数据的审计事件流。
-- 在可选的外部文本摘要请求之前，使用确定性的 PHI 脱敏网关。
-- 签名会话令牌、过期与吊销、PostgreSQL 账户/成员关系表结构，以及强制的诊所级 RLS 策略。
-- PostgreSQL 临床快照和冷数据归档的认证加密；带数据库锚点的哈希链式审计事件；仅含元数据的请求日志和保留期维护。
-- 可选且默认拒绝的外部模型与转录适配器；未明确配置项目 API 密钥时不会发起任何调用。
-- 可复现的 Glance 基准测试：最近一次本地记录的热路径 P95 为 1.535 ms。
-
-上线生产前还需要：
-
-- 在目标托管 PostgreSQL 服务上验证 PostgreSQL 适配器和 RLS 策略。
-- 接入 TLS 证书、托管的密钥/机密服务、不可篡改的审计导出、法律保全、备份与恢复，以及运维层面的保留期调度。
-- 用机构自己的身份提供方、MFA/SSO、账户恢复和账户生命周期流程，替换本地的密码配置方式。
-- 在接近生产的数据库、网络、并发和代表性数据集上重新进行 Glance 压测；本地内存环境的结果不代表容量承诺。
-
-默认不会调用任何外部 LLM。只有设置 `OPENAI_API_KEY` 才会启用模型边界；真实的临床使用还需要机构的隐私、数据保留和验证审批。
+CI 在 Python 3.11 和 3.12 上运行以上检查，另外还会对真实数据库跑 PostgreSQL 集成测试，并跑一个 Docker 任务：登录、发起审阅、重启应用、恢复运行，然后写入。
 
 ## 项目结构
 
 ```text
 src/carenote/
-├── api/           HTTP 路由与响应处理
-├── core/          应用配置
-├── data/          确定性的合成种子数据
-├── domain/        领域模型与 API 契约
+├── agent/         审阅流程图、工具、校验器、模型网关、提示词、追踪、持久化
+├── retrieval/     BM25 检索与同义词表
+├── evals/         评测用例格式、评测套件与报告
+├── api/           HTTP 路由
+├── services/      用例、权限策略、冲突检测、实体抽取
+├── repositories/  内存与加密 PostgreSQL 存储适配器
 ├── privacy/       PHI 脱敏边界
-├── repositories/  存储适配器
-├── services/      用例与策略执行
-└── static/        患者端 Web 界面
-tests/             自动化验收与集成测试
-docs/              架构与开发文档
+├── domain/        领域模型与 API 契约
+├── data/          确定性合成种子数据
+├── core/          配置、身份、安全
+└── static/        Web 界面（原生 JS，三种语言）
+evals/             评测用例（YAML）、录制结果与生成的报告
+migrations/        PostgreSQL 表结构与行级安全
+scripts/           演示录制、Docker 冒烟测试、Glance 基准测试
+tests/             自动化测试
+docs/              设计、路线图、架构与运维文档
 ```
+
+## 现状与局限
+
+- **还没有用真实模型做过评测。** OpenAI 和 Anthropic 适配器只用模拟的 HTTP 测试过。关键发现召回率、注入抵抗等模型指标，要等录制真实结果后才会出现。
+- **规模。** 每个诊所的数据是一份加密快照，整体加载进内存，适合小规模部署。按行存储计划作为单独的重构来做。
+- **已知缺口**直接列在[评测报告](evals/REPORT.md)里，没有回避。例如：冲突检测还没把商品名和通用名关联起来；部分姓名和邮箱不会被脱敏；多词的通俗说法检索不到。
+- 投入生产还需要机构的身份认证系统、托管密钥、在目标数据库上验证过的行级安全，以及隐私和临床审批。详见[生产安全](docs/PRODUCTION_SECURITY.md)。
 
 ## 文档
 
-以下文档均为英文：
-
-- [Architecture](docs/ARCHITECTURE.md)：分层、信任边界和生产化方向
-- [Technical brief](docs/TECHNICAL_BRIEF.md)：产品理念、范围和设计取舍
-- [Development](docs/DEVELOPMENT.md)：环境要求、安装、测试和运行
-- [Production security](docs/PRODUCTION_SECURITY.md)：必需的配置和密钥管理
-- [Performance](docs/PERFORMANCE.md)：Glance 热路径性能测量
-- [Clinical Review Agent design](docs/AGENT_DESIGN.md)：拟建的多步审核 Agent 设计
-- [Agent roadmap](docs/AGENT_ROADMAP.md)：构建阶段、进度和决策记录
-- [Attribution](ATTRIBUTION.txt)：第三方许可证
+- [临床审阅 Agent 设计](docs/AGENT_DESIGN.md)：目标、流程图、工具、校验与评测
+- [Agent 路线图](docs/AGENT_ROADMAP.md)：各阶段、进度和所有设计决策
+- [评测说明](evals/README.md)与[最新报告](evals/REPORT.md)
+- [架构](docs/ARCHITECTURE.md)：分层、信任边界和生产方向
+- [技术简介](docs/TECHNICAL_BRIEF.md)：产品思路与范围
+- [开发](docs/DEVELOPMENT.md)：环境、配置、测试与运行
+- [生产安全](docs/PRODUCTION_SECURITY.md)：必需配置与密钥管理
+- [性能](docs/PERFORMANCE.md)：Glance 热路径测量
+- [第三方许可](ATTRIBUTION.txt)
 
 ## 许可证
 
-基于 MIT 许可证发布，详见 `LICENSE`。
-
-> 本文档为英文 [README](README.md) 的中文翻译，如有出入以英文版为准。
+MIT，见 [LICENSE](LICENSE)。
