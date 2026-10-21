@@ -284,6 +284,13 @@ class HighlightDecision(BaseModel):
     action: Literal["accept", "reject"]
 
 
+class CheckPointDecision(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    check_point_index: int = Field(ge=0)
+    action: Literal["accept", "reject"]
+
+
 class ReviewDecisions(BaseModel):
     """A clinician's response at `human_review`: commit with per-item decisions, revise, or discard."""
 
@@ -292,6 +299,7 @@ class ReviewDecisions(BaseModel):
     action: Literal["commit", "revise", "discard"] = "commit"
     claims: list[ClaimDecision] = Field(default_factory=list)
     highlights: list[HighlightDecision] = Field(default_factory=list)
+    check_points: list[CheckPointDecision] = Field(default_factory=list)
     revise_instruction: str | None = Field(default=None, min_length=1, max_length=500)
 
     @model_validator(mode="after")
@@ -302,6 +310,9 @@ class ReviewDecisions(BaseModel):
             raise ValueError("each claim can be decided only once")
         if len(set(highlight_indexes)) != len(highlight_indexes):
             raise ValueError("each highlight can be decided only once")
+        check_point_indexes = [item.check_point_index for item in self.check_points]
+        if len(set(check_point_indexes)) != len(check_point_indexes):
+            raise ValueError("each check point can be decided only once")
         if (self.action == "revise") != (self.revise_instruction is not None):
             raise ValueError("a revise instruction is required for revise and only allowed there")
         return self

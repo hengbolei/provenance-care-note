@@ -31,6 +31,7 @@ from carenote.agent.graph import Committer, GraphDeps, build_review_graph, initi
 from carenote.agent.persistence import InMemoryRunStore, RunRecord, RunStore
 from carenote.agent.state import (
     Budget,
+    CheckPointDecision,
     Citation,
     ClaimDecision,
     DraftReview,
@@ -73,6 +74,17 @@ class AgentCommitRequest(BaseModel):
 
     claims: list[ClaimDecision] = Field(default_factory=list)
     highlights: list[HighlightDecision] = Field(default_factory=list)
+    check_points: list[CheckPointDecision] = Field(default_factory=list)
+
+
+class ReferenceLabel(BaseModel):
+    """How the panel names a reference version a check point cites."""
+
+    document_id: UUID
+    version: int
+    title: str
+    kind: str
+    label: str
 
 
 class BudgetUsage(BaseModel):
@@ -103,6 +115,7 @@ class AgentRunView(BaseModel):
     # One OpenTelemetry trace per run; its ID is the run ID, as carried by the audit events.
     trace_id: str | None = None
     timeline: list[TimelineStep] = Field(default_factory=list)
+    references: list[ReferenceLabel] = Field(default_factory=list)
 
 
 _SAFE_ERRORS = (CassetteMissingError, ModelNotConfiguredError, ExternalModelError)
@@ -110,6 +123,10 @@ _CLAIM_OPERATIONS = {
     "accept": "agent_claim_accepted",
     "edit": "agent_claim_edited",
     "reject": "agent_claim_rejected",
+}
+_CHECK_POINT_OPERATIONS = {
+    "accept": "agent_check_point_accepted",
+    "reject": "agent_check_point_rejected",
 }
 
 
@@ -203,7 +220,33 @@ class AgentRunService:
             budget=_usage(budget) if budget is not None else None,
             trace_id=trace_id_for(run_id),
             timeline=[TimelineStep.model_validate(step) for step in record.timeline],
+            references=self._reference_labels(clinician, values.get("verification")),
         )
+
+    def _reference_labels(self, clinician: Actor, verification) -> list[ReferenceLabel]:
+        knowledge = self.deps.knowledge
+        if knowledge is None or verification is None:
+            return []
+        labels: dict[tuple[UUID, int], ReferenceLabel] = {}
+        for check in verification.check_points:
+            if check.reference is None:
+                continue
+            key = (check.reference.document_id, check.reference.version)
+            if key in labels:
+                continue
+            try:
+                version = knowledge.get_version(clinician, *key)
+                document = knowledge.store.get_document(clinician.clinic_id, key[0])
+            except (LookupError, PermissionError):
+                continue
+            labels[key] = ReferenceLabel(
+                document_id=key[0],
+                version=key[1],
+                title=document.title,
+                kind=document.kind.value,
+                label=version.label,
+            )
+        return list(labels.values())
 
     def revise(self, clinician: Actor, run_id: UUID, request: AgentReviseRequest) -> AgentRunView:
         decisions = ReviewDecisions(action="revise", revise_instruction=request.instruction)
@@ -215,17 +258,25 @@ class AgentRunService:
         if self.committer is None:
             raise CommitUnavailableError("committing agent reviews is not available yet")
         decisions = ReviewDecisions(
-            action="commit", claims=request.claims, highlights=request.highlights
+            action="commit",
+            claims=request.claims,
+            highlights=request.highlights,
+            check_points=request.check_points,
         )
         record = self._resume_checks(clinician, run_id)
         values = self.graph.get_state(self._config(run_id)).values
         draft = values.get("draft")
         claim_count = len(draft.claims) if draft else 0
         highlight_count = len(draft.candidate_highlights) if draft else 0
-        if any(item.claim_index >= claim_count for item in decisions.claims) or any(
-            item.highlight_index >= highlight_count for item in decisions.highlights
+        check_point_count = len(draft.check_points) if draft else 0
+        if (
+            any(item.claim_index >= claim_count for item in decisions.claims)
+            or any(item.highlight_index >= highlight_count for item in decisions.highlights)
+            or any(item.check_point_index >= check_point_count for item in decisions.check_points)
         ):
-            raise ValueError("a decision refers to a claim or highlight the draft does not have")
+            raise ValueError(
+                "a decision refers to a claim, highlight or check point the draft does not have"
+            )
         check_commit_decisions(
             decisions, values.get("verification"), values.get("highlight_citations") or []
         )
@@ -302,6 +353,14 @@ class AgentRunService:
                 reviewer.id,
                 resource="agent_claim",
                 resource_id=f"{record.run_id}:{decision.claim_index}",
+            )
+        for decision in state["decisions"].check_points:
+            self._audit(
+                record,
+                _CHECK_POINT_OPERATIONS[decision.action],
+                reviewer.id,
+                resource="agent_check_point",
+                resource_id=f"{record.run_id}:{decision.check_point_index}",
             )
         self._audit(record, "agent_run_committed", reviewer.id)
 

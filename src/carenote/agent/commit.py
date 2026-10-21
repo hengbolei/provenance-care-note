@@ -7,7 +7,9 @@ ownership, span, scope, revision and audit rules apply unchanged:
 - accepted and edited claims become one new revision of the internal `agent_review` section;
   rejected and undecided claims are left out;
 - accepted candidate highlights are created with `create_highlight`, at the citation offsets the
-  verifier resolved in the original entry, with priority from the deterministic scorer.
+  verifier resolved in the original entry, with priority from the deterministic scorer;
+- accepted check points are listed under "Points to check" in the same revision, each with the
+  reference document title, version and exact quote it rests on (design §19).
 
 Sections are care-team documents that patients never see, so the committed review stays
 internal; patient-facing guidance still goes through the existing highlight instruction flow.
@@ -31,10 +33,17 @@ def check_commit_decisions(
 ) -> None:
     """Reject decisions the commit could not honour, before the run resumes.
 
-    A claim that failed verification can be edited or rejected but not accepted as written, and
-    a highlight whose citation did not resolve cannot be created.
+    A claim that failed verification can be edited or rejected but not accepted as written, a
+    highlight whose citation did not resolve cannot be created, and a check point that failed
+    verification cannot be accepted.
     """
     checks = verification.checks if verification is not None else []
+    check_points = verification.check_points if verification is not None else []
+    for decision in decisions.check_points:
+        if decision.action == "accept" and not check_points[decision.check_point_index].verified:
+            raise ValueError(
+                f"check point {decision.check_point_index} did not pass verification; reject it"
+            )
     for decision in decisions.claims:
         if decision.action == "accept" and not checks[decision.claim_index].verified:
             raise ValueError(
@@ -70,6 +79,24 @@ def commit_review(service: CareNoteService) -> Committer:
                     f"  Source: entry {citation.entry_id} [{citation.start}:{citation.end}] "
                     f'"{citation.quote}"'
                 )
+        points: list[str] = []
+        for decision in sorted(decisions.check_points, key=lambda item: item.check_point_index):
+            if decision.action != "accept":
+                continue
+            check = verification.check_points[decision.check_point_index]
+            reference = check.reference
+            points.append(f"- {draft.check_points[decision.check_point_index].text}")
+            points.append(
+                f"  Reference: {tools.reference_label(reference.document_id, reference.version)} "
+                f'[{reference.start}:{reference.end}] "{reference.quote}"'
+            )
+            for citation in check.citations:
+                points.append(
+                    f"  Source: entry {citation.entry_id} [{citation.start}:{citation.end}] "
+                    f'"{citation.quote}"'
+                )
+        if points:
+            lines += ["", "Points to check (from the reference library):", *points]
         if lines:
             header = (
                 f"Agent review run {state['run_id']} (prompt {state['prompt_version']}), "

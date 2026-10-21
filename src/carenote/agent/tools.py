@@ -214,6 +214,13 @@ class ReviewTools:
             for document, version in self._current_references()
         }
 
+    def reference_label(self, document_id: UUID, version: int) -> str:
+        """How a committed review names a reference version, e.g. 'Lisinopril label, v2 (2026)'."""
+        for document, item in self._current_references():
+            if document.id == document_id and item.version == version:
+                return f"{document.title}, v{item.version} ({item.label})"
+        raise LookupError("reference version is not in effect for this run")
+
     def reference_document_ids(self) -> set[UUID]:
         return {document.id for document, _ in self._current_references()}
 

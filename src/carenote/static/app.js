@@ -156,6 +156,8 @@ const elements = {
   agentClaimList: document.querySelector("#agent-claim-list"),
   agentQuestions: document.querySelector("#agent-questions"),
   agentQuestionList: document.querySelector("#agent-question-list"),
+  agentCheckPoints: document.querySelector("#agent-check-points"),
+  agentCheckPointList: document.querySelector("#agent-check-point-list"),
   agentHighlights: document.querySelector("#agent-highlights"),
   agentHighlightList: document.querySelector("#agent-highlight-list"),
   agentReviewActions: document.querySelector("#agent-review-actions"),
@@ -186,6 +188,8 @@ let agentRun = null;
 let agentPollTimer = null;
 let agentDecisions = new Map();
 let agentHighlightAccepts = new Set();
+// Check point index -> included; verified check points start included, others cannot be.
+let agentCheckPointAccepts = new Map();
 let currentSession = null;
 let latestDetail = null;
 let latestAuditEvents = [];
@@ -940,13 +944,16 @@ function agentRunSummary(run) {
   if (report.uncovered_conflict_ids.length) {
     parts.push(t("agent.summaryUncovered", { count: report.uncovered_conflict_ids.length }));
   }
+  const failedPoints = (report.check_points || []).filter((item) => item.failures.length).length;
+  if (failedPoints) parts.push(t("agent.summaryCheckPointsUnsupported", { count: failedPoints }));
   const flagged = report.instruction_like_entry_ids?.length || 0;
   const withheld = report.withheld?.length || 0;
   if (flagged) parts.push(t("agent.summaryInstructionLike", { count: flagged }));
   if (withheld) parts.push(t("agent.summaryWithheld", { count: withheld }));
   return {
     text: parts.join(" · "),
-    warning: unsupported > 0 || report.uncovered_conflict_ids.length > 0 || flagged > 0,
+    warning:
+      unsupported > 0 || report.uncovered_conflict_ids.length > 0 || flagged > 0 || failedPoints > 0,
   };
 }
 
@@ -1080,6 +1087,84 @@ function renderAgentClaims(run, editable) {
   });
 }
 
+function renderAgentCheckPoints(run, editable) {
+  elements.agentCheckPointList.replaceChildren();
+  const points = run.draft.check_points || [];
+  const checks = run.verification?.check_points || [];
+  elements.agentCheckPoints.hidden = points.length === 0;
+  const labels = new Map(
+    (run.references || []).map((item) => [`${item.document_id}:${item.version}`, item]),
+  );
+  points.forEach((point, index) => {
+    const check = checks[index] || { failures: [], citations: [], reference: null };
+    const verified = check.failures.length === 0;
+    const card = createElement("div", `agent-claim ${verified ? "verified" : "unsupported"}`);
+    const body = createElement("div");
+    const meta = createElement("div", "agent-claim-meta");
+    meta.append(
+      createElement(
+        "span",
+        `agent-chip ${verified ? "verified" : "unsupported"}`,
+        verified ? t("agent.verified") : t("agent.unsupported"),
+      ),
+    );
+    const reference = check.reference || point.reference;
+    const label = labels.get(`${reference.document_id}:${reference.version}`);
+    if (label) meta.append(createElement("span", "agent-chip", t(`knowledge.kind.${label.kind}`)));
+    body.append(createElement("p", "agent-claim-text", point.text), meta);
+    if (!verified) {
+      const failures = createElement("ul", "agent-failures");
+      check.failures.forEach((failure) => {
+        failures.append(createElement("li", "", t(`agent.checkPointFailure.${failure}`)));
+      });
+      body.append(failures);
+    }
+    const quote = createElement("blockquote", "agent-reference");
+    quote.append(
+      createElement(
+        "span",
+        "agent-reference-title",
+        label
+          ? t("agent.referenceLabel", { title: label.title, version: label.version, label: label.label })
+          : t("agent.referenceUnknown"),
+      ),
+      document.createTextNode(reference.quote),
+    );
+    body.append(quote);
+    const shown = check.citations.length ? check.citations : point.citations;
+    if (shown.length) {
+      const citations = createElement("div", "agent-citations");
+      shown.forEach((citation, position) => {
+        citations.append(
+          citationButton(
+            citation,
+            t("agent.sourceNumbered", { number: position + 1 }),
+            check.citations.length > 0,
+          ),
+        );
+      });
+      body.append(citations);
+    }
+    if (!agentCheckPointAccepts.has(index)) agentCheckPointAccepts.set(index, verified);
+    const controls = createElement("div", "agent-decision");
+    const include = createElement("label", "agent-checkbox");
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = verified && agentCheckPointAccepts.get(index);
+    checkbox.disabled = !editable || !verified;
+    checkbox.addEventListener("change", () => agentCheckPointAccepts.set(index, checkbox.checked));
+    include.append(
+      checkbox,
+      document.createTextNode(
+        verified ? t("agent.checkPointInclude") : t("agent.checkPointNotVerified"),
+      ),
+    );
+    controls.append(include);
+    card.append(body, controls);
+    elements.agentCheckPointList.append(card);
+  });
+}
+
 function renderAgentHighlights(run, editable) {
   elements.agentHighlightList.replaceChildren();
   const candidates = run.draft.candidate_highlights;
@@ -1177,6 +1262,7 @@ function renderAgentRun(run) {
   elements.agentSummary.textContent = summary.text;
   elements.agentSummary.classList.toggle("warning", summary.warning);
   renderAgentClaims(run, editable);
+  renderAgentCheckPoints(run, editable);
   renderAgentHighlights(run, editable);
   elements.agentQuestions.hidden = run.draft.open_questions.length === 0;
   elements.agentQuestionList.replaceChildren(
@@ -1230,6 +1316,7 @@ async function restoreAgentRun() {
 function resetAgentDecisions() {
   agentDecisions = new Map();
   agentHighlightAccepts = new Set();
+  agentCheckPointAccepts = new Map();
 }
 
 function agentCommitPayload() {
@@ -1253,7 +1340,13 @@ function agentCommitPayload() {
   const highlights = [...agentHighlightAccepts]
     .sort((left, right) => left - right)
     .map((index) => ({ highlight_index: index, action: "accept" }));
-  return { claims, highlights };
+  const checkPoints = [...agentCheckPointAccepts.entries()]
+    .sort((left, right) => left[0] - right[0])
+    .map(([index, accepted]) => ({
+      check_point_index: index,
+      action: accepted ? "accept" : "reject",
+    }));
+  return { claims, highlights, check_points: checkPoints };
 }
 
 function renderAgentReviewSection(sections) {

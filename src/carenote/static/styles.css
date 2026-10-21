@@ -215,6 +215,8 @@ textarea:focus, select:focus, input:focus { outline: 2px solid #91c2b1; outline-
 .agent-citation { max-width: 100%; text-align: left; overflow-wrap: anywhere; }
 .agent-decision { display: grid; gap: 6px; align-content: start; }
 .agent-decision .field-label { margin: 0; }
+.agent-reference { margin: 8px 0 0; padding: 7px 10px; border-left: 3px solid #bfd2ca; color: #456159; font-size: 0.76rem; line-height: 1.45; overflow-wrap: anywhere; }
+.agent-reference-title { display: block; color: #244c41; font-weight: 750; }
 .agent-question-list { margin: 0; padding-left: 18px; color: #456159; font-size: 0.8rem; line-height: 1.5; }
 .agent-budget { display: block; margin-top: 12px; white-space: normal; }
 .agent-latest-review { margin-top: 14px; color: #50675f; font-size: 0.78rem; }

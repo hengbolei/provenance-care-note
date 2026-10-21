@@ -185,8 +185,14 @@ separate **check points** that say what to verify, never what to prescribe.
       reference fail `reference_as_fact`; failed check points go through the revise loop; check
       points repeating a flagged reference or record passage are withheld (`draft_v5`,
       `revise_v4`)
-- [ ] 4.5 Review panel and commit: check points shown apart from claims with document title and
-      version, accept or reject, written into `agent_review`; audit
+- [x] 4.5 Review panel and commit: a "Points to check" list in the review panel, apart from
+      claims, with the reference title, version and quote, failure reasons, and an include box
+      (verified points start included; failed ones cannot be); `CheckPointDecision` in the
+      commit request; accepted points are written under "Points to check" in the
+      `agent_review` revision with the document title, version and exact quote; every decision
+      is audited (`agent_check_point_accepted` / `_rejected`); the run view names each cited
+      reference version. The panel is checked in a browser in 4.6, once the demo has a check
+      point
 - [ ] 4.6 Evaluation and demo: a `knowledge` case family and pipeline metrics; demo reference
       documents for the seed clinic; re-recorded demo cassette
 
@@ -209,6 +215,8 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-21 | Verified check points start included in the commit, like verified claims; failed ones cannot be included, and every check point gets an explicit accept or reject decision | One click commits what verified, nothing unverified reaches the record, and the audit trail shows a decision for every point |
+| 2026-10-21 | The committed review names a reference as "title, version number (version label)" with the exact quote | The text stays readable in the section history and still identifies the immutable version it relied on |
 | 2026-10-21 | Check-point failures are their own enum (`CheckPointFailure`), apart from claim failures; only `reference_as_fact` joins `CheckFailure` | Check points are verified by different rules; keeping the claim enum unchanged keeps the existing probe coverage meaningful |
 | 2026-10-21 | Treatment advice is detected deterministically: an imperative treatment verb at the start, or "should/must/recommend ... <treatment verb>"; text after "whether" or "if" is treated as a question | "Check whether the dose should be reduced" is a check; "Reduce the dose" and "the dose should be reduced" are orders |
 | 2026-10-21 | A failing check point makes the draft fail verification and enters the automatic revise loop with its reasons | The model gets the same chance to fix a check point as a claim, within the same revision budget |
