@@ -10,8 +10,16 @@ from carenote.agent.commit import AGENT_REVIEW_SECTION, commit_review
 from carenote.agent.gateway import gateway_from_settings
 from carenote.agent.runs import AgentCommitRequest, AgentRunService
 from carenote.agent.state import RunStatus
-from carenote.data.seed import DEMO_CLINIC_ID, DEMO_CLINICIAN_ID, DEMO_PATIENT_ID, seed_demo_data
+from carenote.data.seed import (
+    DEMO_CLINIC_ID,
+    DEMO_CLINICIAN_ID,
+    DEMO_PATIENT_ID,
+    seed_demo_data,
+    seed_demo_knowledge,
+)
 from carenote.domain.models import Actor, Role
+from carenote.knowledge.service import KnowledgeService
+from carenote.knowledge.store import InMemoryKnowledgeStore
 from carenote.repositories.memory import InMemoryCareNoteRepository
 from carenote.services.care_notes import CareNoteService
 
@@ -27,12 +35,15 @@ def _runs():
     repository = InMemoryCareNoteRepository()
     seed_demo_data(repository)
     service = CareNoteService(repository)
+    knowledge = KnowledgeService(InMemoryKnowledgeStore(), repository)
+    seed_demo_knowledge(knowledge.store)
     runs = AgentRunService(
         service,
         gateway_from_settings("recorded"),
         committer=commit_review(service),
         executor=InlineExecutor(),
         now=lambda: datetime(2026, 10, 18, tzinfo=UTC),
+        knowledge=knowledge,
     )
     return runs, service
 
@@ -47,6 +58,12 @@ def test_seed_cassette_replays_to_a_fully_verified_draft():
     assert view.model.startswith("curated-demo")
     assert len(view.draft.claims) == 6
     assert len(view.draft.open_questions) == 2
+    assert len(view.draft.check_points) == 2
+    assert all(check.verified for check in view.verification.check_points)
+    assert {label.title for label in view.references} == {
+        "Lisinopril tablets (synthetic label)",
+        "Follow-up after antihypertensive dose changes",
+    }
     assert all(citation is not None for citation in view.highlight_citations)
 
 

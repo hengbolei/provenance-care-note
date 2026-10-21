@@ -30,12 +30,15 @@ flowchart LR
 1. **Deterministic first.** Medication, dose and allergy conflicts are found by code and must be
    mentioned in the draft. The model cannot dismiss them or set risk levels.
 2. **Plan and retrieve.** Standing questions, one per conflict and a few from the model are
-   searched across the whole record (BM25 with brand/generic and spelling synonyms). Older
-   evidence therefore reaches the draft even on long timelines.
+   searched across the whole record (BM25 with brand/generic and spelling synonyms), and across
+   the clinic's reference library of policies, guidelines and drug labels. Older evidence
+   therefore reaches the draft even on long timelines.
 3. **Cite and verify.** Each claim must quote the record. Code checks that the entry exists, the
    span is in bounds, the quote matches, the medication, dose and allergy facts agree with the
    source, and patient-reported text is phrased as reported. Failures go back to the model with
-   the reasons, at most twice; anything still unsupported is shown as such.
+   the reasons, at most twice; anything still unsupported is shown as such. Reference material
+   never supports a claim: it appears only as separate **points to check**, which must quote one
+   reference version exactly, read as a check, and never give treatment or dosing advice.
 4. **Clinician decides.** The run pauses. A clinician accepts, edits or rejects each claim and
    highlight. Commit writes an internal `agent_review` section revision as that clinician; the
    agent itself cannot write.
@@ -63,11 +66,12 @@ flowchart LR
 
 **Evaluation**
 
-- 36 synthetic cases across 8 families: medication changes, dose conflicts, new allergies,
-  contradictory sources, sparse information, long timelines, prompt injection and PHI-heavy text.
+- 39 synthetic cases across 9 families: medication changes, dose conflicts, new allergies,
+  contradictory sources, sparse information, long timelines, prompt injection, PHI-heavy text and
+  reference knowledge.
 - The **pipeline** suite needs no model and gates CI. It covers conflict recall, redaction and
   payload leaks, verifier accuracy, retrieval recall, key entries reaching the model, injection
-  detection and framing.
+  detection and framing, reference retrieval (current versions only) and check-point verdicts.
 - The **agent** suite scores real model drafts from cassettes and reports "not recorded" instead
   of inventing scores. Current results and known gaps are in the
   [evaluation report](evals/REPORT.md), which CI regenerates and checks.
@@ -81,6 +85,8 @@ flowchart LR
   team comments support replies, mentions and resolve/reopen.
 - Versioned sections and plans with history, any-version comparison, revert and optimistic
   concurrency checks.
+- A reference library of clinic policies, guidelines and drug labels with immutable versions,
+  maintained by clinic administrators and readable by the care team.
 - A patient-facing dashboard that shows only clinician-confirmed, published guidance and lets the
   patient add symptom updates or questions.
 - An interface in English, Simplified Chinese and Traditional Chinese.

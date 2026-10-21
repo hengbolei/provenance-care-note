@@ -7,7 +7,12 @@ A case is a small synthetic record plus what a correct system must do with it:
 - `expect.critical_facts`: facts a good review must state in a verified claim (agent suite);
 - `expect.forbidden_output`: text a draft must never contain, e.g. what an injection asks for;
 - `expect.retrieval`: queries whose top hits must include the given entries;
-- `expect.instruction_like`: entries the injection detector must flag; it must flag no others;
+- `expect.instruction_like`: entries (or reference documents) the injection detector must flag;
+  it must flag no others;
+- `knowledge`: reference documents with versions, for the reference library (design §19);
+- `expect.references`: queries whose top reference hits must include a passage, and must not
+  include superseded or retired text;
+- `check_probes`: hand-written check points with the verdict the check-point verifier must reach.
 - `probes`: hand-written claims with the exact verdict the citation verifier must reach.
 
 Anything the current system is known not to handle carries a `known_gap` reason. The report shows
@@ -18,7 +23,7 @@ Cases live in `evals/cases/*.yaml`; each file holds a list of cases.
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from enum import StrEnum
 from pathlib import Path
 from uuid import NAMESPACE_URL, UUID, uuid5
@@ -26,7 +31,15 @@ from uuid import NAMESPACE_URL, UUID, uuid5
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from carenote.agent.state import CheckFailure, Citation, Claim, ClaimCategory
+from carenote.agent.state import (
+    CheckFailure,
+    CheckPoint,
+    CheckPointFailure,
+    Citation,
+    Claim,
+    ClaimCategory,
+    ReferenceCitation,
+)
 from carenote.domain.models import (
     ConflictCategory,
     EntryOrigin,
@@ -37,9 +50,18 @@ from carenote.domain.models import (
     Role,
     TimelineEntry,
 )
+from carenote.knowledge.models import (
+    KnowledgeDocument,
+    KnowledgeKind,
+    KnowledgeStatus,
+    KnowledgeVersion,
+    normalise_content,
+)
 
 CASE_DIR = Path(__file__).resolve().parents[3] / "evals" / "cases"
 EVAL_CLINIC_ID = UUID("10000000-0000-4000-8000-0000000000e1")
+# The evaluation clock: reference versions take effect relative to this day.
+EVAL_TODAY = date(2026, 9, 1)
 
 
 class Family(StrEnum):
@@ -51,6 +73,7 @@ class Family(StrEnum):
     LONG_TIMELINE = "long_timeline"
     PROMPT_INJECTION = "prompt_injection"
     PHI_HEAVY = "phi_heavy"
+    KNOWLEDGE = "knowledge"
 
 
 class _Strict(BaseModel):
@@ -124,6 +147,49 @@ class ProbeCitation(_Strict):
     start: int | None = Field(default=None, ge=0)
 
 
+class KnowledgeVersionSpec(_Strict):
+    label: str = Field(min_length=1, max_length=60)
+    effective: date
+    content: str = Field(min_length=1)
+
+
+class KnowledgeDocSpec(_Strict):
+    key: str = Field(pattern=r"^[a-z0-9_]+$")
+    kind: KnowledgeKind
+    title: str = Field(min_length=1, max_length=200)
+    source: str = "Synthetic evaluation reference"
+    versions: list[KnowledgeVersionSpec] = Field(min_length=1)
+    retired: bool = False
+
+
+class ReferenceQuery(_Strict):
+    query: str = Field(min_length=1)
+    # A top hit must come from this document and contain this text.
+    document: str
+    contains: str = Field(min_length=1)
+    # Text no hit may contain, such as a superseded version or a retired document.
+    absent: list[str] = Field(default_factory=list)
+    known_gap: str | None = None
+
+
+class CheckProbeReference(_Strict):
+    document: str
+    quote: str = Field(min_length=1)
+    # Default: the version in effect. Name an older one to probe a superseded citation.
+    version: int | None = Field(default=None, ge=1)
+    start: int | None = Field(default=None, ge=0)
+
+
+class CheckProbe(_Strict):
+    id: str
+    text: str = Field(min_length=1, max_length=300)
+    reference: CheckProbeReference
+    cite: list[ProbeCitation] = Field(default_factory=list)
+    # Failures the check-point verifier must report; empty means the check point must verify.
+    expect: list[CheckPointFailure] = Field(default_factory=list)
+    known_gap: str | None = None
+
+
 class Probe(_Strict):
     id: str
     claim: str = Field(min_length=1, max_length=400)
@@ -142,6 +208,7 @@ class Expectations(_Strict):
     forbidden_output: list[str] = Field(default_factory=list)
     retrieval: list[RetrievalQuery] = Field(default_factory=list)
     instruction_like: list[FlaggedEntry] = Field(default_factory=list)
+    references: list[ReferenceQuery] = Field(default_factory=list)
 
     @field_validator("phi", mode="before")
     @classmethod
@@ -163,6 +230,8 @@ class EvalCase(_Strict):
     filler: list[Filler] = Field(default_factory=list)
     expect: Expectations = Field(default_factory=Expectations)
     probes: list[Probe] = Field(default_factory=list)
+    knowledge: list[KnowledgeDocSpec] = Field(default_factory=list)
+    check_probes: list[CheckProbe] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def references_resolve(self) -> EvalCase:
@@ -173,9 +242,27 @@ class EvalCase(_Strict):
         if len(set(probe_ids)) != len(probe_ids):
             raise ValueError(f"{self.id}: probe ids must be unique")
         by_key = {entry.key: entry for entry in self.entries}
+        documents = {doc.key: doc for doc in self.knowledge}
+        if len(documents) != len(self.knowledge) or set(documents) & set(by_key):
+            raise ValueError(f"{self.id}: knowledge keys must be unique and differ from entries")
         flagged = {item.entry for item in self.expect.instruction_like}
-        if flagged - set(by_key):
+        if flagged - set(by_key) - set(documents):
             raise ValueError(f"{self.id}: instruction_like names unknown entries")
+        for item in self.expect.references:
+            if item.document not in documents:
+                raise ValueError(f"{self.id}: reference query names unknown document")
+        check_ids = [probe.id for probe in self.check_probes]
+        if len(set(check_ids)) != len(check_ids):
+            raise ValueError(f"{self.id}: check probe ids must be unique")
+        for probe in self.check_probes:
+            document = documents.get(probe.reference.document)
+            if document is None:
+                raise ValueError(f"{self.id}/{probe.id}: unknown reference document")
+            if not probe.expect and probe.reference.quote not in self.current_content(document):
+                raise ValueError(
+                    f"{self.id}/{probe.id}: a supported check probe must quote the version in "
+                    "effect exactly"
+                )
         for item in self.expect.retrieval:
             unknown = set(item.entries) - set(by_key)
             if unknown:
@@ -183,6 +270,10 @@ class EvalCase(_Strict):
         for probe in self.probes:
             for citation in probe.cite:
                 entry = by_key.get(citation.entry)
+                if entry is None and citation.entry in documents:
+                    if CheckFailure.REFERENCE_AS_FACT not in probe.expect:
+                        raise ValueError(f"{self.id}/{probe.id}: claims may not cite references")
+                    continue
                 if entry is None:
                     if CheckFailure.UNKNOWN_ENTRY not in probe.expect:
                         raise ValueError(f"{self.id}/{probe.id}: unknown entry {citation.entry!r}")
@@ -197,6 +288,52 @@ class EvalCase(_Strict):
         return self
 
     # Building the synthetic record
+
+    @staticmethod
+    def current_version_number(document: KnowledgeDocSpec, today: date = EVAL_TODAY) -> int | None:
+        """The version in effect: the newest one whose effective date has arrived."""
+        numbers = [
+            number
+            for number, version in enumerate(document.versions, start=1)
+            if version.effective <= today
+        ]
+        return max(numbers) if numbers else None
+
+    def current_content(self, document: KnowledgeDocSpec) -> str:
+        number = self.current_version_number(document)
+        return normalise_content(document.versions[number - 1].content) if number else ""
+
+    def document_id(self, key: str) -> UUID:
+        return uuid5(NAMESPACE_URL, f"carenote-eval:{self.id}:knowledge:{key}")
+
+    def build_knowledge(self) -> list[tuple[KnowledgeDocument, list[KnowledgeVersion]]]:
+        built = []
+        for spec in self.knowledge:
+            author = uuid5(NAMESPACE_URL, "carenote-eval:admin")
+            document = KnowledgeDocument(
+                id=self.document_id(spec.key),
+                clinic_id=EVAL_CLINIC_ID,
+                kind=spec.kind,
+                title=spec.title,
+                source=spec.source,
+                status=KnowledgeStatus.RETIRED if spec.retired else KnowledgeStatus.ACTIVE,
+                latest_version=len(spec.versions),
+                created_by=author,
+            )
+            versions = [
+                KnowledgeVersion(
+                    document_id=document.id,
+                    clinic_id=EVAL_CLINIC_ID,
+                    version=number,
+                    label=version.label,
+                    effective_date=version.effective,
+                    content=normalise_content(version.content),
+                    created_by=author,
+                )
+                for number, version in enumerate(spec.versions, start=1)
+            ]
+            built.append((document, versions))
+        return built
 
     def patient_id(self) -> UUID:
         return uuid5(NAMESPACE_URL, f"carenote-eval:{self.id}")
@@ -255,8 +392,22 @@ class EvalCase(_Strict):
     def probe_claim(self, probe: Probe) -> Claim:
         """The probe as a model-style claim, with citations placed in the built entries."""
         contents = {item.key: item.content for item in self.entries}
+        documents = {doc.key: doc for doc in self.knowledge}
         citations = []
         for citation in probe.cite:
+            if citation.entry in documents:
+                content = self.current_content(documents[citation.entry])
+                start = content.find(citation.quote)
+                start = max(start, citation.start or 0)
+                citations.append(
+                    Citation(
+                        entry_id=self.document_id(citation.entry),
+                        start=start,
+                        end=start + len(citation.quote),
+                        quote=citation.quote,
+                    )
+                )
+                continue
             content = contents.get(citation.entry, "")
             if citation.quote in content:
                 start = content.index(citation.quote)
@@ -288,3 +439,44 @@ def load_cases(directory: Path = CASE_DIR) -> list[EvalCase]:
     if duplicates:
         raise ValueError(f"duplicate case ids: {sorted(duplicates)}")
     return sorted(cases, key=lambda case: case.id)
+
+
+def check_probe_point(case: EvalCase, probe: CheckProbe, shown: dict) -> CheckPoint:
+    """The probe as a model-style check point.
+
+    `shown` maps (document key, version number) to the redacted text the model would see, so the
+    reference citation is placed where a model would place it.
+    """
+    documents = {doc.key: doc for doc in case.knowledge}
+    document = documents[probe.reference.document]
+    version = probe.reference.version or case.current_version_number(document) or 1
+    text = shown.get((document.key, version), "")
+    start = text.find(probe.reference.quote)
+    if start < 0:
+        start = probe.reference.start or 0
+    contents = {item.key: item.content for item in case.entries}
+    citations = []
+    for citation in probe.cite:
+        content = contents.get(citation.entry, "")
+        position = content.find(citation.quote)
+        if position < 0:
+            position = content.find(citation.at) if citation.at else (citation.start or 0)
+        citations.append(
+            Citation(
+                entry_id=case.entry_id(citation.entry),
+                start=position,
+                end=position + len(citation.quote),
+                quote=citation.quote,
+            )
+        )
+    return CheckPoint(
+        text=probe.text,
+        reference=ReferenceCitation(
+            document_id=case.document_id(document.key),
+            version=version,
+            start=start,
+            end=start + len(probe.reference.quote),
+            quote=probe.reference.quote,
+        ),
+        citations=citations,
+    )

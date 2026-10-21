@@ -34,12 +34,17 @@ from carenote.agent.gateway import (
 from carenote.agent.graph import GraphDeps, build_review_graph, initial_state
 from carenote.agent.state import ReviewPlan
 from carenote.data.seed import (
+    DEMO_BP_POLICY_ID,
     DEMO_CLINIC_ID,
     DEMO_CLINICIAN_ID,
+    DEMO_LISINOPRIL_LABEL_ID,
     DEMO_PATIENT_ID,
     seed_demo_data,
+    seed_demo_knowledge,
 )
 from carenote.domain.models import Actor, AgentActor, Role
+from carenote.knowledge.service import KnowledgeService
+from carenote.knowledge.store import InMemoryKnowledgeStore
 from carenote.repositories.memory import InMemoryCareNoteRepository
 from carenote.services.care_notes import CareNoteService
 
@@ -117,6 +122,31 @@ OPEN_QUESTIONS = [
     "Has the blood pressure check arranged for within 48 hours been completed?",
 ]
 
+# (check point, reference document, exact reference quote, [(entry type, exact record quote), ...])
+CHECK_POINTS = [
+    (
+        (
+            "Check blood pressure and kidney function after the lisinopril dose change; no "
+            "kidney function result appears in the record."
+        ),
+        DEMO_LISINOPRIL_LABEL_ID,
+        "Check blood pressure and kidney function after starting treatment or changing the dose.",
+        [("staff_note", "started lisinopril 10 mg seven days ago")],
+    ),
+    (
+        (
+            "Confirm the current lisinopril dose with the patient and the pharmacy, as the "
+            "records disagree."
+        ),
+        DEMO_BP_POLICY_ID,
+        "Confirm the current dose with the patient and the pharmacy when records disagree.",
+        [
+            ("staff_note", "started lisinopril 10 mg seven days ago"),
+            ("ai_nurse_consult_summary", "lisinopril 20 mg morning dose"),
+        ],
+    ),
+]
+
 # (entry type, exact quote, risk reason, suggested action, entities)
 HIGHLIGHTS = [
     (
@@ -138,7 +168,7 @@ HIGHLIGHTS = [
 
 # (question, search words) the curated plan asks beyond the standing questions.
 PLAN = [
-    ("Which lisinopril dose is the patient taking now?", "lisinopril dose"),
+    ("Which lisinopril dose is the patient taking now?", "lisinopril dose pharmacy"),
     ("Has the blood pressure check been completed?", "blood pressure check"),
 ]
 
@@ -153,6 +183,20 @@ class CuratedDemoGateway:
                 output=schema.model_validate(plan), model=CURATED_MODEL, usage=Usage()
             )
         entries = _entries_by_type(request)
+        references = _references(request)
+
+        def cite_reference(document_id: UUID, quote: str) -> dict:
+            version, start, text = next(
+                item for item in references[document_id] if quote in item[2]
+            )
+            offset = start + text.index(quote)
+            return {
+                "document_id": str(document_id),
+                "version": version,
+                "start": offset,
+                "end": offset + len(quote),
+                "quote": quote,
+            }
 
         def cite(entry_type: str, quote: str) -> dict:
             entry_id, text = entries[entry_type]
@@ -175,6 +219,15 @@ class CuratedDemoGateway:
                 for text, category, risk, sources in CLAIMS
             ],
             "open_questions": OPEN_QUESTIONS,
+            "check_points": [
+                {
+                    "text": text,
+                    "reference": cite_reference(document_id, quote),
+                    "citations": [cite(entry_type, record) for entry_type, record in sources],
+                }
+                for text, document_id, quote, sources in CHECK_POINTS
+                if any(quote in passage for *_, passage in references.get(document_id, []))
+            ],
             "candidate_highlights": [
                 {
                     "citation": cite(entry_type, quote),
@@ -206,6 +259,22 @@ def _cassettes(directory: Path) -> list[Path]:
     return [*directory.glob("agent_plan-*.json"), *directory.glob("agent_draft-*.json")]
 
 
+def _references(request: ModelRequest) -> dict[UUID, list[tuple[int, int, str]]]:
+    """Reference passages shown, by document: (version, start offset, passage text)."""
+    found: dict[UUID, list[tuple[int, int, str]]] = {}
+    current: dict | None = None
+    for item in request.inputs:
+        if isinstance(item, DataTag):
+            current = (
+                dict(item.attributes) if item.name == "reference" and not item.closing else None
+            )
+        elif current is not None:
+            found.setdefault(current["id"], []).append(
+                (current["version"], current["start"], item.text)
+            )
+    return found
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument(
@@ -219,10 +288,13 @@ def main() -> int:
         stale.unlink()
     repository = InMemoryCareNoteRepository()
     seed_demo_data(repository)
+    knowledge = KnowledgeService(InMemoryKnowledgeStore(), repository)
+    seed_demo_knowledge(knowledge.store)
     deps = GraphDeps(
         service=CareNoteService(repository),
         gateway=RecordedGateway(args.directory, record_with=live),
         commit=lambda state, tools: None,
+        knowledge=knowledge,
     )
     graph = build_review_graph(deps)
     run_id = uuid4()

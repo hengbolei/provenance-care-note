@@ -153,7 +153,7 @@ Status: every key entry reaches the draft payload (100%), and the deterministic 
 pass (detection 100%, false flags 0, framing breaks 0). Injection failures and critical-finding
 recall are model metrics: the agent suite reports them only once live cassettes are recorded.
 
-## Phase 4 — Reference knowledge base · 🚧 in progress
+## Phase 4 — Reference knowledge base · ✅ done (pending merge)
 
 Branch: `feat/agent-knowledge`. Design §19.
 
@@ -193,13 +193,22 @@ separate **check points** that say what to verify, never what to prescribe.
       is audited (`agent_check_point_accepted` / `_rejected`); the run view names each cited
       reference version. The panel is checked in a browser in 4.6, once the demo has a check
       point
-- [ ] 4.6 Evaluation and demo: a `knowledge` case family and pipeline metrics; demo reference
-      documents for the seed clinic; re-recorded demo cassette
+- [x] 4.6 Evaluation and demo: a `knowledge` case family (3 cases, 39 in all) with reference
+      documents, superseded, future-dated and retired versions, reference-retrieval queries and
+      check-point probes; pipeline gates for reference recall and check-point verdict accuracy;
+      claim probes now cover `reference_as_fact`; two synthetic demo reference documents and two
+      curated check points in the re-recorded demo cassette; review panel checked in a browser,
+      including commit and a 375 px layout
 
 **Exit criteria**: no claim cites a reference document (gated); every check point resolves to
 an active document version; retired and superseded versions are never retrieved; reference
 retrieval recall 100% on the knowledge cases; no check-point probe that gives dosing advice
 verifies; injection inside a reference document is flagged.
+
+Status: all met in the pipeline suite (reference recall 100%, check-point verdict accuracy 100%,
+`reference_as_fact` probes fail as expected, the injected guideline is flagged). One known gap:
+an order joined to a check by "and then" is not caught. Model behaviour with references is
+measured once live cassettes exist.
 
 ## Later
 
@@ -215,6 +224,8 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-21 | Knowledge eval cases describe documents and versions in YAML, with check probes placed in the redacted version text as a model would cite them | The pipeline suite measures reference retrieval and check-point verification with no model, like the record checks |
+| 2026-10-21 | The demo seeds two synthetic reference documents with fixed IDs into an empty knowledge store only | Keeps the demo cassette's requests stable and never overwrites a clinic's own library in PostgreSQL |
 | 2026-10-21 | Verified check points start included in the commit, like verified claims; failed ones cannot be included, and every check point gets an explicit accept or reject decision | One click commits what verified, nothing unverified reaches the record, and the audit trail shows a decision for every point |
 | 2026-10-21 | The committed review names a reference as "title, version number (version label)" with the exact quote | The text stays readable in the section history and still identifies the immutable version it relied on |
 | 2026-10-21 | Check-point failures are their own enum (`CheckPointFailure`), apart from claim failures; only `reference_as_fact` joins `CheckFailure` | Check points are verified by different rules; keeping the claim enum unchanged keeps the existing probe coverage meaningful |

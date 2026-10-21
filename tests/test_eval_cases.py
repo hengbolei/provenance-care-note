@@ -5,7 +5,7 @@ from collections import Counter
 import pytest
 from pydantic import ValidationError
 
-from carenote.agent.state import CheckFailure
+from carenote.agent.state import CheckFailure, CheckPointFailure
 from carenote.evals.cases import EvalCase, Family, load_cases
 
 CASES = load_cases()
@@ -58,16 +58,67 @@ def test_probes_exercise_every_verifier_failure_and_supported_claims():
     )
     supported = sum(not probe.expect for case in CASES for probe in case.probes)
 
-    # Probes cannot cite reference documents until the knowledge cases arrive (roadmap step 4.6).
-    assert set(expected) == set(CheckFailure) - {CheckFailure.REFERENCE_AS_FACT}
+    assert set(expected) == set(CheckFailure)
     assert supported >= 15
+
+
+def test_check_probes_exercise_every_check_point_failure_and_supported_points():
+    expected = Counter(
+        failure for case in CASES for probe in case.check_probes for failure in probe.expect
+    )
+    supported = sum(not probe.expect for case in CASES for probe in case.check_probes)
+
+    assert set(expected) == set(CheckPointFailure)
+    assert supported >= 3
+
+
+def test_knowledge_cases_check_reference_retrieval():
+    for case in CASES:
+        if case.family is Family.KNOWLEDGE:
+            assert case.knowledge and case.expect.references and case.check_probes, case.id
+
+
+def test_a_claim_may_cite_a_reference_only_when_expecting_reference_as_fact():
+    knowledge = [
+        {
+            "key": "label",
+            "kind": "drug_label",
+            "title": "Label",
+            "versions": [{"label": "v1", "effective": "2025-01-01", "content": "Aspirin text."}],
+        }
+    ]
+    probe = {"id": "p", "claim": "Aspirin.", "cite": [{"entry": "label", "quote": "Aspirin"}]}
+    with pytest.raises(ValidationError, match="may not cite references"):
+        EvalCase.model_validate(_case(knowledge=knowledge, probes=[probe]))
+
+    EvalCase.model_validate(
+        _case(knowledge=knowledge, probes=[probe | {"expect": ["reference_as_fact"]}])
+    )
+
+
+def test_a_supported_check_probe_must_quote_the_version_in_effect():
+    knowledge = [
+        {
+            "key": "label",
+            "kind": "drug_label",
+            "title": "Label",
+            "versions": [
+                {"label": "v1", "effective": "2025-01-01", "content": "Old text."},
+                {"label": "v2", "effective": "2026-01-01", "content": "Check aspirin yearly."},
+            ],
+        }
+    ]
+    probe = {"id": "c", "text": "Check it.", "reference": {"document": "label", "quote": "Old"}}
+    with pytest.raises(ValidationError, match="version in effect"):
+        EvalCase.model_validate(_case(knowledge=knowledge, check_probes=[probe]))
 
 
 def test_known_gaps_always_explain_themselves():
     for case in CASES:
         expectations = case.expect.conflicts + case.expect.phi + case.expect.retrieval
         gaps = [item.known_gap for item in expectations]
-        gaps += [probe.known_gap for probe in case.probes]
+        gaps += [probe.known_gap for probe in case.probes + case.check_probes]
+        gaps += [item.known_gap for item in case.expect.references]
         for gap in gaps:
             assert gap is None or len(gap.strip()) >= 20, case.id
 

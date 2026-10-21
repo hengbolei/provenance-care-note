@@ -30,7 +30,7 @@ from carenote.agent.tracing import configure_tracing
 from carenote.core.config import settings
 from carenote.core.identity import AuthenticationError, session_service
 from carenote.core.security import clinical_cipher
-from carenote.data.seed import DEMO_CLINIC_ID, seed_demo_data
+from carenote.data.seed import DEMO_CLINIC_ID, seed_demo_data, seed_demo_knowledge
 from carenote.domain.models import (
     Actor,
     AIIngestRequest,
@@ -98,6 +98,7 @@ knowledge = KnowledgeService(
     else InMemoryKnowledgeStore(),
     repository,
 )
+seed_demo_knowledge(knowledge.store)
 # With PostgreSQL, agent runs are checkpointed (encrypted) and registered there, so they survive a
 # restart; without it they live in memory like the rest of the development store.
 agent_runs = AgentRunService(
