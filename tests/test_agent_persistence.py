@@ -4,14 +4,13 @@ Uses CARENOTE_TEST_DATABASE_URL when set (CI runs a Postgres service), otherwise
 server from the optional `pgserver` package, and skips when neither is available.
 """
 
-import os
 from datetime import UTC, datetime
 from uuid import uuid4
 
 import psycopg
 import pytest
 from agent_fakes import ScriptedGateway
-from psycopg.conninfo import make_conninfo
+from postgres_support import restricted_url
 
 from carenote.agent.commit import commit_review
 from carenote.agent.persistence import (
@@ -59,29 +58,6 @@ def test_unencrypted_or_foreign_checkpoint_values_are_refused():
 
 
 # PostgreSQL
-
-
-@pytest.fixture(scope="session")
-def postgres_server(tmp_path_factory):
-    url = os.environ.get("CARENOTE_TEST_DATABASE_URL")
-    if url:
-        yield url
-        return
-    pgserver = pytest.importorskip(
-        "pgserver", reason="set CARENOTE_TEST_DATABASE_URL or install pgserver"
-    )
-    server = pgserver.get_server(tmp_path_factory.mktemp("pgdata"), cleanup_mode="stop")
-    yield server.get_uri()
-
-
-@pytest.fixture
-def database(postgres_server):
-    name = f"carenote_test_{uuid4().hex[:12]}"
-    with psycopg.connect(postgres_server, autocommit=True) as connection:
-        connection.execute(f"CREATE DATABASE {name}")
-    yield make_conninfo(postgres_server, dbname=name)
-    with psycopg.connect(postgres_server, autocommit=True) as connection:
-        connection.execute(f"DROP DATABASE {name} WITH (FORCE)")
 
 
 class InlineExecutor:
@@ -145,20 +121,11 @@ def test_checkpoints_hold_no_clinical_text_in_clear(database):
     assert not any("lisinopril" in document.lower() for (document,) in documents)
 
 
-def _restricted_url(database):
-    """A non-superuser login, since superusers bypass row-level security."""
-    role = f"carenote_app_{uuid4().hex[:8]}"
-    with psycopg.connect(database, autocommit=True) as connection:
-        connection.execute(f"CREATE ROLE {role} LOGIN PASSWORD 'test-only'")
-        connection.execute(f"GRANT ALL ON ALL TABLES IN SCHEMA public TO {role}")
-    return make_conninfo(database, user=role, password="test-only")
-
-
 def test_runs_and_checkpoints_are_invisible_to_other_clinics(database):
     runs, checkpointer = _service(database)
     run_id = runs.start(CLINICIAN, DEMO_PATIENT_ID).run_id
     checkpointer.conn.close()
-    restricted = _restricted_url(database)
+    restricted = restricted_url(database)
 
     def visible(clinic_id):
         with psycopg.connect(restricted, options=f"-c app.current_clinic_id={clinic_id}") as conn:
@@ -178,7 +145,7 @@ def test_runs_and_checkpoints_are_invisible_to_other_clinics(database):
 
 def test_run_store_round_trips_and_is_clinic_scoped(database):
     postgres_checkpointer(database, DEMO_CLINIC_ID, CIPHER, max_connections=1).conn.close()
-    restricted = _restricted_url(database)
+    restricted = restricted_url(database)
     record = RunRecord(
         run_id=uuid4(),
         patient_id=DEMO_PATIENT_ID,

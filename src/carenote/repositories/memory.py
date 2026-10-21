@@ -306,6 +306,16 @@ class InMemoryCareNoteRepository:
         self.entries[entry.id] = entry
         return entry
 
+    def list_clinic_audit_events(self, clinic_id: UUID, resource: str) -> list[AuditEvent]:
+        """Clinic-level events for one resource type, such as knowledge documents."""
+        return [
+            event
+            for event in self.audit_events
+            if event.patient_id is None
+            and event.clinic_id == clinic_id
+            and event.resource == resource
+        ]
+
     def list_audit_events(self, patient_id: UUID, clinic_id: UUID) -> list[AuditEvent]:
         return [
             event

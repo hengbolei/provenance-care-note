@@ -161,11 +161,12 @@ Clinic policies, public guidelines and drug labels become a clinic-scoped, versi
 base. The record still supports every claim about the patient; reference documents support only
 separate **check points** that say what to verify, never what to prescribe.
 
-- [ ] 4.0 Plan: design §19 and this phase
-- [ ] 4.1 Knowledge documents: `KnowledgeDocument` and immutable `KnowledgeVersion` (kind, title,
-      source, version label, effective date, content, author); retire; service with
-      administrator-only writes and metadata-only audit; in-memory repository and an encrypted
-      PostgreSQL table with forced clinic RLS (`migrations/004`)
+- [x] 4.0 Plan: design §19 and this phase (`44195a0`)
+- [x] 4.1 Knowledge documents: `KnowledgeDocument` and immutable `KnowledgeVersion` (kind, title,
+      source, version label, effective date, content, author, content hash); retire;
+      `KnowledgeService` with administrator-only writes, care-team reads, optimistic
+      concurrency and clinic-level audit events; in-memory store and encrypted PostgreSQL tables
+      with forced clinic RLS and no update or delete policy on versions (`migrations/004`)
 - [ ] 4.2 Knowledge API and administrator panel: create, add a version, retire, list and read;
       care-team read access; three-language interface
 - [ ] 4.3 Reference retrieval: passages with offsets over current versions of active documents,
@@ -199,6 +200,10 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-21 | `AuditEvent.patient_id` may be `None` for clinic-level resources; knowledge writes use it and are listed by `list_clinic_audit_events` | Knowledge documents belong to the clinic, not a patient, yet their writes belong in the same hash-chained trail; patient audit views are unchanged |
+| 2026-10-21 | The current version of a document is the newest one whose effective date has arrived; future-dated versions wait, retired documents are excluded | An administrator can load next year's guideline in advance without it changing today's reviews |
+| 2026-10-21 | Version immutability is enforced twice: the store refuses to replace a version, and migration 004 grants no UPDATE or DELETE policy on `knowledge_versions` | A committed review cites a version; the database itself keeps that text unchanged for the application role |
+| 2026-10-21 | `PostgresKnowledgeStore(migrate=False)` lets an application role without DDL rights connect after the schema owner migrates | Matches production practice where the app role cannot create tables; tests use it to check RLS as a non-owner |
 | 2026-10-21 | Reference documents support only check points; claims about the patient must cite record entries | The record states what happened to this patient; guidance can say what to check but must never become evidence of a patient fact |
 | 2026-10-21 | Check points prompt verification ("check", "confirm", "no ... appears") and never give treatment or dosing advice | Keeps the agent within the §2 non-goals; recommending treatment would make it clinical decision support with a different regulatory standing |
 | 2026-10-21 | Knowledge covers clinic policies, public guidelines and drug labels; licensing of uploaded material is left to the organisation | The feature should accept the material clinics actually use; the system records each document's stated source |

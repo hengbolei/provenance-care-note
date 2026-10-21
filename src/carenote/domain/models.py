@@ -361,7 +361,8 @@ class SectionState(BaseModel):
 
 
 class AuditEvent(BaseModel):
-    patient_id: UUID
+    # None for clinic-level resources such as reference knowledge documents.
+    patient_id: UUID | None
     clinic_id: UUID
     resource: str
     resource_id: str
