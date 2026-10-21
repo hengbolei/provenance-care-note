@@ -228,6 +228,17 @@ textarea:focus, select:focus, input:focus { outline: 2px solid #91c2b1; outline-
 .agent-timeline-node { color: #244c41; font-weight: 750; }
 .agent-checkbox { display: flex; align-items: center; gap: 8px; color: #456159; font-size: 0.76rem; }
 .agent-checkbox input { width: auto; }
+.knowledge-card { grid-column: 1 / -1; }
+.knowledge-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin: 10px 0; }
+.knowledge-list { display: grid; gap: 8px; }
+.knowledge-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 11px 12px; border: 1px solid #dce7e2; border-radius: 11px; background: #fbfdfc; }
+.knowledge-item.retired { background: #f6f8f7; color: #7c918b; }
+.knowledge-item-title { margin: 0; color: #244c41; font-size: 0.86rem; font-weight: 750; overflow-wrap: anywhere; }
+.knowledge-item-meta { margin: 4px 0 0; color: #647a73; font-size: 0.72rem; overflow-wrap: anywhere; }
+.knowledge-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+.knowledge-viewer, .knowledge-form { margin-top: 14px; padding-top: 4px; border-top: 1px solid #e5ece9; }
+.knowledge-content { max-height: 320px; margin: 10px 0 0; padding: 12px; overflow: auto; border-radius: 10px; background: #f4f8f6; color: #244c41; font-size: 0.78rem; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.knowledge-form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .audit-list { display: grid; gap: 7px; }
 .audit-item { display: grid; grid-template-columns: minmax(130px, 0.7fr) minmax(160px, 1fr) auto; gap: 12px; align-items: center; padding: 9px 10px; border-bottom: 1px solid #e5ece9; color: #647a73; font-size: 0.72rem; }
 .audit-operation { color: #345c51; font-weight: 750; }
@@ -259,4 +270,6 @@ textarea:focus, select:focus, input:focus { outline: 2px solid #91c2b1; outline-
   .entry-footer { align-items: flex-start; flex-direction: column; }
   .workspace-grid { grid-template-columns: 1fr; }
   .agent-claim { grid-template-columns: 1fr; }
+  .knowledge-item, .knowledge-form-row { grid-template-columns: 1fr; }
+  .knowledge-actions { justify-content: flex-start; }
 }

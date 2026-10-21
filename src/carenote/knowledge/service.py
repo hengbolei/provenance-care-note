@@ -16,10 +16,12 @@ from carenote.domain.models import Actor, AuditEvent, Role
 from carenote.knowledge.models import (
     KnowledgeDocument,
     KnowledgeDocumentCreate,
+    KnowledgeDocumentDetail,
     KnowledgeRetire,
     KnowledgeStatus,
     KnowledgeVersion,
     KnowledgeVersionCreate,
+    KnowledgeVersionSummary,
 )
 from carenote.knowledge.store import KnowledgeStore
 from carenote.repositories.memory import InMemoryCareNoteRepository
@@ -148,6 +150,23 @@ class KnowledgeService:
             if effective:
                 current.append((document, max(effective, key=lambda item: item.version)))
         return current
+
+    def document_detail(self, actor: Actor, document_id: UUID) -> KnowledgeDocumentDetail:
+        versions = self.list_versions(actor, document_id)
+        document = self._document(actor, document_id)
+        current = next(
+            (
+                version.version
+                for item, version in self.current_versions(actor)
+                if item.id == document_id
+            ),
+            None,
+        )
+        return KnowledgeDocumentDetail(
+            document=document,
+            versions=[KnowledgeVersionSummary.of(item) for item in versions],
+            current_version=current,
+        )
 
     def list_audit_events(self, actor: Actor) -> list[AuditEvent]:
         self._require_admin(actor)

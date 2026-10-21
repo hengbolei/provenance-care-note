@@ -103,3 +103,34 @@ class KnowledgeVersionCreate(_VersionFields):
 
 class KnowledgeRetire(_Request):
     expected_version: int = Field(ge=1)
+
+
+class KnowledgeVersionSummary(BaseModel):
+    """A version without its text, for listings."""
+
+    version: int
+    label: str
+    effective_date: date
+    content_sha256: str
+    characters: int
+    created_by: UUID
+    created_at: datetime
+
+    @classmethod
+    def of(cls, version: KnowledgeVersion) -> KnowledgeVersionSummary:
+        return cls(
+            version=version.version,
+            label=version.label,
+            effective_date=version.effective_date,
+            content_sha256=version.content_sha256,
+            characters=len(version.content),
+            created_by=version.created_by,
+            created_at=version.created_at,
+        )
+
+
+class KnowledgeDocumentDetail(BaseModel):
+    document: KnowledgeDocument
+    versions: list[KnowledgeVersionSummary]
+    # The version retrieval uses today, or None when no version is in effect or it is retired.
+    current_version: int | None = None
