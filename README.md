@@ -57,8 +57,9 @@ flowchart LR
   survive an app restart.
 - Each run is one OpenTelemetry trace that carries IDs and counts only, never record text. The
   review panel shows a metadata-only run timeline.
-- Model providers are OpenAI and Anthropic, with fallback to the other provider on errors. A
-  recorded mode replays cassettes, so the demo, tests and CI need no API key.
+- Model providers are OpenAI, Anthropic and any OpenAI-compatible service (DeepSeek, Qwen,
+  Kimi, GLM, OpenRouter, or a local Ollama or vLLM server), with fallback to another provider on
+  errors. A recorded mode replays cassettes, so the demo, tests and CI need no API key.
 
 **Evaluation**
 
@@ -128,6 +129,7 @@ PostgreSQL. The demo accounts are `patient`, `staff`, `clinician` and `admin`, w
 | --- | --- |
 | `recorded` (default) | Replays cassettes; no key, no network |
 | `openai` / `anthropic` | Live calls; needs `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` |
+| `compatible` | Live calls to an OpenAI-compatible service at `CARENOTE_COMPAT_BASE_URL` with `CARENOTE_COMPAT_MODEL`; no key needed for a local server |
 | `live` | Live calls to `CARENOTE_AGENT_PROVIDER` |
 | `record` | Live calls that also record cassettes |
 
@@ -171,9 +173,9 @@ docs/              Design, roadmap, architecture and operations
 
 ## Status and limitations
 
-- **No live model has been evaluated yet.** The OpenAI and Anthropic adapters are tested with
-  mocked HTTP only, so model metrics such as critical-finding recall and injection resistance
-  appear once live cassettes are recorded.
+- **No live model has been evaluated yet.** The OpenAI, Anthropic and compatible adapters are
+  tested with mocked HTTP only, so model metrics such as critical-finding recall and injection
+  resistance appear once live cassettes are recorded.
 - **Scale.** Each clinic's data is one encrypted snapshot loaded into memory, which suits a small
   deployment. Per-row storage is a planned separate refactor.
 - **Known gaps** are listed in the [evaluation report](evals/REPORT.md) instead of being worded

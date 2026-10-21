@@ -41,7 +41,7 @@ flowchart LR
 
 - 运行状态保存在 PostgreSQL 中，状态用 Fernet 加密，并按诊所做行级隔离，所以应用重启后可以接着跑。
 - 每次运行对应一条 OpenTelemetry 追踪，只包含 ID 和计数，不含病历文本。审阅面板会显示一条只含元数据的运行时间线。
-- 模型提供方支持 OpenAI 和 Anthropic，出错时可以回退到另一家。回放模式会重放录制的结果，所以演示、测试和 CI 都不需要 API key。
+- 模型提供方支持 OpenAI、Anthropic，以及任何兼容 OpenAI 接口的服务（DeepSeek、通义千问、Kimi、智谱 GLM、OpenRouter，或本地的 Ollama、vLLM），出错时可以回退到另一家。回放模式会重放录制的结果，所以演示、测试和 CI 都不需要 API key。
 
 **评测**
 
@@ -96,6 +96,7 @@ python -m venv .venv
 | --- | --- |
 | `recorded`（默认） | 回放录制结果，不需要 key，不联网 |
 | `openai` / `anthropic` | 实时调用；需要 `OPENAI_API_KEY` 或 `ANTHROPIC_API_KEY` |
+| `compatible` | 实时调用 `CARENOTE_COMPAT_BASE_URL` 上的兼容服务，模型由 `CARENOTE_COMPAT_MODEL` 指定；本地服务不需要 key |
 | `live` | 实时调用 `CARENOTE_AGENT_PROVIDER` 指定的提供方 |
 | `record` | 实时调用的同时录制结果 |
 
@@ -135,7 +136,7 @@ docs/              设计、路线图、架构与运维文档
 
 ## 现状与局限
 
-- **还没有用真实模型做过评测。** OpenAI 和 Anthropic 适配器只用模拟的 HTTP 测试过。关键发现召回率、注入抵抗等模型指标，要等录制真实结果后才会出现。
+- **还没有用真实模型做过评测。** OpenAI、Anthropic 和兼容接口适配器只用模拟的 HTTP 测试过。关键发现召回率、注入抵抗等模型指标，要等录制真实结果后才会出现。
 - **规模。** 每个诊所的数据是一份加密快照，整体加载进内存，适合小规模部署。按行存储计划作为单独的重构来做。
 - **已知缺口**直接列在[评测报告](evals/REPORT.md)里，没有回避。例如：冲突检测还没把商品名和通用名关联起来；部分姓名和邮箱不会被脱敏；多词的通俗说法检索不到。
 - 投入生产还需要机构的身份认证系统、托管密钥、在目标数据库上验证过的行级安全，以及隐私和临床审批。详见[生产安全](docs/PRODUCTION_SECURITY.md)。
