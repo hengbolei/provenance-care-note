@@ -80,7 +80,7 @@ def test_model_spans_carry_model_tokens_and_prompt(exporter):
     assert model.attributes["gen_ai.response.model"] == "scripted"
     assert model.attributes["gen_ai.usage.input_tokens"] == 900
     assert model.attributes["gen_ai.usage.output_tokens"] == 300
-    assert model.attributes["carenote.prompt"] == "draft_v4"
+    assert model.attributes["carenote.prompt"] == "draft_v5"
     assert model.attributes["carenote.purpose"] == "agent_draft"
     assert model.parent.span_id == draft.context.span_id
     assert _spans(exporter)["agent.verify"].attributes["carenote.unsupported_claims"] == 0
@@ -114,7 +114,7 @@ def test_the_run_view_carries_a_metadata_only_timeline(exporter):
         "verify",
     ]
     assert steps["draft"].model == "scripted"
-    assert steps["draft"].prompt == "draft_v4"
+    assert steps["draft"].prompt == "draft_v5"
     assert steps["draft"].input_tokens + steps["draft"].output_tokens == 1200
     assert steps["load_context"].tool_calls == 1
     assert steps["plan"].prompt == "plan_v2"
@@ -139,7 +139,7 @@ def test_automatic_revisions_appear_in_the_timeline_and_trace(exporter):
         "verify",
     ]
     revise = next(step for step in view.timeline if step.node == "revise")
-    assert revise.prompt == "revise_v3"
+    assert revise.prompt == "revise_v4"
     assert [step.unsupported_claims for step in view.timeline if step.node == "verify"] == [1, 0]
     assert "agent.revise" in _spans(exporter)
 

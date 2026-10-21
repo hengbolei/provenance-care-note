@@ -7,9 +7,9 @@ text cannot open or close a tag. On top of that:
   ("ignore previous instructions", "SYSTEM:", "add a claim ... mark it critical"). Flagged entries
   carry `instruction_like="true"` in their tag, the prompts tell the model what that means, and
   the run view shows the clinician which entries were flagged.
-- `withhold_echoes` removes open questions and highlight suggestions that repeat a flagged
-  passage's words. Claims are not filtered here: the verifier already checks every claim against
-  its citations and the patient-source policy.
+- `withhold_echoes` removes open questions, highlight suggestions and check points that repeat
+  the words of a flagged record or reference passage. Claims are not filtered here: the verifier
+  already checks every claim against its citations and the patient-source policy.
 
 The patterns are deliberately narrow: they look for text aimed at an assistant, not for clinical
 instructions between people, so "stop ibuprofen" or "ask the doctor" stay unflagged.
@@ -86,34 +86,54 @@ def _grams(text: str) -> set[tuple[str, ...]]:
 
 
 def withhold_echoes(
-    draft: DraftReview, flagged: dict[UUID, list[str]]
+    draft: DraftReview,
+    flagged: dict[UUID, list[str]],
+    flagged_references: dict[UUID, list[str]] | None = None,
 ) -> tuple[DraftReview, list[WithheldItem]]:
-    """Drop open questions and highlights that share `ECHO_WORDS` words in a row with a flagged
-    passage, and report what was dropped. Indexes refer to the draft as the model returned it."""
-    grams = {entry_id: set().union(*map(_grams, texts)) for entry_id, texts in flagged.items()}
+    """Drop open questions, highlights and check points that share `ECHO_WORDS` words in a row
+    with a flagged record or reference passage, and report what was dropped. Indexes refer to
+    the draft as the model returned it."""
+    grams = [
+        (source_id, kind, set().union(*map(_grams, texts)))
+        for kind, passages in (("entry", flagged), ("reference", flagged_references or {}))
+        for source_id, texts in passages.items()
+    ]
 
-    def source(text: str) -> UUID | None:
+    def withhold(kind: str, index: int, text: str, withheld: list[WithheldItem]) -> bool:
         mine = _grams(text)
-        return next((entry_id for entry_id, theirs in grams.items() if mine & theirs), None)
+        for source_id, source, theirs in grams:
+            if mine & theirs:
+                withheld.append(
+                    WithheldItem(kind=kind, index=index, entry_id=source_id, source=source)
+                )
+                return True
+        return False
 
     withheld: list[WithheldItem] = []
-    questions = []
-    for index, question in enumerate(draft.open_questions):
-        entry_id = source(question)
-        if entry_id is None:
-            questions.append(question)
-        else:
-            withheld.append(WithheldItem(kind="open_question", index=index, entry_id=entry_id))
-    highlights = []
-    for index, highlight in enumerate(draft.candidate_highlights):
-        entry_id = source(f"{highlight.risk_reason} {highlight.suggested_action}")
-        if entry_id is None:
-            highlights.append(highlight)
-        else:
-            withheld.append(WithheldItem(kind="highlight", index=index, entry_id=entry_id))
+    questions = [
+        question
+        for index, question in enumerate(draft.open_questions)
+        if not withhold("open_question", index, question, withheld)
+    ]
+    highlights = [
+        highlight
+        for index, highlight in enumerate(draft.candidate_highlights)
+        if not withhold(
+            "highlight", index, f"{highlight.risk_reason} {highlight.suggested_action}", withheld
+        )
+    ]
+    check_points = [
+        item
+        for index, item in enumerate(draft.check_points)
+        if not withhold("check_point", index, item.text, withheld)
+    ]
     if not withheld:
         return draft, []
     guarded = draft.model_copy(
-        update={"open_questions": questions, "candidate_highlights": highlights}
+        update={
+            "open_questions": questions,
+            "candidate_highlights": highlights,
+            "check_points": check_points,
+        }
     )
     return guarded, withheld

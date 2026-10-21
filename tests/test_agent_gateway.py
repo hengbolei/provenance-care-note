@@ -168,7 +168,12 @@ def test_missing_api_key_is_reported_before_any_call():
 def test_strict_schema_requires_every_property_and_drops_defaults():
     schema = strict_json_schema(DraftReview)
 
-    assert schema["required"] == ["claims", "open_questions", "candidate_highlights"]
+    assert schema["required"] == [
+        "claims",
+        "open_questions",
+        "candidate_highlights",
+        "check_points",
+    ]
     assert "default" not in json.dumps(schema)
     for definition in schema["$defs"].values():
         if definition.get("type") == "object":

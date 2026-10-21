@@ -207,6 +207,16 @@ class ReviewTools:
                 return item
         raise LookupError("reference version is not in effect for this run")
 
+    def reference_texts(self) -> dict[tuple[UUID, int], tuple[str, RedactionResult]]:
+        """Original and redacted text of every reference version this run may cite."""
+        return {
+            (document.id, version.version): (version.content, self.reference_redaction(version))
+            for document, version in self._current_references()
+        }
+
+    def reference_document_ids(self) -> set[UUID]:
+        return {document.id for document, _ in self._current_references()}
+
     def reference_redaction(self, version: KnowledgeVersion) -> RedactionResult:
         key = (version.document_id, version.version)
         if key not in self.reference_redactions:

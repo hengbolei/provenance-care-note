@@ -40,6 +40,9 @@ from carenote.agent.state import (
     Budget,
     CandidateHighlight,
     CheckFailure,
+    CheckPoint,
+    CheckPointCheck,
+    CheckPointFailure,
     Citation,
     Claim,
     ClaimCheck,
@@ -47,6 +50,7 @@ from carenote.agent.state import (
     DraftReview,
     HighlightDecision,
     QuestionSource,
+    ReferenceCitation,
     ReviewDecisions,
     ReviewPlan,
     ReviewQuestion,
@@ -57,7 +61,7 @@ from carenote.agent.state import (
 )
 from carenote.agent.tools import ReviewTools
 from carenote.agent.tracing import RunTracer, TimelineStep, TracingGateway, timeline_step
-from carenote.agent.verify import resolve_citation, verify_draft
+from carenote.agent.verify import resolve_citation, verify_check_points, verify_draft
 from carenote.domain.models import (
     Actor,
     AgentActor,
@@ -75,9 +79,9 @@ from carenote.knowledge.service import KnowledgeService
 from carenote.privacy.redaction import RedactionResult
 from carenote.services.care_notes import CareNoteService
 
-PROMPT_VERSION = "draft_v4"
+PROMPT_VERSION = "draft_v5"
 PLAN_PROMPT_VERSION = "plan_v2"
-REVISE_PROMPT_VERSION = "revise_v3"
+REVISE_PROMPT_VERSION = "revise_v4"
 MAX_CONTEXT_ENTRIES = 40
 # Hits kept per question, and the share of the context window older retrieved entries may take.
 RETRIEVE_K = 5
@@ -116,6 +120,9 @@ CHECKPOINT_TYPES = (
     Budget,
     CandidateHighlight,
     CheckFailure,
+    CheckPoint,
+    CheckPointCheck,
+    CheckPointFailure,
     Citation,
     Claim,
     ClaimCheck,
@@ -129,6 +136,7 @@ CHECKPOINT_TYPES = (
     HighlightDecision,
     KnowledgeKind,
     QuestionSource,
+    ReferenceCitation,
     ReferenceSpan,
     ReviewDecisions,
     ReviewQuestion,
@@ -447,6 +455,39 @@ def build_review_graph(
         for conflict_id in report.uncovered_conflict_ids:
             inputs.append(DataTag.open("uncovered_conflict", id=conflict_id))
             inputs.append(DataTag.close("uncovered_conflict"))
+        for check in report.check_points:
+            item = previous.check_points[check.check_point_index]
+            reference = item.reference
+            inputs += [
+                DataTag.open(
+                    "previous_check_point", index=check.check_point_index, verified=check.verified
+                ),
+                tools.redactor.redact(item.text, names),
+                DataTag.open(
+                    "reference_citation",
+                    document=reference.document_id,
+                    version=reference.version,
+                    start=reference.start,
+                    end=reference.end,
+                ),
+                tools.redactor.redact(reference.quote, names),
+                DataTag.close("reference_citation"),
+            ]
+            for citation in item.citations:
+                inputs += [
+                    DataTag.open(
+                        "citation", entry=citation.entry_id, start=citation.start, end=citation.end
+                    ),
+                    tools.redactor.redact(citation.quote, names),
+                    DataTag.close("citation"),
+                ]
+            for failure, detail in zip(check.failures, check.detail or [], strict=False):
+                inputs += [
+                    DataTag.open("failure", reason=failure),
+                    tools.redactor.redact(detail, names),
+                    DataTag.close("failure"),
+                ]
+            inputs.append(DataTag.close("previous_check_point"))
         budget = state["budget"]
         budget = budget.model_copy(update={"auto_revisions": budget.auto_revisions + 1})
         result = model.structured(
@@ -472,10 +513,31 @@ def build_review_graph(
             for ref in state["context"]
             if (passages := _flagged(tools, ref.entry_id))
         }
-        draft_review, withheld = withhold_echoes(state["draft"] or DraftReview(claims=[]), flagged)
-        report = verify_draft(draft_review, entries, state["conflicts"], tools.redactions)
+        flagged_references: dict[UUID, list[str]] = {}
+        for reference in _reference_passages(state.get("references") or {}):
+            flagged_references.setdefault(reference.document_id, []).extend(
+                flagged_passages(reference.text)
+            )
+        draft_review, withheld = withhold_echoes(
+            state["draft"] or DraftReview(claims=[]),
+            flagged,
+            {key: value for key, value in flagged_references.items() if value},
+        )
+        report = verify_draft(
+            draft_review,
+            entries,
+            state["conflicts"],
+            tools.redactions,
+            reference_ids=tools.reference_document_ids(),
+        )
         report = report.model_copy(
-            update={"instruction_like_entry_ids": list(flagged), "withheld": withheld}
+            update={
+                "instruction_like_entry_ids": list(flagged),
+                "withheld": withheld,
+                "check_points": verify_check_points(
+                    draft_review, tools.reference_texts(), entries, tools.redactions
+                ),
+            }
         )
         return {
             "draft": draft_review,

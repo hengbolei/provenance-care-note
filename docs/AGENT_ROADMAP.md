@@ -177,9 +177,14 @@ separate **check points** that say what to verify, never what to prescribe.
       `retrieve` keeps up to 3 reference passages per question; the draft and revise requests
       carry up to 12 in `<reference id version kind start>` tags, flagged when instruction-like
       (`draft_v4`, `revise_v3`); claims still may not cite them
-- [ ] 4.4 Check points: `ReferenceCitation` and `CheckPoint` in `DraftReview`; prompts
-      (`draft`, `revise`); verifier checks for reference quotes, `reference_as_fact`,
-      `check_point_phrasing` and doses absent from the reference
+- [x] 4.4 Check points: `ReferenceCitation` and `CheckPoint` (at most 8) in `DraftReview`;
+      `verify_check_points` resolves the reference quote against the run's version snapshot
+      (`unknown_reference`, `reference_mismatch`), checks record citations (`record_citation`),
+      check phrasing (`check_point_phrasing`), treatment orders (`recommends_treatment`) and
+      medications and doses absent from what is cited (`unsupported_entities`); claims citing a
+      reference fail `reference_as_fact`; failed check points go through the revise loop; check
+      points repeating a flagged reference or record passage are withheld (`draft_v5`,
+      `revise_v4`)
 - [ ] 4.5 Review panel and commit: check points shown apart from claims with document title and
       version, accept or reject, written into `agent_review`; audit
 - [ ] 4.6 Evaluation and demo: a `knowledge` case family and pipeline metrics; demo reference
@@ -204,6 +209,10 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-21 | Check-point failures are their own enum (`CheckPointFailure`), apart from claim failures; only `reference_as_fact` joins `CheckFailure` | Check points are verified by different rules; keeping the claim enum unchanged keeps the existing probe coverage meaningful |
+| 2026-10-21 | Treatment advice is detected deterministically: an imperative treatment verb at the start, or "should/must/recommend ... <treatment verb>"; text after "whether" or "if" is treated as a question | "Check whether the dose should be reduced" is a check; "Reduce the dose" and "the dose should be reduced" are orders |
+| 2026-10-21 | A failing check point makes the draft fail verification and enters the automatic revise loop with its reasons | The model gets the same chance to fix a check point as a claim, within the same revision budget |
+| 2026-10-21 | Until the knowledge eval cases arrive (step 4.6), the probe-coverage test excludes `reference_as_fact` | Probes cannot cite reference documents yet; the exception is removed in 4.6 |
 | 2026-10-21 | References reach the model in step 4.3 as background only, before check points exist; the prompts forbid citing them in claims, and step 4.4 adds the verifier check | Retrieval and framing can be tested on their own, and the model never sees references without the rule that they are not patient facts |
 | 2026-10-21 | Reference passages are redacted and markup-neutralised like record text, with an offset map per version | They are model input; the same path keeps tags unforgeable and lets a later citation map back to the exact original text |
 | 2026-10-21 | A run reads the versions in effect once, like the patient view; a citation may only name a version from that snapshot | Every search in a run sees the same library, and a version added mid-run cannot be cited by a draft that never saw it |

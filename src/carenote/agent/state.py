@@ -2,11 +2,11 @@
 
 Two kinds of type live here:
 
-- **Model output** (`Citation`, `Claim`, `CandidateHighlight`, `DraftReview`, `PlanQuestion`,
-  `ReviewPlan`): what the model must return through structured output. Every model forbids extra
+- **Model output** (`Citation`, `Claim`, `CandidateHighlight`, `ReferenceCitation`,
+  `CheckPoint`, `DraftReview`, `PlanQuestion`, `ReviewPlan`): what the model must return through structured output. Every model forbids extra
   keys and bounds its lengths, so a response that does not fit is rejected before anything reads it.
-- **Run state** (`ReviewQuestion`, `ClaimCheck`, `WithheldItem`, `VerificationReport`, `Budget`,
-  `ReviewDecisions`, `ReviewState`): what the graph carries between nodes. Only deterministic code writes these.
+- **Run state** (`ReviewQuestion`, `ClaimCheck`, `CheckPointCheck`, `WithheldItem`,
+  `VerificationReport`, `Budget`, `ReviewDecisions`, `ReviewState`): what the graph carries between nodes. Only deterministic code writes these.
 """
 
 from __future__ import annotations
@@ -26,6 +26,7 @@ MAX_CITATIONS_PER_CLAIM = 5
 MAX_CANDIDATE_HIGHLIGHTS = 10
 MAX_OPEN_QUESTIONS = 10
 MAX_PLAN_QUESTIONS = 6
+MAX_CHECK_POINTS = 8
 
 
 class _ModelOutput(BaseModel):
@@ -66,12 +67,41 @@ class CandidateHighlight(_ModelOutput):
     clinical_entities: list[str] = Field(default_factory=list, max_length=20)
 
 
+class ReferenceCitation(_ModelOutput):
+    """A passage of one reference document version, quoted exactly."""
+
+    document_id: UUID
+    version: int = Field(ge=1)
+    start: int = Field(ge=0)
+    end: int = Field(gt=0)
+    quote: str = Field(min_length=1, max_length=300)
+
+    @model_validator(mode="after")
+    def validate_span(self) -> ReferenceCitation:
+        if self.end <= self.start:
+            raise ValueError("reference citation end must be greater than start")
+        return self
+
+
+class CheckPoint(_ModelOutput):
+    """Something the clinician should verify, raised by a reference passage (design §19).
+
+    It states a check, never a treatment or dose recommendation. It cites exactly one reference
+    passage and may cite record entries that show what the record does or does not say.
+    """
+
+    text: str = Field(min_length=1, max_length=300)
+    reference: ReferenceCitation
+    citations: list[Citation] = Field(default_factory=list, max_length=MAX_CITATIONS_PER_CLAIM)
+
+
 class DraftReview(_ModelOutput):
     claims: list[Claim] = Field(max_length=MAX_CLAIMS)
     open_questions: list[str] = Field(default_factory=list, max_length=MAX_OPEN_QUESTIONS)
     candidate_highlights: list[CandidateHighlight] = Field(
         default_factory=list, max_length=MAX_CANDIDATE_HIGHLIGHTS
     )
+    check_points: list[CheckPoint] = Field(default_factory=list, max_length=MAX_CHECK_POINTS)
 
 
 class PlanQuestion(_ModelOutput):
@@ -108,6 +138,19 @@ class CheckFailure(StrEnum):
     UNSUPPORTED_ENTITIES = "unsupported_entities"
     PATIENT_SOURCE_RISK = "patient_source_risk"
     PATIENT_SOURCE_PHRASING = "patient_source_phrasing"
+    # A claim cites a reference document; claims about the patient must cite the record.
+    REFERENCE_AS_FACT = "reference_as_fact"
+
+
+class CheckPointFailure(StrEnum):
+    """Why a check point failed verification (design §19)."""
+
+    UNKNOWN_REFERENCE = "unknown_reference"
+    REFERENCE_MISMATCH = "reference_mismatch"
+    RECORD_CITATION = "record_citation"
+    CHECK_POINT_PHRASING = "check_point_phrasing"
+    RECOMMENDS_TREATMENT = "recommends_treatment"
+    UNSUPPORTED_ENTITIES = "unsupported_entities"
 
 
 class ClaimCheck(BaseModel):
@@ -122,13 +165,28 @@ class ClaimCheck(BaseModel):
         return not self.failures
 
 
+class CheckPointCheck(BaseModel):
+    check_point_index: int = Field(ge=0)
+    failures: list[CheckPointFailure] = Field(default_factory=list)
+    detail: list[str] = Field(default_factory=list)
+    # The reference citation and record citations mapped to original offsets and exact text.
+    reference: ReferenceCitation | None = None
+    citations: list[Citation] = Field(default_factory=list)
+
+    @property
+    def verified(self) -> bool:
+        return not self.failures
+
+
 class WithheldItem(BaseModel):
     """Draft text removed because it repeats an instruction-like passage; the text is not kept."""
 
-    kind: Literal["open_question", "highlight"]
+    kind: Literal["open_question", "highlight", "check_point"]
     # Position in the draft as the model returned it.
     index: int = Field(ge=0)
+    # The record entry, or for `source == "reference"` the reference document, it repeated.
     entry_id: UUID
+    source: Literal["entry", "reference"] = "entry"
 
 
 class VerificationReport(BaseModel):
@@ -138,14 +196,23 @@ class VerificationReport(BaseModel):
     # Context entries whose text addresses the assistant, and draft text withheld for echoing them.
     instruction_like_entry_ids: list[UUID] = Field(default_factory=list)
     withheld: list[WithheldItem] = Field(default_factory=list)
+    check_points: list[CheckPointCheck] = Field(default_factory=list)
 
     @property
     def unsupported(self) -> list[ClaimCheck]:
         return [check for check in self.checks if not check.verified]
 
     @property
+    def unsupported_check_points(self) -> list[CheckPointCheck]:
+        return [check for check in self.check_points if not check.verified]
+
+    @property
     def passed(self) -> bool:
-        return not self.unsupported and not self.uncovered_conflict_ids
+        return (
+            not self.unsupported
+            and not self.uncovered_conflict_ids
+            and not self.unsupported_check_points
+        )
 
 
 class Budget(BaseModel):

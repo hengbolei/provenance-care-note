@@ -1,5 +1,5 @@
 {
-  "fingerprint": "9d7c4cd560d962234d6877ba3b26e8a520547e9db18873aeccfdbc9303879689",
+  "fingerprint": "96e075437a2ff0c99c8297edfb39dea78dd79c8547c985dead0d2f3daad10ea2",
   "purpose": "agent_draft",
   "schema": "DraftReview",
   "model": "curated-demo (hand-written, not model output)",
@@ -145,6 +145,7 @@
           "blood pressure"
         ]
       }
-    ]
+    ],
+    "check_points": []
   }
 }

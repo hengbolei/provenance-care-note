@@ -58,7 +58,8 @@ def test_probes_exercise_every_verifier_failure_and_supported_claims():
     )
     supported = sum(not probe.expect for case in CASES for probe in case.probes)
 
-    assert set(expected) == set(CheckFailure)
+    # Probes cannot cite reference documents until the knowledge cases arrive (roadmap step 4.6).
+    assert set(expected) == set(CheckFailure) - {CheckFailure.REFERENCE_AS_FACT}
     assert supported >= 15
 
 
