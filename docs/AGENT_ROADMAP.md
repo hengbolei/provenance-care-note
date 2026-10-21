@@ -4,7 +4,7 @@ Status tracker for building the agent described in [AGENT_DESIGN.md](AGENT_DESIG
 design says *what* and *why*; this file says *in what order* and *where we are*. Update it in the
 same PR as the work it describes.
 
-Last updated: 2026-10-20 · Current phase: all planned phases done; next work is under [Later](#later)
+Last updated: 2026-10-21 · Current phase: **Phase 4 — Reference knowledge base**
 
 ## How we work
 
@@ -153,6 +153,38 @@ Status: every key entry reaches the draft payload (100%), and the deterministic 
 pass (detection 100%, false flags 0, framing breaks 0). Injection failures and critical-finding
 recall are model metrics: the agent suite reports them only once live cassettes are recorded.
 
+## Phase 4 — Reference knowledge base · 🚧 in progress
+
+Branch: `feat/agent-knowledge`. Design §19.
+
+Clinic policies, public guidelines and drug labels become a clinic-scoped, versioned knowledge
+base. The record still supports every claim about the patient; reference documents support only
+separate **check points** that say what to verify, never what to prescribe.
+
+- [ ] 4.0 Plan: design §19 and this phase
+- [ ] 4.1 Knowledge documents: `KnowledgeDocument` and immutable `KnowledgeVersion` (kind, title,
+      source, version label, effective date, content, author); retire; service with
+      administrator-only writes and metadata-only audit; in-memory repository and an encrypted
+      PostgreSQL table with forced clinic RLS (`migrations/004`)
+- [ ] 4.2 Knowledge API and administrator panel: create, add a version, retire, list and read;
+      care-team read access; three-language interface
+- [ ] 4.3 Reference retrieval: passages with offsets over current versions of active documents,
+      reusing BM25 and the synonym table; `ReviewTools.search_knowledge`; `retrieve` adds
+      reference evidence per question; references reach the model in `<reference>` tags,
+      redacted and checked for instruction-like text
+- [ ] 4.4 Check points: `ReferenceCitation` and `CheckPoint` in `DraftReview`; prompts
+      (`draft`, `revise`); verifier checks for reference quotes, `reference_as_fact`,
+      `check_point_phrasing` and doses absent from the reference
+- [ ] 4.5 Review panel and commit: check points shown apart from claims with document title and
+      version, accept or reject, written into `agent_review`; audit
+- [ ] 4.6 Evaluation and demo: a `knowledge` case family and pipeline metrics; demo reference
+      documents for the seed clinic; re-recorded demo cassette
+
+**Exit criteria**: no claim cites a reference document (gated); every check point resolves to
+an active document version; retired and superseded versions are never retrieved; reference
+retrieval recall 100% on the knowledge cases; no check-point probe that gives dosing advice
+verifies; injection inside a reference document is flagged.
+
 ## Later
 
 - Local embeddings fused with BM25 (formerly 3.6), when an eval case shows wording that the
@@ -167,6 +199,11 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-21 | Reference documents support only check points; claims about the patient must cite record entries | The record states what happened to this patient; guidance can say what to check but must never become evidence of a patient fact |
+| 2026-10-21 | Check points prompt verification ("check", "confirm", "no ... appears") and never give treatment or dosing advice | Keeps the agent within the §2 non-goals; recommending treatment would make it clinical decision support with a different regulatory standing |
+| 2026-10-21 | Knowledge covers clinic policies, public guidelines and drug labels; licensing of uploaded material is left to the organisation | The feature should accept the material clinics actually use; the system records each document's stated source |
+| 2026-10-21 | Administrators maintain documents per clinic; versions are immutable, every citation records the document version, and only the current version of an active document is retrieved | A committed review must keep pointing at the exact text it relied on, while new reviews use current guidance |
+| 2026-10-21 | Knowledge documents live in their own encrypted, clinic-scoped PostgreSQL table, not in the clinical snapshot | Guidelines are large and change rarely; keeping them out of the snapshot avoids rewriting them on every record write, while retrieval still runs in memory as decided for the record |
 | 2026-10-19 | One `OpenAICompatibleGateway` (provider `compatible`) covers hosted Chat Completions services and local servers, with `CARENOTE_COMPAT_STRUCTURED` choosing `json_schema`, `json_object` or `tools` | Many services speak this API but differ in structured-output support; one adapter with a mode gives many models without a client per vendor, and a local server keeps the redacted record on the machine |
 | 2026-10-19 | The compatible adapter needs no key for `localhost`, `127.0.0.1`, `::1` or `host.docker.internal`, strips `<think>` reasoning and code fences, and accepts a plain-string `error` | Local servers often run without auth; reasoning models and JSON mode wrap their output in ways the schema validation would otherwise reject |
 | 2026-10-19 | Local embeddings (step 3.6) are deferred | BM25 with synonyms meets every retrieval and context gate; an embedding model adds a dependency and offline-CI cost with no measured gain |
