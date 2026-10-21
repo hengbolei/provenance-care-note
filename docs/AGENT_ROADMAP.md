@@ -167,16 +167,18 @@ separate **check points** that say what to verify, never what to prescribe.
       `KnowledgeService` with administrator-only writes, care-team reads, optimistic
       concurrency and clinic-level audit events; in-memory store and encrypted PostgreSQL tables
       with forced clinic RLS and no update or delete policy on versions (`migrations/004`)
+      (`043d501`)
 - [x] 4.2 Knowledge API and administrator panel: `/api/knowledge` endpoints to create, add a
       version, retire, list, read a version and read the audit trail; a "Reference library"
       card where the care team reads documents and versions and administrators add documents
       (typed or loaded from a .txt/.md file), add versions and retire; three-language interface
+      (`5674ca4`)
 - [x] 4.3 Reference retrieval: the BM25 ranker generalised to any passages; `search_references`
       over the versions in effect of active documents; `ReviewTools.search_knowledge` returns
       spans of the redacted version text, from one snapshot of current versions per run;
       `retrieve` keeps up to 3 reference passages per question; the draft and revise requests
       carry up to 12 in `<reference id version kind start>` tags, flagged when instruction-like
-      (`draft_v4`, `revise_v3`); claims still may not cite them
+      (`draft_v4`, `revise_v3`); claims still may not cite them (`fcdfdba`)
 - [x] 4.4 Check points: `ReferenceCitation` and `CheckPoint` (at most 8) in `DraftReview`;
       `verify_check_points` resolves the reference quote against the run's version snapshot
       (`unknown_reference`, `reference_mismatch`), checks record citations (`record_citation`),
@@ -184,7 +186,7 @@ separate **check points** that say what to verify, never what to prescribe.
       medications and doses absent from what is cited (`unsupported_entities`); claims citing a
       reference fail `reference_as_fact`; failed check points go through the revise loop; check
       points repeating a flagged reference or record passage are withheld (`draft_v5`,
-      `revise_v4`)
+      `revise_v4`) (`7a74007`)
 - [x] 4.5 Review panel and commit: a "Points to check" list in the review panel, apart from
       claims, with the reference title, version and quote, failure reasons, and an include box
       (verified points start included; failed ones cannot be); `CheckPointDecision` in the
@@ -192,13 +194,13 @@ separate **check points** that say what to verify, never what to prescribe.
       `agent_review` revision with the document title, version and exact quote; every decision
       is audited (`agent_check_point_accepted` / `_rejected`); the run view names each cited
       reference version. The panel is checked in a browser in 4.6, once the demo has a check
-      point
+      point (`ef6ddf0`)
 - [x] 4.6 Evaluation and demo: a `knowledge` case family (3 cases, 39 in all) with reference
       documents, superseded, future-dated and retired versions, reference-retrieval queries and
       check-point probes; pipeline gates for reference recall and check-point verdict accuracy;
       claim probes now cover `reference_as_fact`; two synthetic demo reference documents and two
       curated check points in the re-recorded demo cassette; review panel checked in a browser,
-      including commit and a 375 px layout
+      including commit and a 375 px layout (`30d5d56`)
 
 **Exit criteria**: no claim cites a reference document (gated); every check point resolves to
 an active document version; retired and superseded versions are never retrieved; reference
