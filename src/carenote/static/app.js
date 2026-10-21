@@ -2,10 +2,12 @@ import {
   ApiError,
   DEMO_CONTEXT,
   addComment,
+  addKnowledgeVersion,
   addTimelineEntry,
   commitAgentRun,
   compareSectionRevisions,
   createHighlight,
+  createKnowledge,
   discardAgentRun,
   getAgentRun,
   getAuditEvents,
@@ -14,13 +16,17 @@ import {
   getHighlightRevisions,
   getHighlightSource,
   getConflictRevisions,
+  getKnowledge,
+  getKnowledgeVersion,
   getPatientDetail,
   getSectionRevisions,
   getSession,
   ingestAI,
+  listKnowledge,
   login,
   logout,
   recordHighlightImpression,
+  retireKnowledge,
   revertSection,
   reviseAgentRun,
   setCommentResolved,
@@ -119,6 +125,28 @@ const elements = {
   recordAudio: document.querySelector("#record-audio"),
   aiFeedback: document.querySelector("#ai-feedback"),
   agentReviewCard: document.querySelector("#agent-review-card"),
+  knowledgeCard: document.querySelector("#knowledge-card"),
+  knowledgeCount: document.querySelector("#knowledge-count"),
+  knowledgeShowRetired: document.querySelector("#knowledge-show-retired"),
+  knowledgeNew: document.querySelector("#knowledge-new"),
+  knowledgeList: document.querySelector("#knowledge-list"),
+  knowledgeFeedback: document.querySelector("#knowledge-feedback"),
+  knowledgeViewer: document.querySelector("#knowledge-viewer"),
+  knowledgeViewerTitle: document.querySelector("#knowledge-viewer-title"),
+  knowledgeViewerMeta: document.querySelector("#knowledge-viewer-meta"),
+  knowledgeVersionSelect: document.querySelector("#knowledge-version-select"),
+  knowledgeContent: document.querySelector("#knowledge-content"),
+  knowledgeForm: document.querySelector("#knowledge-form"),
+  knowledgeFormTitle: document.querySelector("#knowledge-form-title"),
+  knowledgeDocumentFields: document.querySelector("#knowledge-document-fields"),
+  knowledgeKind: document.querySelector("#knowledge-kind"),
+  knowledgeDocTitle: document.querySelector("#knowledge-doc-title"),
+  knowledgeSource: document.querySelector("#knowledge-source"),
+  knowledgeLabel: document.querySelector("#knowledge-label"),
+  knowledgeEffective: document.querySelector("#knowledge-effective"),
+  knowledgeFile: document.querySelector("#knowledge-file"),
+  knowledgeText: document.querySelector("#knowledge-text"),
+  knowledgeCancel: document.querySelector("#knowledge-cancel"),
   agentRunStatus: document.querySelector("#agent-run-status"),
   agentStart: document.querySelector("#agent-start"),
   agentProgress: document.querySelector("#agent-progress"),
@@ -128,6 +156,8 @@ const elements = {
   agentClaimList: document.querySelector("#agent-claim-list"),
   agentQuestions: document.querySelector("#agent-questions"),
   agentQuestionList: document.querySelector("#agent-question-list"),
+  agentCheckPoints: document.querySelector("#agent-check-points"),
+  agentCheckPointList: document.querySelector("#agent-check-point-list"),
   agentHighlights: document.querySelector("#agent-highlights"),
   agentHighlightList: document.querySelector("#agent-highlight-list"),
   agentReviewActions: document.querySelector("#agent-review-actions"),
@@ -158,9 +188,16 @@ let agentRun = null;
 let agentPollTimer = null;
 let agentDecisions = new Map();
 let agentHighlightAccepts = new Set();
+// Check point index -> included; verified check points start included, others cannot be.
+let agentCheckPointAccepts = new Map();
 let currentSession = null;
 let latestDetail = null;
 let latestAuditEvents = [];
+let knowledgeDocuments = [];
+// The document being viewed, and the form's mode: null, { mode: "create" } or
+// { mode: "version", document }.
+let knowledgeViewed = null;
+let knowledgeEditing = null;
 let currentScreenState = "loading";
 let aiDefaultTitle = elements.aiTitle.value;
 
@@ -907,13 +944,16 @@ function agentRunSummary(run) {
   if (report.uncovered_conflict_ids.length) {
     parts.push(t("agent.summaryUncovered", { count: report.uncovered_conflict_ids.length }));
   }
+  const failedPoints = (report.check_points || []).filter((item) => item.failures.length).length;
+  if (failedPoints) parts.push(t("agent.summaryCheckPointsUnsupported", { count: failedPoints }));
   const flagged = report.instruction_like_entry_ids?.length || 0;
   const withheld = report.withheld?.length || 0;
   if (flagged) parts.push(t("agent.summaryInstructionLike", { count: flagged }));
   if (withheld) parts.push(t("agent.summaryWithheld", { count: withheld }));
   return {
     text: parts.join(" · "),
-    warning: unsupported > 0 || report.uncovered_conflict_ids.length > 0 || flagged > 0,
+    warning:
+      unsupported > 0 || report.uncovered_conflict_ids.length > 0 || flagged > 0 || failedPoints > 0,
   };
 }
 
@@ -1047,6 +1087,84 @@ function renderAgentClaims(run, editable) {
   });
 }
 
+function renderAgentCheckPoints(run, editable) {
+  elements.agentCheckPointList.replaceChildren();
+  const points = run.draft.check_points || [];
+  const checks = run.verification?.check_points || [];
+  elements.agentCheckPoints.hidden = points.length === 0;
+  const labels = new Map(
+    (run.references || []).map((item) => [`${item.document_id}:${item.version}`, item]),
+  );
+  points.forEach((point, index) => {
+    const check = checks[index] || { failures: [], citations: [], reference: null };
+    const verified = check.failures.length === 0;
+    const card = createElement("div", `agent-claim ${verified ? "verified" : "unsupported"}`);
+    const body = createElement("div");
+    const meta = createElement("div", "agent-claim-meta");
+    meta.append(
+      createElement(
+        "span",
+        `agent-chip ${verified ? "verified" : "unsupported"}`,
+        verified ? t("agent.verified") : t("agent.unsupported"),
+      ),
+    );
+    const reference = check.reference || point.reference;
+    const label = labels.get(`${reference.document_id}:${reference.version}`);
+    if (label) meta.append(createElement("span", "agent-chip", t(`knowledge.kind.${label.kind}`)));
+    body.append(createElement("p", "agent-claim-text", point.text), meta);
+    if (!verified) {
+      const failures = createElement("ul", "agent-failures");
+      check.failures.forEach((failure) => {
+        failures.append(createElement("li", "", t(`agent.checkPointFailure.${failure}`)));
+      });
+      body.append(failures);
+    }
+    const quote = createElement("blockquote", "agent-reference");
+    quote.append(
+      createElement(
+        "span",
+        "agent-reference-title",
+        label
+          ? t("agent.referenceLabel", { title: label.title, version: label.version, label: label.label })
+          : t("agent.referenceUnknown"),
+      ),
+      document.createTextNode(reference.quote),
+    );
+    body.append(quote);
+    const shown = check.citations.length ? check.citations : point.citations;
+    if (shown.length) {
+      const citations = createElement("div", "agent-citations");
+      shown.forEach((citation, position) => {
+        citations.append(
+          citationButton(
+            citation,
+            t("agent.sourceNumbered", { number: position + 1 }),
+            check.citations.length > 0,
+          ),
+        );
+      });
+      body.append(citations);
+    }
+    if (!agentCheckPointAccepts.has(index)) agentCheckPointAccepts.set(index, verified);
+    const controls = createElement("div", "agent-decision");
+    const include = createElement("label", "agent-checkbox");
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = verified && agentCheckPointAccepts.get(index);
+    checkbox.disabled = !editable || !verified;
+    checkbox.addEventListener("change", () => agentCheckPointAccepts.set(index, checkbox.checked));
+    include.append(
+      checkbox,
+      document.createTextNode(
+        verified ? t("agent.checkPointInclude") : t("agent.checkPointNotVerified"),
+      ),
+    );
+    controls.append(include);
+    card.append(body, controls);
+    elements.agentCheckPointList.append(card);
+  });
+}
+
 function renderAgentHighlights(run, editable) {
   elements.agentHighlightList.replaceChildren();
   const candidates = run.draft.candidate_highlights;
@@ -1144,6 +1262,7 @@ function renderAgentRun(run) {
   elements.agentSummary.textContent = summary.text;
   elements.agentSummary.classList.toggle("warning", summary.warning);
   renderAgentClaims(run, editable);
+  renderAgentCheckPoints(run, editable);
   renderAgentHighlights(run, editable);
   elements.agentQuestions.hidden = run.draft.open_questions.length === 0;
   elements.agentQuestionList.replaceChildren(
@@ -1197,6 +1316,7 @@ async function restoreAgentRun() {
 function resetAgentDecisions() {
   agentDecisions = new Map();
   agentHighlightAccepts = new Set();
+  agentCheckPointAccepts = new Map();
 }
 
 function agentCommitPayload() {
@@ -1220,7 +1340,13 @@ function agentCommitPayload() {
   const highlights = [...agentHighlightAccepts]
     .sort((left, right) => left - right)
     .map((index) => ({ highlight_index: index, action: "accept" }));
-  return { claims, highlights };
+  const checkPoints = [...agentCheckPointAccepts.entries()]
+    .sort((left, right) => left[0] - right[0])
+    .map(([index, accepted]) => ({
+      check_point_index: index,
+      action: accepted ? "accept" : "reject",
+    }));
+  return { claims, highlights, check_points: checkPoints };
 }
 
 function renderAgentReviewSection(sections) {
@@ -1438,6 +1564,8 @@ async function loadPatient() {
     elements.aiIngestCard.hidden = !["staff", "clinician", "admin"].includes(
       DEMO_CONTEXT.actorRole,
     );
+    elements.knowledgeCard.hidden = isPatient;
+    if (!isPatient) loadKnowledge();
     elements.sectionContent.disabled = DEMO_CONTEXT.actorRole !== "clinician";
     elements.saveSection.disabled = DEMO_CONTEXT.actorRole !== "clinician";
     const isEmpty = detail.highlights.length === 0 && detail.entries.length === 0;
@@ -1749,6 +1877,192 @@ function renderLanguageOptions() {
   elements.languageSelect.value = getLanguage();
 }
 
+// Reference library
+
+const isAdmin = () => DEMO_CONTEXT.actorRole === "admin";
+
+async function loadKnowledge() {
+  try {
+    knowledgeDocuments = await listKnowledge(elements.knowledgeShowRetired.checked);
+    renderKnowledgeList();
+  } catch (error) {
+    knowledgeDocuments = [];
+    renderKnowledgeList();
+    showFeedback(elements.knowledgeFeedback, error.message || t("knowledge.loadFailed"), true);
+  }
+}
+
+function renderKnowledgeList() {
+  elements.knowledgeNew.hidden = !isAdmin();
+  elements.knowledgeCount.textContent = t("knowledge.count", { count: knowledgeDocuments.length });
+  elements.knowledgeList.replaceChildren();
+  if (knowledgeDocuments.length === 0) {
+    elements.knowledgeList.append(createElement("p", "helper-text", t("knowledge.empty")));
+    return;
+  }
+  knowledgeDocuments.forEach((doc) => {
+    const retired = doc.status === "retired";
+    const item = createElement("article", `knowledge-item${retired ? " retired" : ""}`);
+    const body = createElement("div");
+    const meta = createElement("div", "agent-claim-meta");
+    meta.append(createElement("span", "agent-chip", t(`knowledge.kind.${doc.kind}`)));
+    if (retired) meta.append(createElement("span", "agent-chip", t("knowledge.status.retired")));
+    body.append(
+      createElement("p", "knowledge-item-title", doc.title),
+      createElement(
+        "p",
+        "knowledge-item-meta",
+        t("knowledge.itemMeta", { version: doc.latest_version, source: doc.source }),
+      ),
+      meta,
+    );
+    const actions = createElement("div", "knowledge-actions");
+    const view = createElement("button", "text-button", t("knowledge.view"));
+    view.type = "button";
+    view.addEventListener("click", () => viewKnowledge(doc.id));
+    actions.append(view);
+    if (isAdmin() && !retired) {
+      const version = createElement("button", "text-button", t("knowledge.newVersion"));
+      version.type = "button";
+      version.addEventListener("click", () => openKnowledgeForm({ mode: "version", doc }));
+      const retire = createElement("button", "text-button", t("knowledge.retire"));
+      retire.type = "button";
+      retire.addEventListener("click", () => retireKnowledgeDocument(doc));
+      actions.append(version, retire);
+    }
+    item.append(body, actions);
+    elements.knowledgeList.append(item);
+  });
+}
+
+async function viewKnowledge(documentId, version) {
+  try {
+    const detail = await getKnowledge(documentId);
+    const chosen = version || detail.current_version || detail.document.latest_version;
+    knowledgeViewed = { detail, version: chosen };
+    renderKnowledgeViewer();
+    const text = await getKnowledgeVersion(documentId, chosen);
+    elements.knowledgeContent.textContent = text.content;
+    elements.knowledgeViewer.hidden = false;
+    showFeedback(elements.knowledgeFeedback, "");
+  } catch (error) {
+    showFeedback(elements.knowledgeFeedback, error.message || t("knowledge.loadFailed"), true);
+  }
+}
+
+function renderKnowledgeViewer() {
+  if (!knowledgeViewed) return;
+  const { detail, version } = knowledgeViewed;
+  elements.knowledgeViewerTitle.textContent = detail.document.title;
+  elements.knowledgeViewerMeta.textContent = [
+    t(`knowledge.kind.${detail.document.kind}`),
+    detail.document.source,
+    detail.current_version
+      ? t("knowledge.currentVersion", { version: detail.current_version })
+      : t("knowledge.noCurrentVersion"),
+  ].join(" · ");
+  elements.knowledgeVersionSelect.replaceChildren(
+    ...[...detail.versions].reverse().map((item) => {
+      const option = createElement(
+        "option",
+        "",
+        t("knowledge.versionOption", {
+          version: item.version,
+          label: item.label,
+          date: formatDate(item.effective_date),
+        }),
+      );
+      option.value = String(item.version);
+      option.selected = item.version === version;
+      return option;
+    }),
+  );
+}
+
+function openKnowledgeForm(editing) {
+  knowledgeEditing = editing;
+  const creating = editing.mode === "create";
+  elements.knowledgeFormTitle.textContent = creating
+    ? t("knowledge.createTitle")
+    : t("knowledge.versionTitle", { title: editing.doc.title });
+  elements.knowledgeDocumentFields.hidden = !creating;
+  elements.knowledgeDocTitle.value = "";
+  elements.knowledgeSource.value = "";
+  elements.knowledgeLabel.value = "";
+  elements.knowledgeEffective.value = new Date().toISOString().slice(0, 10);
+  elements.knowledgeFile.value = "";
+  elements.knowledgeText.value = "";
+  elements.knowledgeForm.hidden = false;
+  showFeedback(elements.knowledgeFeedback, "");
+  (creating ? elements.knowledgeDocTitle : elements.knowledgeLabel).focus();
+}
+
+function closeKnowledgeForm() {
+  knowledgeEditing = null;
+  elements.knowledgeForm.hidden = true;
+}
+
+async function saveKnowledge(event) {
+  event.preventDefault();
+  if (!knowledgeEditing) return;
+  const fields = {
+    version_label: elements.knowledgeLabel.value.trim(),
+    effective_date: elements.knowledgeEffective.value,
+    content: elements.knowledgeText.value,
+  };
+  try {
+    let detail;
+    if (knowledgeEditing.mode === "create") {
+      detail = await createKnowledge({
+        ...fields,
+        kind: elements.knowledgeKind.value,
+        title: elements.knowledgeDocTitle.value.trim(),
+        source: elements.knowledgeSource.value.trim(),
+      });
+    } else {
+      detail = await addKnowledgeVersion(knowledgeEditing.doc.id, {
+        ...fields,
+        expected_version: knowledgeEditing.doc.latest_version,
+      });
+    }
+    closeKnowledgeForm();
+    await loadKnowledge();
+    await viewKnowledge(detail.document.id, detail.document.latest_version);
+    showFeedback(elements.knowledgeFeedback, t("knowledge.saved"));
+  } catch (error) {
+    showFeedback(elements.knowledgeFeedback, error.message || t("knowledge.saveFailed"), true);
+  }
+}
+
+async function retireKnowledgeDocument(doc) {
+  if (!window.confirm(t("knowledge.retireConfirm", { title: doc.title }))) return;
+  try {
+    await retireKnowledge(doc.id, doc.latest_version);
+    if (knowledgeViewed?.detail.document.id === doc.id) {
+      knowledgeViewed = null;
+      elements.knowledgeViewer.hidden = true;
+    }
+    await loadKnowledge();
+    showFeedback(elements.knowledgeFeedback, t("knowledge.retired"));
+  } catch (error) {
+    showFeedback(elements.knowledgeFeedback, error.message || t("knowledge.saveFailed"), true);
+  }
+}
+
+elements.knowledgeShowRetired.addEventListener("change", loadKnowledge);
+elements.knowledgeNew.addEventListener("click", () => openKnowledgeForm({ mode: "create" }));
+elements.knowledgeCancel.addEventListener("click", closeKnowledgeForm);
+elements.knowledgeForm.addEventListener("submit", saveKnowledge);
+elements.knowledgeVersionSelect.addEventListener("change", () => {
+  if (knowledgeViewed) {
+    viewKnowledge(knowledgeViewed.detail.document.id, Number(elements.knowledgeVersionSelect.value));
+  }
+});
+elements.knowledgeFile.addEventListener("change", async () => {
+  const [file] = elements.knowledgeFile.files;
+  if (file) elements.knowledgeText.value = await file.text();
+});
+
 function rerenderForLanguage() {
   elements.currentRole.textContent = currentSession
     ? roleLabel(currentSession.actor.role)
@@ -1775,6 +2089,11 @@ function rerenderForLanguage() {
     renderCommentTargets(detail.entries, detail.sections || []);
     renderPatientActions(detail.patient_actions || []);
     if (DEMO_CONTEXT.actorRole !== "patient") renderAudit(latestAuditEvents);
+    if (!elements.knowledgeCard.hidden) {
+      renderKnowledgeList();
+      renderKnowledgeViewer();
+      if (knowledgeEditing) openKnowledgeForm(knowledgeEditing);
+    }
   } else {
     elements.name.textContent = t("patient.loading");
     elements.sectionVersion.textContent = t("plan.versionUnknown");

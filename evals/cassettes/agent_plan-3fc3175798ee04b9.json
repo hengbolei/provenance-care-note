@@ -12,7 +12,7 @@
     "questions": [
       {
         "question": "Which lisinopril dose is the patient taking now?",
-        "query": "lisinopril dose"
+        "query": "lisinopril dose pharmacy"
       },
       {
         "question": "Has the blood pressure check been completed?",

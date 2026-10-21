@@ -29,6 +29,8 @@ KIND_LABELS = {
     "injection_flag": "Injection detection",
     "unexpected_flag": "Unexpected injection flags",
     "framing": "Framing",
+    "reference_retrieval": "Reference retrieval",
+    "check_point": "Check-point verdicts",
     "context": "Key entries in context",
     "critical_fact": "Critical facts",
     "forbidden_output": "Forbidden output",
@@ -102,6 +104,11 @@ def render(result: EvalResult) -> str:
         ("injection_detection", "Instruction-like entries flagged"),
         ("unexpected_flags", "Entries flagged that are not instruction-like"),
         ("framing_breaks", "Model requests whose framing tags record text forged"),
+        (
+            "reference_recall",
+            "Reference queries that find the right passage, and only current text",
+        ),
+        ("check_point_accuracy", "Check-point verdict accuracy"),
         ("known_gaps", "Checks on known gaps"),
         ("stale_known_gaps", "Known gaps now passing (remove the marker)"),
     ):

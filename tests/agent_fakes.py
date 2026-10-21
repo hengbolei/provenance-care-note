@@ -1,7 +1,7 @@
 """Shared fakes for agent tests."""
 
-from carenote.agent.gateway import ModelResult, Usage
-from carenote.agent.state import ReviewPlan
+from carenote.agent.gateway import DataTag, ModelResult, Usage
+from carenote.agent.state import CheckPoint, ReferenceCitation, ReviewPlan
 
 
 class ScriptedGateway:
@@ -58,6 +58,41 @@ class ScriptedGateway:
 
     def text(self, request):
         raise AssertionError("the review graph only makes structured calls")
+
+
+class CheckPointGateway(ScriptedGateway):
+    """Adds one check point quoting the first reference passage it is shown."""
+
+    def __init__(self, texts, quote=None):
+        super().__init__()
+        self.texts = list(texts)
+        self.quote = quote
+
+    def structured(self, request, schema):
+        result = super().structured(request, schema)
+        if schema is ReviewPlan:
+            return result
+        reference = None
+        for item in request.inputs:
+            if isinstance(item, DataTag) and item.name == "reference" and not item.closing:
+                reference = dict(item.attributes)
+            elif reference is not None and not isinstance(item, DataTag):
+                quote = self.quote or item.text
+                start = reference["start"] + item.text.find(quote)
+                text = self.texts.pop(0) if len(self.texts) > 1 else self.texts[0]
+                point = CheckPoint(
+                    text=text,
+                    reference=ReferenceCitation(
+                        document_id=reference["id"],
+                        version=reference["version"],
+                        start=start,
+                        end=start + len(quote),
+                        quote=quote,
+                    ),
+                )
+                draft = result.output.model_copy(update={"check_points": [point]})
+                return type(result)(output=draft, model=result.model, usage=result.usage)
+        return result
 
 
 def _find(request, quote):

@@ -31,6 +31,9 @@ from carenote.domain.models import (
     Span,
     TimelineEntry,
 )
+from carenote.knowledge.models import KnowledgeDocument, KnowledgeVersion, ReferenceSpan
+from carenote.knowledge.search import search_references
+from carenote.knowledge.service import KnowledgeService
 from carenote.privacy.redaction import PHIRedactionGateway, RedactionResult
 from carenote.services.care_notes import CareNoteService
 
@@ -89,8 +92,10 @@ class ReviewTools:
         patient_id: UUID,
         redactor: PHIRedactionGateway | None = None,
         today: date | None = None,
+        knowledge: KnowledgeService | None = None,
     ) -> None:
         self.service = service
+        self.knowledge = knowledge
         self.actor = actor
         self.patient_id = patient_id
         self.redactor = redactor or PHIRedactionGateway()
@@ -98,7 +103,10 @@ class ReviewTools:
         self.calls: list[ToolCall] = []
         self.proposed: list[CandidateHighlight] = []
         self.redactions: dict[UUID, RedactionResult] = {}
+        # Redacted reference versions, keyed by (document, version).
+        self.reference_redactions: dict[tuple[UUID, int], RedactionResult] = {}
         self._view: PatientDetailResponse | None = None
+        self._references: list[tuple[KnowledgeDocument, KnowledgeVersion]] | None = None
 
     # Reads
 
@@ -174,6 +182,56 @@ class ReviewTools:
         self._record("search_entries", result_count=len(spans))
         return spans
 
+    def search_knowledge(self, query: str, k: int = 3) -> list[ReferenceSpan]:
+        """Passages of the reference versions in effect, as spans of their redacted text.
+
+        Read as the principal clinician; with no knowledge base configured this finds nothing.
+        """
+        spans: list[ReferenceSpan] = []
+        for hit in search_references(self._current_references(), query, k):
+            version = self.reference_version(hit.document_id, hit.version)
+            redaction = self.reference_redaction(version)
+            start, end = redaction.to_redacted(hit.start, hit.end, len(version.content))
+            spans.append(
+                hit.model_copy(
+                    update={"start": start, "end": end, "text": redaction.text[start:end]}
+                )
+            )
+        self._record("search_knowledge", result_count=len(spans))
+        return spans
+
+    def reference_version(self, document_id: UUID, version: int) -> KnowledgeVersion:
+        """A version this run may cite: one of the versions in effect when the run read them."""
+        for document, item in self._current_references():
+            if document.id == document_id and item.version == version:
+                return item
+        raise LookupError("reference version is not in effect for this run")
+
+    def reference_texts(self) -> dict[tuple[UUID, int], tuple[str, RedactionResult]]:
+        """Original and redacted text of every reference version this run may cite."""
+        return {
+            (document.id, version.version): (version.content, self.reference_redaction(version))
+            for document, version in self._current_references()
+        }
+
+    def reference_label(self, document_id: UUID, version: int) -> str:
+        """How a committed review names a reference version, e.g. 'Lisinopril label, v2 (2026)'."""
+        for document, item in self._current_references():
+            if document.id == document_id and item.version == version:
+                return f"{document.title}, v{item.version} ({item.label})"
+        raise LookupError("reference version is not in effect for this run")
+
+    def reference_document_ids(self) -> set[UUID]:
+        return {document.id for document, _ in self._current_references()}
+
+    def reference_redaction(self, version: KnowledgeVersion) -> RedactionResult:
+        key = (version.document_id, version.version)
+        if key not in self.reference_redactions:
+            self.reference_redactions[key] = self.redactor.redact(
+                version.content, self.known_names()
+            )
+        return self.reference_redactions[key]
+
     def get_source_evidence(self, entry_id: UUID) -> SourceExcerpt:
         """The original message or transcript excerpt behind an AI-scribed entry."""
         evidence = self.service.get_source_evidence(self.actor.principal, self.patient_id, entry_id)
@@ -233,6 +291,16 @@ class ReviewTools:
         if self._view is None:
             self._view = self.service.get_patient_view(self.actor.principal, self.patient_id)
         return self._view
+
+    def _current_references(self) -> list[tuple[KnowledgeDocument, KnowledgeVersion]]:
+        # One snapshot per run, like the patient view, so every search sees the same versions.
+        if self._references is None:
+            self._references = (
+                self.knowledge.current_versions(self.actor.principal, self.today)
+                if self.knowledge is not None
+                else []
+            )
+        return self._references
 
     def _entry(self, entry_id: UUID) -> TimelineEntry:
         entry = self.context_entries().get(entry_id)

@@ -26,6 +26,8 @@ def test_pipeline_suite_passes_its_gate_on_the_committed_cases(result):
     assert metrics["conflict_recall"] == 1.0
     assert metrics["verifier_accuracy"] == 1.0
     assert metrics["retrieval_recall"] == 1.0
+    assert metrics["reference_recall"] == 1.0
+    assert metrics["check_point_accuracy"] == 1.0
     assert metrics["payload_leaks"] == 0
     assert metrics["stale_known_gaps"] == 0
     assert metrics["known_gaps"] > 0
@@ -59,7 +61,7 @@ def test_agent_suite_reports_not_recorded_instead_of_scoring(result):
     assert metrics["recorded"] == 0
     assert metrics["citation_validity"] is None
     assert result.agent == []
-    assert "Not recorded: 0 of 36" in render(result)
+    assert "Not recorded: 0 of 39" in render(result)
 
 
 def test_committed_report_matches_the_code(result):
@@ -199,12 +201,34 @@ def test_a_retrieval_query_that_misses_its_entry_fails_the_gate():
     assert any("retrieval_recall" in problem for problem in result.gate())
 
 
+def test_a_check_probe_with_the_wrong_verdict_fails_the_gate():
+    case = next(case for case in CASES if case.id == "knowledge-01-apixaban-criteria")
+    probe = case.check_probes[0].model_copy(update={"expect": ["recommends_treatment"]})
+    wrong = case.model_copy(update={"check_probes": [probe]})
+
+    result = evaluate([wrong])
+
+    assert result.pipeline_metrics["check_point_accuracy"] == 0.0
+    assert any("check_point_accuracy" in problem for problem in result.gate())
+
+
+def test_the_knowledge_run_shows_current_references_only():
+    run = evaluate([case for case in CASES if case.id == "knowledge-02-retired-and-future"]).runs[
+        "knowledge-02-retired-and-future"
+    ]
+
+    [draft] = run.draft_requests
+    assert "Check the INR within one week" in draft.input_text
+    assert "Retired INR rule" not in draft.input_text
+    assert "Future INR rule" not in draft.input_text
+
+
 def test_cli_check_exit_code_follows_the_gate(tmp_path, capsys):
     report = tmp_path / "REPORT.md"
 
     assert main(["--check", "--report", str(report)]) == 0
     assert "Gate: **pass**" in report.read_text(encoding="utf-8")
-    assert "recorded 0 of 36" in capsys.readouterr().out
+    assert "recorded 0 of 39" in capsys.readouterr().out
 
 
 def test_every_family_contributes_pipeline_checks(result):

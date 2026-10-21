@@ -30,7 +30,7 @@ from carenote.agent.tracing import configure_tracing
 from carenote.core.config import settings
 from carenote.core.identity import AuthenticationError, session_service
 from carenote.core.security import clinical_cipher
-from carenote.data.seed import DEMO_CLINIC_ID, seed_demo_data
+from carenote.data.seed import DEMO_CLINIC_ID, seed_demo_data, seed_demo_knowledge
 from carenote.domain.models import (
     Actor,
     AIIngestRequest,
@@ -63,6 +63,16 @@ from carenote.domain.models import (
     TimelineEntryCreateRequest,
     TranscriptionResponse,
 )
+from carenote.knowledge.models import (
+    KnowledgeDocument,
+    KnowledgeDocumentCreate,
+    KnowledgeDocumentDetail,
+    KnowledgeRetire,
+    KnowledgeVersion,
+    KnowledgeVersionCreate,
+)
+from carenote.knowledge.service import KnowledgeService
+from carenote.knowledge.store import InMemoryKnowledgeStore, PostgresKnowledgeStore
 from carenote.repositories.memory import InMemoryCareNoteRepository
 from carenote.repositories.postgres import PostgresCareNoteRepository
 from carenote.services.ai import ExternalModelError, ModelNotConfiguredError
@@ -82,6 +92,13 @@ repository = (
 seed_demo_data(repository)
 service = CareNoteService(repository)
 configure_tracing()
+knowledge = KnowledgeService(
+    PostgresKnowledgeStore(settings.database_url, DEMO_CLINIC_ID, clinical_cipher)
+    if settings.database_url
+    else InMemoryKnowledgeStore(),
+    repository,
+)
+seed_demo_knowledge(knowledge.store)
 # With PostgreSQL, agent runs are checkpointed (encrypted) and registered there, so they survive a
 # restart; without it they live in memory like the rest of the development store.
 agent_runs = AgentRunService(
@@ -97,6 +114,7 @@ agent_runs = AgentRunService(
     store=PostgresRunStore(settings.database_url, DEMO_CLINIC_ID)
     if settings.database_url
     else None,
+    knowledge=knowledge,
 )
 
 
@@ -600,4 +618,80 @@ def discard_agent_run(run_id: UUID, actor: ActorDependency) -> AgentRunView:
     try:
         return agent_runs.discard(actor, run_id)
     except AGENT_RUN_ERRORS as exc:
+        raise translate_service_error(exc) from exc
+
+
+# Reference knowledge base (design §19): administrators write, the care team reads.
+
+KNOWLEDGE_ERRORS = (PermissionError, LookupError, ConcurrentEditError, ValueError)
+
+
+@router.get("/knowledge", response_model=list[KnowledgeDocument])
+def list_knowledge(
+    actor: ActorDependency, include_retired: bool = False
+) -> list[KnowledgeDocument]:
+    try:
+        return knowledge.list_documents(actor, include_retired)
+    except KNOWLEDGE_ERRORS as exc:
+        raise translate_service_error(exc) from exc
+
+
+@router.post("/knowledge", response_model=KnowledgeDocumentDetail, status_code=201)
+def create_knowledge(
+    request: KnowledgeDocumentCreate, actor: ActorDependency
+) -> KnowledgeDocumentDetail:
+    try:
+        document, _ = knowledge.create_document(actor, request)
+        return knowledge.document_detail(actor, document.id)
+    except KNOWLEDGE_ERRORS as exc:
+        raise translate_service_error(exc) from exc
+
+
+@router.get("/knowledge/audit", response_model=list[AuditEvent])
+def knowledge_audit(actor: ActorDependency) -> list[AuditEvent]:
+    try:
+        return knowledge.list_audit_events(actor)
+    except KNOWLEDGE_ERRORS as exc:
+        raise translate_service_error(exc) from exc
+
+
+@router.get("/knowledge/{document_id}", response_model=KnowledgeDocumentDetail)
+def get_knowledge(document_id: UUID, actor: ActorDependency) -> KnowledgeDocumentDetail:
+    try:
+        return knowledge.document_detail(actor, document_id)
+    except KNOWLEDGE_ERRORS as exc:
+        raise translate_service_error(exc) from exc
+
+
+@router.get("/knowledge/{document_id}/versions/{version}", response_model=KnowledgeVersion)
+def get_knowledge_version(
+    document_id: UUID, version: int, actor: ActorDependency
+) -> KnowledgeVersion:
+    try:
+        return knowledge.get_version(actor, document_id, version)
+    except KNOWLEDGE_ERRORS as exc:
+        raise translate_service_error(exc) from exc
+
+
+@router.post(
+    "/knowledge/{document_id}/versions", response_model=KnowledgeDocumentDetail, status_code=201
+)
+def add_knowledge_version(
+    document_id: UUID, request: KnowledgeVersionCreate, actor: ActorDependency
+) -> KnowledgeDocumentDetail:
+    try:
+        knowledge.add_version(actor, document_id, request)
+        return knowledge.document_detail(actor, document_id)
+    except KNOWLEDGE_ERRORS as exc:
+        raise translate_service_error(exc) from exc
+
+
+@router.post("/knowledge/{document_id}/retire", response_model=KnowledgeDocumentDetail)
+def retire_knowledge(
+    document_id: UUID, request: KnowledgeRetire, actor: ActorDependency
+) -> KnowledgeDocumentDetail:
+    try:
+        knowledge.retire_document(actor, document_id, request)
+        return knowledge.document_detail(actor, document_id)
+    except KNOWLEDGE_ERRORS as exc:
         raise translate_service_error(exc) from exc

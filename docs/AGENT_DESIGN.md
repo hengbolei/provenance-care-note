@@ -338,6 +338,7 @@ All endpoints require a clinician session in the patient's clinic.
 | 1 | Graph with `load_context → draft → verify → human_review → commit`, structured output, deterministic verifier, recorded gateway, review panel, Docker Compose, public demo | Demo link works offline; CI green; README GIF |
 | 2 | Eval suite (≥ 30 cases), CI eval gate, tracing, budgets | Metrics table in README; trace view in demo |
 | 3 | Hybrid retrieval with pgvector, conflict tool, injection defences and cases, revise loop, second provider | Injection resistance 0 failures; recall ≥ 90% on long timelines |
+| 4 | Reference knowledge base (§19): clinic-scoped, versioned documents; reference retrieval; check points that cite a document version beside the record-based claims | Claims never cite references; every check point resolves to an active document version; no check point gives treatment or dosing advice |
 | Later | Expose tools as an MCP server; streaming token output; per-claim LLM-judge flag in UI | — |
 
 ## 18. Risks and open questions
@@ -352,3 +353,56 @@ All endpoints require a clinician session in the patient's clinic.
 - **Open question:** should the `agent_review` section be shown to patients after commit, or stay
   internal until a clinician explicitly publishes guidance through the existing patient-facing
   flow? Default: internal.
+
+## 19. Reference knowledge base
+
+Added after the first three phases. The record says what happened to this patient; a knowledge
+base of clinic policies, public guidelines and drug labels says what the care team usually checks
+in such a situation. The agent uses it to point out **what needs checking**, never to recommend a
+treatment or a dose: the non-goals in §2 still hold.
+
+**Two kinds of evidence, never mixed**
+
+| | Record entries | Reference documents |
+| --- | --- | --- |
+| Supports | Claims about this patient | Check points |
+| Cited as | `Citation` (entry, offsets, quote) | `ReferenceCitation` (document, version, offsets, quote) |
+| Trust | Untrusted record content | Curated, but still untrusted model input |
+
+- A **claim** must cite record entries only. A claim citing a reference document fails
+  verification (`reference_as_fact`).
+- A **check point** states something to verify, for example "Apixaban dose reduction depends on
+  age, weight and creatinine; no assessment of these appears in the record." It cites one
+  reference passage and may cite record entries as well. It must read as a check (cues such as
+  "check", "confirm", "verify", "review", "no ... appears") and may not state a dose that its
+  reference quote does not contain; otherwise it fails (`check_point_phrasing`,
+  `unsupported_entities`).
+
+**Documents**
+
+- Kinds: `clinic_policy`, `guideline`, `drug_label`. Each document has a title, source, kind and
+  a list of immutable versions; a version has a label, an effective date, plain text or Markdown
+  content and its author.
+- Administrators of the clinic create documents, add versions and retire documents. Every write
+  is audited with metadata only. Licensing of uploaded material is the organisation's
+  responsibility; the system records the source the administrator gives.
+- Only the current version of an active document is retrieved. Earlier versions and retired
+  documents stay readable, so a committed review keeps resolving to the exact version it cited.
+- Storage is clinic-scoped like the record: in memory for development, and an encrypted
+  per-clinic PostgreSQL table under forced row-level security in production.
+
+**Retrieval and drafting**
+
+- Versions are split into passages with character offsets; retrieval reuses the BM25 retriever
+  and the synonym table.
+- `retrieve` searches the record and the knowledge base for every planned question. Reference
+  passages reach the draft inside `<reference id=... version=... kind=...>` tags, redacted and
+  checked for instruction-like text like any other input.
+- `DraftReview` gains `check_points`. The clinician accepts or rejects each one; accepted check
+  points are written into the `agent_review` section with the document title and version.
+
+**Evaluation**
+
+A `knowledge` case family covers a reference cited as a patient fact, a retired or superseded
+version that must not be retrieved, an injection inside a reference document, a check point that
+turns into dosing advice, and retrieval of the right reference passage for each question.

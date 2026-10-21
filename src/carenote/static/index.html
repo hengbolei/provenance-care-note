@@ -173,6 +173,11 @@
                   <h4 class="agent-subheading" data-i18n="agent.openQuestions">Open questions</h4>
                   <ul id="agent-question-list" class="agent-question-list"></ul>
                 </div>
+                <div id="agent-check-points" hidden>
+                  <h4 class="agent-subheading" data-i18n="agent.checkPoints">Points to check</h4>
+                  <p class="helper-text" data-i18n="agent.checkPointsHelper">From the reference library. Each says what to verify for this patient, never what to prescribe.</p>
+                  <div id="agent-check-point-list" class="agent-claim-list"></div>
+                </div>
                 <div id="agent-highlights" hidden>
                   <h4 class="agent-subheading" data-i18n="agent.candidateHighlights">Candidate highlights</h4>
                   <div id="agent-highlight-list" class="agent-claim-list"></div>
@@ -328,6 +333,62 @@
                 <button id="ai-ingest" class="primary-button" type="button" data-i18n="ai.create">Create AI summary</button>
               </div>
               <p id="ai-feedback" class="form-feedback" role="status"></p>
+            </article>
+            <article id="knowledge-card" class="workspace-card knowledge-card" aria-labelledby="knowledge-title" hidden>
+              <div class="workspace-card-heading">
+                <div>
+                  <p class="eyebrow" data-i18n="knowledge.eyebrow">REFERENCE LIBRARY</p>
+                  <h3 id="knowledge-title" data-i18n="knowledge.title">Reference documents</h3>
+                </div>
+                <span id="knowledge-count" class="version-label"></span>
+              </div>
+              <p class="helper-text" data-i18n="knowledge.helper">Clinic policies, guidelines and drug labels. The review agent may cite them only as points to check, never as evidence about a patient.</p>
+              <div class="knowledge-toolbar">
+                <label class="agent-checkbox"><input id="knowledge-show-retired" type="checkbox" /> <span data-i18n="knowledge.showRetired">Show retired documents</span></label>
+                <button id="knowledge-new" class="secondary-button" type="button" data-i18n="knowledge.new" hidden>Add document</button>
+              </div>
+              <div id="knowledge-list" class="knowledge-list" aria-label="Reference documents" data-i18n-aria-label="knowledge.list"></div>
+              <p id="knowledge-feedback" class="form-feedback" role="status"></p>
+              <section id="knowledge-viewer" class="knowledge-viewer" aria-labelledby="knowledge-viewer-title" hidden>
+                <h4 id="knowledge-viewer-title" class="agent-subheading"></h4>
+                <p id="knowledge-viewer-meta" class="helper-text"></p>
+                <label class="field-label" for="knowledge-version-select" data-i18n="knowledge.version">Version</label>
+                <select id="knowledge-version-select"></select>
+                <pre id="knowledge-content" class="knowledge-content"></pre>
+              </section>
+              <form id="knowledge-form" class="knowledge-form" hidden>
+                <h4 id="knowledge-form-title" class="agent-subheading"></h4>
+                <div id="knowledge-document-fields">
+                  <label class="field-label" for="knowledge-kind" data-i18n="knowledge.kind">Kind</label>
+                  <select id="knowledge-kind">
+                    <option value="clinic_policy" data-i18n="knowledge.kind.clinic_policy">Clinic policy</option>
+                    <option value="guideline" data-i18n="knowledge.kind.guideline">Guideline</option>
+                    <option value="drug_label" data-i18n="knowledge.kind.drug_label">Drug label</option>
+                  </select>
+                  <label class="field-label" for="knowledge-doc-title" data-i18n="knowledge.docTitle">Title</label>
+                  <input id="knowledge-doc-title" maxlength="200" />
+                  <label class="field-label" for="knowledge-source" data-i18n="knowledge.source">Source</label>
+                  <input id="knowledge-source" maxlength="500" placeholder="Publisher, edition or URL" data-i18n-placeholder="knowledge.sourcePlaceholder" />
+                </div>
+                <div class="knowledge-form-row">
+                  <div>
+                    <label class="field-label" for="knowledge-label" data-i18n="knowledge.versionLabel">Version label</label>
+                    <input id="knowledge-label" maxlength="60" placeholder="2026 edition" data-i18n-placeholder="knowledge.versionLabelPlaceholder" />
+                  </div>
+                  <div>
+                    <label class="field-label" for="knowledge-effective" data-i18n="knowledge.effectiveDate">Effective from</label>
+                    <input id="knowledge-effective" type="date" />
+                  </div>
+                </div>
+                <label class="field-label" for="knowledge-file" data-i18n="knowledge.file">Load text from a file (.txt or .md)</label>
+                <input id="knowledge-file" type="file" accept=".txt,.md,text/plain,text/markdown" />
+                <label class="field-label" for="knowledge-text" data-i18n="knowledge.content">Content</label>
+                <textarea id="knowledge-text" rows="8" maxlength="500000"></textarea>
+                <div class="form-actions">
+                  <button id="knowledge-cancel" class="secondary-button" type="button" data-i18n="knowledge.cancel">Cancel</button>
+                  <button id="knowledge-save" class="primary-button" type="submit" data-i18n="knowledge.save">Save</button>
+                </div>
+              </form>
             </article>
             <article class="workspace-card audit-card">
               <div class="workspace-card-heading">

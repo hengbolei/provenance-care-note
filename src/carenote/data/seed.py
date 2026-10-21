@@ -400,3 +400,73 @@ def seed_demo_data(repository: InMemoryCareNoteRepository) -> None:
                 operation="seed",
             ),
         )
+
+
+# Reference library for the demo clinic (design §19). Synthetic text written for the demo, not
+# copied from any real label or guideline. Fixed IDs keep the demo cassette's requests stable.
+DEMO_LISINOPRIL_LABEL_ID = UUID("80000000-0000-4000-8000-000000000001")
+DEMO_BP_POLICY_ID = UUID("80000000-0000-4000-8000-000000000002")
+DEMO_KNOWLEDGE = (
+    (
+        DEMO_LISINOPRIL_LABEL_ID,
+        "drug_label",
+        "Lisinopril tablets (synthetic label)",
+        "Synthetic demonstration label; not a real product label",
+        "2025 synthetic edition",
+        (
+            "Lisinopril tablets (synthetic label for demonstration).\n"
+            "Symptomatic hypotension may occur after the first dose or after a dose increase, "
+            "especially in volume-depleted patients.\n"
+            "Check blood pressure and kidney function after starting treatment or changing the "
+            "dose.\n"
+            "Patients who become dizzy or light-headed should have their blood pressure measured "
+            "before the next dose."
+        ),
+    ),
+    (
+        DEMO_BP_POLICY_ID,
+        "clinic_policy",
+        "Follow-up after antihypertensive dose changes",
+        "Synthetic demonstration clinic policy",
+        "v1",
+        (
+            "Follow-up after an antihypertensive dose change (synthetic clinic policy).\n"
+            "Record a blood pressure check within 48 hours of any antihypertensive dose change.\n"
+            "Confirm the current dose with the patient and the pharmacy when records disagree."
+        ),
+    ),
+)
+
+
+def seed_demo_knowledge(store, clinic_id: UUID = DEMO_CLINIC_ID) -> None:
+    """Add the demo reference documents to an empty knowledge store; leave a used one alone."""
+    from carenote.knowledge.models import KnowledgeDocument, KnowledgeVersion
+
+    if store.list_documents(clinic_id):
+        return
+    created = _timestamp("2025-01-01T09:00:00+00:00")
+    for document_id, kind, title, source, label, content in DEMO_KNOWLEDGE:
+        store.save_document(
+            KnowledgeDocument(
+                id=document_id,
+                clinic_id=clinic_id,
+                kind=kind,
+                title=title,
+                source=source,
+                created_by=DEMO_ADMIN_ID,
+                created_at=created,
+                updated_at=created,
+            )
+        )
+        store.add_version(
+            KnowledgeVersion(
+                document_id=document_id,
+                clinic_id=clinic_id,
+                version=1,
+                label=label,
+                effective_date=date(2025, 1, 1),
+                content=content,
+                created_by=DEMO_ADMIN_ID,
+                created_at=created,
+            )
+        )

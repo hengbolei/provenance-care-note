@@ -1,5 +1,5 @@
 {
-  "fingerprint": "178bc52e8c2e77daab7bb8f0eb947389a1ff6a4510742379baaaa2f0464b008c",
+  "fingerprint": "458b964407a5c111cecf0524585adab7d33facec3d4c66c74d4e62c3b3d71555",
   "purpose": "agent_draft",
   "schema": "DraftReview",
   "model": "curated-demo (hand-written, not model output)",
@@ -143,6 +143,50 @@
         "suggested_action": "Book the blood pressure check and record the result.",
         "clinical_entities": [
           "blood pressure"
+        ]
+      }
+    ],
+    "check_points": [
+      {
+        "text": "Check blood pressure and kidney function after the lisinopril dose change; no kidney function result appears in the record.",
+        "reference": {
+          "document_id": "80000000-0000-4000-8000-000000000001",
+          "version": 1,
+          "start": 177,
+          "end": 264,
+          "quote": "Check blood pressure and kidney function after starting treatment or changing the dose."
+        },
+        "citations": [
+          {
+            "entry_id": "50000000-0000-4000-8000-000000000003",
+            "start": 36,
+            "end": 75,
+            "quote": "started lisinopril 10 mg seven days ago"
+          }
+        ]
+      },
+      {
+        "text": "Confirm the current lisinopril dose with the patient and the pharmacy, as the records disagree.",
+        "reference": {
+          "document_id": "80000000-0000-4000-8000-000000000002",
+          "version": 1,
+          "start": 158,
+          "end": 239,
+          "quote": "Confirm the current dose with the patient and the pharmacy when records disagree."
+        },
+        "citations": [
+          {
+            "entry_id": "50000000-0000-4000-8000-000000000003",
+            "start": 36,
+            "end": 75,
+            "quote": "started lisinopril 10 mg seven days ago"
+          },
+          {
+            "entry_id": "50000000-0000-4000-8000-000000000004",
+            "start": 38,
+            "end": 67,
+            "quote": "lisinopril 20 mg morning dose"
+          }
         ]
       }
     ]

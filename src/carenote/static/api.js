@@ -244,3 +244,33 @@ export function commitAgentRun(runId, decisions, context = DEMO_CONTEXT) {
 export function discardAgentRun(runId, context = DEMO_CONTEXT) {
   return request(`/api/agent-runs/${runId}/discard`, { method: "POST" }, context);
 }
+
+export function listKnowledge(includeRetired = false) {
+  return request(`/api/knowledge?include_retired=${includeRetired}`);
+}
+
+export function getKnowledge(documentId) {
+  return request(`/api/knowledge/${documentId}`);
+}
+
+export function getKnowledgeVersion(documentId, version) {
+  return request(`/api/knowledge/${documentId}/versions/${version}`);
+}
+
+export function createKnowledge(payload) {
+  return request("/api/knowledge", { method: "POST", body: JSON.stringify(payload) });
+}
+
+export function addKnowledgeVersion(documentId, payload) {
+  return request(`/api/knowledge/${documentId}/versions`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function retireKnowledge(documentId, expectedVersion) {
+  return request(`/api/knowledge/${documentId}/retire`, {
+    method: "POST",
+    body: JSON.stringify({ expected_version: expectedVersion }),
+  });
+}
