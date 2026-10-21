@@ -134,3 +134,14 @@ class KnowledgeDocumentDetail(BaseModel):
     versions: list[KnowledgeVersionSummary]
     # The version retrieval uses today, or None when no version is in effect or it is retired.
     current_version: int | None = None
+
+
+class ReferenceSpan(BaseModel):
+    """A passage of one document version. Offsets point into that version's content."""
+
+    document_id: UUID
+    version: int = Field(ge=1)
+    kind: KnowledgeKind
+    start: int = Field(ge=0)
+    end: int = Field(gt=0)
+    text: str

@@ -19,6 +19,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from carenote.domain.models import Actor, AgentActor, Conflict, EntryRef, RiskLevel, Span
+from carenote.knowledge.models import ReferenceSpan
 
 MAX_CLAIMS = 20
 MAX_CITATIONS_PER_CLAIM = 5
@@ -264,6 +265,8 @@ class ReviewState(TypedDict):
     # Questions the run retrieved evidence for, and the redacted spans found for each question.
     questions: list[ReviewQuestion]
     evidence: dict[str, list[Span]]
+    # Reference passages (redacted) found for each question; background, never patient evidence.
+    references: dict[str, list[ReferenceSpan]]
     draft: DraftReview | None
     verification: VerificationReport | None
     # Verification of the model's draft before any automatic revision, for measuring revision.

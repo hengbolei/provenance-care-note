@@ -91,13 +91,13 @@ repository = (
 )
 seed_demo_data(repository)
 service = CareNoteService(repository)
+configure_tracing()
 knowledge = KnowledgeService(
     PostgresKnowledgeStore(settings.database_url, DEMO_CLINIC_ID, clinical_cipher)
     if settings.database_url
     else InMemoryKnowledgeStore(),
     repository,
 )
-configure_tracing()
 # With PostgreSQL, agent runs are checkpointed (encrypted) and registered there, so they survive a
 # restart; without it they live in memory like the rest of the development store.
 agent_runs = AgentRunService(
@@ -113,6 +113,7 @@ agent_runs = AgentRunService(
     store=PostgresRunStore(settings.database_url, DEMO_CLINIC_ID)
     if settings.database_url
     else None,
+    knowledge=knowledge,
 )
 
 

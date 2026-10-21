@@ -171,10 +171,12 @@ separate **check points** that say what to verify, never what to prescribe.
       version, retire, list, read a version and read the audit trail; a "Reference library"
       card where the care team reads documents and versions and administrators add documents
       (typed or loaded from a .txt/.md file), add versions and retire; three-language interface
-- [ ] 4.3 Reference retrieval: passages with offsets over current versions of active documents,
-      reusing BM25 and the synonym table; `ReviewTools.search_knowledge`; `retrieve` adds
-      reference evidence per question; references reach the model in `<reference>` tags,
-      redacted and checked for instruction-like text
+- [x] 4.3 Reference retrieval: the BM25 ranker generalised to any passages; `search_references`
+      over the versions in effect of active documents; `ReviewTools.search_knowledge` returns
+      spans of the redacted version text, from one snapshot of current versions per run;
+      `retrieve` keeps up to 3 reference passages per question; the draft and revise requests
+      carry up to 12 in `<reference id version kind start>` tags, flagged when instruction-like
+      (`draft_v4`, `revise_v3`); claims still may not cite them
 - [ ] 4.4 Check points: `ReferenceCitation` and `CheckPoint` in `DraftReview`; prompts
       (`draft`, `revise`); verifier checks for reference quotes, `reference_as_fact`,
       `check_point_phrasing` and doses absent from the reference
@@ -202,6 +204,9 @@ Departures from or refinements of the design, newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-10-21 | References reach the model in step 4.3 as background only, before check points exist; the prompts forbid citing them in claims, and step 4.4 adds the verifier check | Retrieval and framing can be tested on their own, and the model never sees references without the rule that they are not patient facts |
+| 2026-10-21 | Reference passages are redacted and markup-neutralised like record text, with an offset map per version | They are model input; the same path keeps tags unforgeable and lets a later citation map back to the exact original text |
+| 2026-10-21 | A run reads the versions in effect once, like the patient view; a citation may only name a version from that snapshot | Every search in a run sees the same library, and a version added mid-run cannot be cited by a draft that never saw it |
 | 2026-10-21 | The reference library is a card in the existing care-team workspace, read-only for staff and clinicians and editable for administrators; listings return version metadata, and text is fetched one version at a time | No separate admin app to maintain; large documents are not sent until someone opens them |
 | 2026-10-21 | `AuditEvent.patient_id` may be `None` for clinic-level resources; knowledge writes use it and are listed by `list_clinic_audit_events` | Knowledge documents belong to the clinic, not a patient, yet their writes belong in the same hash-chained trail; patient audit views are unchanged |
 | 2026-10-21 | The current version of a document is the newest one whose effective date has arrived; future-dated versions wait, retired documents are excluded | An administrator can load next year's guideline in advance without it changing today's reviews |

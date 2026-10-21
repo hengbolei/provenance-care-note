@@ -70,16 +70,22 @@ from carenote.domain.models import (
     Role,
     Span,
 )
+from carenote.knowledge.models import KnowledgeKind, ReferenceSpan
+from carenote.knowledge.service import KnowledgeService
+from carenote.privacy.redaction import RedactionResult
 from carenote.services.care_notes import CareNoteService
 
-PROMPT_VERSION = "draft_v3"
+PROMPT_VERSION = "draft_v4"
 PLAN_PROMPT_VERSION = "plan_v2"
-REVISE_PROMPT_VERSION = "revise_v2"
+REVISE_PROMPT_VERSION = "revise_v3"
 MAX_CONTEXT_ENTRIES = 40
 # Hits kept per question, and the share of the context window older retrieved entries may take.
 RETRIEVE_K = 5
 MAX_RETRIEVED_SHARE = 0.5
 MAX_CONFLICT_QUESTIONS = 6
+# Reference passages kept per question, and in all, for one draft.
+REFERENCE_K = 3
+MAX_REFERENCES = 12
 
 # Asked on every run, so retrieval works even when the model asks nothing useful.
 STANDING_QUESTIONS = (
@@ -121,7 +127,9 @@ CHECKPOINT_TYPES = (
     EntryRef,
     EntryType,
     HighlightDecision,
+    KnowledgeKind,
     QuestionSource,
+    ReferenceSpan,
     ReviewDecisions,
     ReviewQuestion,
     RiskLevel,
@@ -153,11 +161,19 @@ class GraphDeps:
     # Tools cache per run; rebuilt from the service after a restart, since they hold no state that
     # cannot be recomputed (the patient-view snapshot and per-entry redactions).
     tools: dict[UUID, ReviewTools] = field(default_factory=dict)
+    # Reference knowledge base; without one, retrieval finds record evidence only.
+    knowledge: KnowledgeService | None = None
 
     def tools_for(self, state: ReviewState) -> ReviewTools:
         run_id = state["run_id"]
         if run_id not in self.tools:
-            self.tools[run_id] = ReviewTools(self.service, state["actor"], state["patient_id"])
+            self.tools[run_id] = ReviewTools(
+                self.service,
+                state["actor"],
+                state["patient_id"],
+                today=self.now().date(),
+                knowledge=self.knowledge,
+            )
         return self.tools[run_id]
 
 
@@ -181,6 +197,7 @@ def initial_state(
         conflicts=[],
         questions=[],
         evidence={},
+        references={},
         draft=None,
         verification=None,
         initial_verification=None,
@@ -313,7 +330,11 @@ def build_review_graph(
             key=lambda ref: ref.timestamp,
             reverse=True,
         )
-        return {"evidence": evidence, "context": context}
+        references = {
+            item.question: tools.search_knowledge(item.query, k=REFERENCE_K)
+            for item in state["questions"]
+        }
+        return {"evidence": evidence, "references": references, "context": context}
 
     def record_inputs(state: ReviewState) -> list[Any]:
         """The redacted record, framed as data: entries, then deterministic conflicts."""
@@ -341,6 +362,21 @@ def build_review_graph(
                 DataTag.open("conflict", id=conflict.id, category=conflict.category),
                 tools.redactor.redact(conflict.summary, names),
                 DataTag.close("conflict"),
+            ]
+        for reference in _reference_passages(state.get("references") or {}):
+            flags = {"instruction_like": True} if flagged_passages(reference.text) else {}
+            inputs += [
+                DataTag.open(
+                    "reference",
+                    id=reference.document_id,
+                    version=reference.version,
+                    kind=reference.kind,
+                    start=reference.start,
+                    **flags,
+                ),
+                # Already redacted (and markup-neutralised) by `search_knowledge`.
+                RedactionResult(text=reference.text),
+                DataTag.close("reference"),
             ]
         return inputs
 
@@ -548,6 +584,17 @@ def build_review_graph(
     for terminal in ("commit", "discard", "stop"):
         graph.add_edge(terminal, END)
     return graph.compile(checkpointer=checkpointer or InMemorySaver(serde=checkpoint_serializer()))
+
+
+def _reference_passages(references: dict[str, list[ReferenceSpan]]) -> list[ReferenceSpan]:
+    """Distinct passages, each question's best first, at most `MAX_REFERENCES`."""
+    chosen: dict[tuple[UUID, int, int], ReferenceSpan] = {}
+    for rank in range(REFERENCE_K):
+        for spans in references.values():
+            if rank < len(spans) and len(chosen) < MAX_REFERENCES:
+                span = spans[rank]
+                chosen.setdefault((span.document_id, span.version, span.start), span)
+    return list(chosen.values())
 
 
 def _flagged(tools: ReviewTools, entry_id: UUID) -> list[str]:

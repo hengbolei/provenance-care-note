@@ -41,6 +41,7 @@ from carenote.agent.state import (
 )
 from carenote.agent.tracing import RunTracer, TimelineStep, trace_id_for
 from carenote.domain.models import Actor, AgentActor, AuditEvent, Role
+from carenote.knowledge.service import KnowledgeService
 from carenote.services.ai import ExternalModelError, ModelNotConfiguredError
 from carenote.services.care_notes import AccessDeniedError, CareNoteService
 
@@ -125,6 +126,7 @@ class AgentRunService:
         tracer: RunTracer | None = None,
         now: Callable[[], datetime] = lambda: datetime.now(UTC),
         budget_factory: Callable[[datetime], Budget] = lambda now: Budget(started_at=now),
+        knowledge: KnowledgeService | None = None,
     ) -> None:
         self.service = service
         self.committer = committer
@@ -140,6 +142,7 @@ class AgentRunService:
             now=now,
             on_step=self._on_step,
             tracer=tracer or RunTracer(),
+            knowledge=knowledge,
         )
         self.graph = build_review_graph(self.deps, checkpointer)
         # Durable registry (Postgres when configured); records are cached here with their locks.
