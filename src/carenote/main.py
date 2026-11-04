@@ -4,12 +4,13 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
+from carenote import __version__
 from carenote.api.routes import router
 from carenote.core.config import settings
 from carenote.core.security import safe_request_logging
 
 settings.validate_production()
-app = FastAPI(title=settings.app_name, version="0.1.0")
+app = FastAPI(title=settings.app_name, version=__version__)
 app.middleware("http")(safe_request_logging)
 app.include_router(router)
 

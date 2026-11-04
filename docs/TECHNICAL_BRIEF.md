@@ -10,7 +10,9 @@ The implementation deliberately favors a narrow, auditable vertical slice over a
 EHR or document editor. It combines patient, staff, clinician, and AI-scribed information in one
 timeline; derives a deterministic Glance ranking; exposes claim-level evidence; supports scoped
 comments and versioned care-plan editing; and prevents unreviewed AI content from becoming
-patient-facing guidance.
+patient-facing guidance. On top of the record, a Clinical Review Agent drafts a cited review that
+code verifies and a clinician approves claim by claim; a versioned reference library supplies
+points to check. The agent is described in `AGENT_DESIGN.md` and `AGENT_ROADMAP.md`.
 
 All bundled records are deterministic and synthetic. This is an evaluation prototype, not a
 medical device or a production clinical system.
@@ -31,6 +33,11 @@ flowchart LR
     Service --> Redaction[PHI redaction boundary]
     Redaction --> OpenAI[Optional Responses / transcription APIs]
     API <--> WS[Authorized WebSocket presence and refresh]
+    API --> Agent[Clinical Review Agent: plan, retrieve, draft, verify, review]
+    Agent -->|reads as the clinician| Service
+    Agent --> Knowledge[Versioned reference library]
+    Agent --> Gateway[Model gateway: recorded, OpenAI, Anthropic, compatible]
+    Gateway --> Redaction
 ```
 
 The browser is never an authorization boundary. Login produces an HMAC-signed, expiring token
@@ -209,22 +216,27 @@ run measured 1.535 ms P95, below the 300 ms prototype target. It excludes a real
 PostgreSQL, concurrent users, and representative longitudinal volume, so it is not a production
 capacity claim.
 
-The automated suite currently contains 45 passing tests covering bidirectional RBAC, patient
-filtering, signed-token tampering and expiry, different-role concurrent edits, stale same-section
-writes, arbitrary section diffs, provenance resolution, exact section comment spans, allergy
-conflicts, resource histories, AI redaction, and authorized WebSocket presence.
+The automated suite covers bidirectional RBAC, patient filtering, signed-token tampering and
+expiry, different-role concurrent edits, stale same-section writes, arbitrary section diffs,
+provenance resolution, exact section comment spans, allergy conflicts, resource histories, AI
+redaction, authorized WebSocket presence, and the whole agent: graph, verifier, gateways,
+retrieval, injection defences, reference library and commit path. CI runs it on Python 3.11 and
+3.12, runs the PostgreSQL tests against a real database, starts the Docker demo, restarts it
+mid-review, and gates on the evaluation suite (`evals/REPORT.md`).
 
 ## Deliberate trade-offs and next steps
 
 - A single synthetic patient proves the vertical slice, not clinic-scale administration.
+- No live model has been evaluated; the agent's model metrics wait for recorded live drafts.
 - Vanilla JavaScript minimizes build risk but does not provide a rich collaborative editor.
 - Optimistic locking is deterministic; automatic merge and live cursor-level co-editing are absent.
 - Complete snapshots improve prototype auditability at the cost of storage volume.
 - The PostgreSQL adapter stores one encrypted clinical snapshot per clinic for implementation
   speed; normalized production tables would improve queryability and independent retention.
 - Formal enterprise identity, MFA/SSO, managed TLS certificates, KMS rotation, immutable audit
-  export, real PostgreSQL/RLS tests, approved model validation, accessibility/usability studies,
-  and clinical safety review remain required before production use.
+  export, RLS validation on the target managed PostgreSQL, approved model validation,
+  accessibility/usability studies, and clinical safety review remain required before production
+  use.
 
 The prototype's central trust decision is to make uncertainty and evidence visible, keep machine
 output unconfirmed, and require a human publication boundary where an error could reach a patient.
