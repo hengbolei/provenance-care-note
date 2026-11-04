@@ -15,7 +15,7 @@ from carenote.agent.runs import (
     RunStateError,
 )
 from carenote.agent.state import Budget, ClaimDecision, RunStatus
-from carenote.api import routes
+from carenote.api.container import container
 from carenote.core.identity import session_service
 from carenote.data.seed import (
     DEMO_CLINIC_ID,
@@ -237,9 +237,9 @@ def test_patient_sockets_never_receive_care_team_events():
 @pytest.fixture
 def client(monkeypatch):
     runs = AgentRunService(
-        routes.service, ScriptedGateway(), executor=InlineExecutor(), now=lambda: NOW
+        container.service, ScriptedGateway(), executor=InlineExecutor(), now=lambda: NOW
     )
-    monkeypatch.setattr(routes, "agent_runs", runs)
+    monkeypatch.setattr(container, "agent_runs", runs)
     return TestClient(app)
 
 

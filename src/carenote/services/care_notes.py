@@ -159,6 +159,17 @@ class CareNoteService:
             excerpt=artifact.content[pointer.start : pointer.end],
         )
 
+    def require_care_team_access(self, actor: Actor, patient_id: UUID) -> None:
+        """Raise unless the actor is on the care team of this patient's clinic."""
+        self._require_internal_collaborator(actor)
+        if self.repository.get_patient(patient_id, actor.clinic_id) is None:
+            raise PatientNotFoundError("patient not found in actor's clinic")
+
+    def transcribe(self, actor: Actor, patient_id: UUID, audio: bytes, content_type: str):
+        """Transcribe a recording for the care team; the audio itself is not stored."""
+        self.require_care_team_access(actor, patient_id)
+        return self.ai_gateway.transcribe(audio, content_type)
+
     def search_entries(self, actor: Actor, patient_id: UUID, query: str, k: int = 10) -> list[Span]:
         """Ranked search over a patient's active entries, for the care team only."""
         self._require_internal_collaborator(actor)

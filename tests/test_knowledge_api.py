@@ -3,7 +3,8 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from carenote.api import routes
+from carenote.api.container import container
+from carenote.data.seed import DEMO_CLINIC_ID
 from carenote.knowledge.store import InMemoryKnowledgeStore
 from carenote.main import app
 
@@ -19,7 +20,7 @@ DOCUMENT = {
 
 @pytest.fixture(autouse=True)
 def empty_library(monkeypatch):
-    monkeypatch.setattr(routes.knowledge, "store", InMemoryKnowledgeStore())
+    monkeypatch.setattr(container.knowledge, "store", InMemoryKnowledgeStore())
 
 
 def _client(username):
@@ -110,7 +111,7 @@ def test_errors_map_to_http_statuses():
 
     assert admin.post(f"/api/knowledge/{document_id}/versions", json=stale).status_code == 409
     assert admin.get(f"/api/knowledge/{document_id}/versions/9").status_code == 404
-    assert admin.get(f"/api/knowledge/{routes.DEMO_CLINIC_ID}").status_code == 404
+    assert admin.get(f"/api/knowledge/{DEMO_CLINIC_ID}").status_code == 404
     assert admin.post("/api/knowledge", json=DOCUMENT | {"content": "  "}).status_code == 422
     assert admin.post("/api/knowledge", json=DOCUMENT | {"kind": "blog"}).status_code == 422
 
