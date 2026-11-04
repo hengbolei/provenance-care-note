@@ -1,12 +1,27 @@
-const CACHE = "carenote-shell-v2";
-const SHELL = ["/", "/static/styles.css", "/static/app.js", "/static/api.js", "/static/i18n.js"];
+const CACHE = "carenote-shell-v3";
+const SHELL = [
+  "/",
+  "/static/styles.css",
+  "/static/app.js",
+  "/static/api.js",
+  "/static/i18n.js",
+  "/static/dom.js",
+  "/static/agent-panel.js",
+  "/static/knowledge-panel.js",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)));
 });
 
 self.addEventListener("activate", (event) => {
-  event.waitUntil(self.clients.claim());
+  // Drop shells cached by earlier versions, then take over open pages.
+  event.waitUntil(
+    caches
+      .keys()
+      .then((names) => Promise.all(names.filter((name) => name !== CACHE).map((name) => caches.delete(name))))
+      .then(() => self.clients.claim()),
+  );
 });
 
 self.addEventListener("fetch", (event) => {
