@@ -135,6 +135,8 @@ const elements = {
 };
 
 let currentPlanVersion = 0;
+// True while the plan textarea holds edits that are not saved yet.
+let planDirty = false;
 let replyToCommentId = null;
 let selectedHighlightSource = null;
 let selectedCommentSpanTarget = null;
@@ -750,7 +752,16 @@ function renderAudit(events) {
 
 function renderSection(sections) {
   const plan = sections.find((section) => section.section === "plan");
-  currentPlanVersion = plan?.version || 0;
+  const latest = plan?.version || 0;
+  if (planDirty) {
+    // Keep the clinician's unsaved text and the version it was based on, so saving it
+    // after someone else's change is refused as a conflict rather than overwriting it.
+    if (latest !== currentPlanVersion) {
+      showFeedback(elements.sectionFeedback, t("plan.changedWhileEditing", { version: latest }), true);
+    }
+    return;
+  }
+  currentPlanVersion = latest;
   elements.sectionContent.value = plan?.content || "";
   elements.sectionVersion.textContent = t("plan.version", { version: currentPlanVersion });
 }
@@ -847,7 +858,7 @@ function connectRealtime() {
     if (message.type === "refresh" && !refreshTimer) {
       refreshTimer = window.setTimeout(async () => {
         refreshTimer = null;
-        await loadPatient();
+        await loadPatient({ background: true });
       }, 250);
     }
   });
@@ -954,6 +965,7 @@ async function renderHistory() {
         button.addEventListener("click", async () => {
           try {
             await revertSection("plan", revision.version);
+            planDirty = false;
             showFeedback(elements.sectionFeedback, t("plan.reverted", { version: revision.version }));
             await loadPatient();
             await renderHistory();
@@ -974,8 +986,13 @@ async function renderHistory() {
   }
 }
 
-async function loadPatient() {
-  setScreenState("loading");
+/**
+ * Load and render the patient. A background refresh (a realtime change made elsewhere) keeps the
+ * page on screen and where it is scrolled to, instead of showing the loading state.
+ */
+async function loadPatient({ background = false } = {}) {
+  if (!background) setScreenState("loading");
+  const scrollY = window.scrollY;
   try {
     const detail = await getPatientDetail();
     latestDetail = detail;
@@ -1008,12 +1025,15 @@ async function loadPatient() {
     elements.aiIngestCard.hidden = !["staff", "clinician", "admin"].includes(
       DEMO_CONTEXT.actorRole,
     );
-    elements.knowledgeCard.hidden = isPatient;
-    if (!isPatient) loadKnowledge();
+    // The library does not change with the patient record, so a background refresh skips it.
+    const showLibrary = !isPatient;
+    if (showLibrary && (!background || elements.knowledgeCard.hidden)) loadKnowledge();
+    elements.knowledgeCard.hidden = !showLibrary;
     elements.sectionContent.disabled = DEMO_CONTEXT.actorRole !== "clinician";
     elements.saveSection.disabled = DEMO_CONTEXT.actorRole !== "clinician";
     const isEmpty = detail.highlights.length === 0 && detail.entries.length === 0;
     setScreenState(isEmpty ? "empty" : "ready");
+    if (background) window.scrollTo(0, scrollY);
     return detail;
   } catch (error) {
     clearPatient();
@@ -1155,6 +1175,7 @@ elements.saveSection.addEventListener("click", async () => {
       currentPlanVersion,
     );
     currentPlanVersion = section.version;
+    planDirty = false;
     elements.sectionVersion.textContent = t("plan.version", { version: section.version });
     showFeedback(elements.sectionFeedback, t("plan.saved", { version: section.version }));
     await renderHistory();
@@ -1163,6 +1184,9 @@ elements.saveSection.addEventListener("click", async () => {
   }
 });
 elements.showHistory.addEventListener("click", renderHistory);
+elements.sectionContent.addEventListener("input", () => {
+  planDirty = true;
+});
 elements.compareVersions.addEventListener("click", async () => {
   try {
     const comparison = await compareSectionRevisions(

@@ -141,12 +141,18 @@ function renderKnowledgeViewer() {
   );
 }
 
+function renderKnowledgeFormTitle() {
+  if (!knowledgeEditing) return;
+  elements.knowledgeFormTitle.textContent =
+    knowledgeEditing.mode === "create"
+      ? t("knowledge.createTitle")
+      : t("knowledge.versionTitle", { title: knowledgeEditing.doc.title });
+}
+
 function openKnowledgeForm(editing) {
   knowledgeEditing = editing;
   const creating = editing.mode === "create";
-  elements.knowledgeFormTitle.textContent = creating
-    ? t("knowledge.createTitle")
-    : t("knowledge.versionTitle", { title: editing.doc.title });
+  renderKnowledgeFormTitle();
   elements.knowledgeDocumentFields.hidden = !creating;
   elements.knowledgeDocTitle.value = "";
   elements.knowledgeSource.value = "";
@@ -230,5 +236,5 @@ export { loadKnowledge };
 export function rerenderKnowledgePanel() {
   renderKnowledgeList();
   renderKnowledgeViewer();
-  if (knowledgeEditing) openKnowledgeForm(knowledgeEditing);
+  renderKnowledgeFormTitle();
 }

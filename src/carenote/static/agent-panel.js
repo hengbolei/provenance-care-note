@@ -40,6 +40,9 @@ const elements = {
 
 let agentRun = null;
 let agentPollTimer = null;
+// One run refresh at a time: realtime step events and polling are coalesced into it.
+let agentRefreshTimer = null;
+let agentRefreshing = false;
 let agentDecisions = new Map();
 let agentHighlightAccepts = new Set();
 // Check point index -> included; verified check points start included, others cannot be.
@@ -432,7 +435,8 @@ function scheduleAgentRefresh() {
 }
 
 async function refreshAgentRun() {
-  if (!agentRun) return;
+  if (!agentRun || agentRefreshing) return;
+  agentRefreshing = true;
   try {
     renderAgentRun(await getAgentRun(agentRun.run_id));
   } catch (error) {
@@ -442,8 +446,19 @@ async function refreshAgentRun() {
       return;
     }
     showFeedback(elements.agentFeedback, error.message, true);
+  } finally {
+    agentRefreshing = false;
   }
   scheduleAgentRefresh();
+}
+
+/** Refresh soon; several events in quick succession cause a single request. */
+function queueAgentRefresh() {
+  if (agentRefreshTimer) return;
+  agentRefreshTimer = window.setTimeout(() => {
+    agentRefreshTimer = null;
+    refreshAgentRun();
+  }, 300);
 }
 
 async function restoreAgentRun() {
@@ -563,6 +578,8 @@ export { renderAgentReviewSection, restoreAgentRun };
 /** Forget the run on sign-out. */
 export function resetAgentPanel() {
   window.clearTimeout(agentPollTimer);
+  window.clearTimeout(agentRefreshTimer);
+  agentRefreshTimer = null;
   agentRun = null;
   resetAgentDecisions();
   rememberAgentRun(null);
@@ -571,7 +588,7 @@ export function resetAgentPanel() {
 /** Refresh when a realtime event concerns the run on screen. */
 export function handleAgentEvent(message) {
   if (message.type?.startsWith("agent.") && message.run_id === agentRun?.run_id) {
-    refreshAgentRun();
+    queueAgentRefresh();
   }
 }
 
