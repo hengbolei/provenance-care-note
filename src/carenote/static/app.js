@@ -40,6 +40,7 @@ import {
   labelFor,
   showFeedback,
 } from "/static/dom.js";
+import { initDemoBanner } from "/static/demo.js";
 import { loadKnowledge, rerenderKnowledgePanel } from "/static/knowledge-panel.js";
 import {
   LANGUAGES,
@@ -1374,4 +1375,5 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/static/service-worker.js").catch(() => {});
 }
 
+initDemoBanner();
 bootstrap();

@@ -71,3 +71,18 @@ def build_container() -> Container:
 
 
 container = build_container()
+
+
+def reset_demo_state() -> None:
+    """Put the in-memory demo clinic back to its synthetic seed (public demo only).
+
+    Routers read `container.<service>` per request, so swapping the fields is enough. Sessions
+    stay valid: tokens are signed, and the seed recreates the same users and IDs.
+    """
+    if settings.database_url:
+        raise RuntimeError("reset_demo_state only resets the in-memory store")
+    fresh = build_container()
+    container.repository = fresh.repository
+    container.service = fresh.service
+    container.knowledge = fresh.knowledge
+    container.agent_runs = fresh.agent_runs

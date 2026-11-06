@@ -9,6 +9,9 @@
 * { box-sizing: border-box; }
 body { margin: 0; min-height: 100vh; background: linear-gradient(180deg, #edf4f0 0, #f8faf9 300px); }
 button { font: inherit; }
+.demo-banner { display: flex; flex-wrap: wrap; gap: 6px 16px; justify-content: center; padding: 8px max(16px, calc((100vw - 1180px) / 2)); background: #fff4d6; border-bottom: 1px solid #e6cf8a; color: #4d3a00; font-size: 0.86rem; line-height: 1.4; text-align: center; }
+.demo-banner[hidden], .demo-banner [hidden] { display: none; }
+.demo-open-tab { color: #173a38; font-weight: 600; }
 .topbar { height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 max(24px, calc((100vw - 1180px) / 2)); border-bottom: 1px solid #dbe5e0; background: rgb(255 255 255 / 82%); backdrop-filter: blur(14px); }
 .brand { display: flex; align-items: center; gap: 10px; color: #173b32; font-weight: 760; text-decoration: none; letter-spacing: -0.01em; }
 .brand-mark { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; color: #fff; background: #245e50; font-family: Georgia, serif; }
