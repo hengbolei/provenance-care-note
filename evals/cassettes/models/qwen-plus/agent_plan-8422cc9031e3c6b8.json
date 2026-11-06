@@ -1,0 +1,39 @@
+{
+  "fingerprint": "8422cc9031e3c6b8328b51183171c27b02887d848bedc4b7591b2ba7e7eddba5",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 1056,
+    "output_tokens": 277,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was lisinopril first started, and at what dose?",
+        "query": "lisinopril started dose"
+      },
+      {
+        "question": "Was the lisinopril dose increased from 10 mg to 20 mg, and if so, when and by whom?",
+        "query": "lisinopril increase 20 mg"
+      },
+      {
+        "question": "What was the patient's blood pressure before starting lisinopril, and how has it trended since initiation?",
+        "query": "blood pressure baseline lisinopril"
+      },
+      {
+        "question": "Has dizziness been documented before starting lisinopril, or is it new onset?",
+        "query": "dizziness history prior lisinopril"
+      },
+      {
+        "question": "Were any actions taken in response to the low BP (98/62) or dizziness—e.g., dose reduction, hold, or monitoring plan?",
+        "query": "dizziness low BP action"
+      },
+      {
+        "question": "Is there documentation of renal function or potassium levels around lisinopril initiation or dose change?",
+        "query": "creatinine potassium lisinopril"
+      }
+    ]
+  }
+}

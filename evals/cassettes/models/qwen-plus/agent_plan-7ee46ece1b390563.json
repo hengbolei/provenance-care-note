@@ -1,0 +1,39 @@
+{
+  "fingerprint": "7ee46ece1b3905636eb87456ec716889baaca7bc5dd72c13059cb8e554b76c7f",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 1010,
+    "output_tokens": 214,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was the latex allergy first documented?",
+        "query": "latex allergy"
+      },
+      {
+        "question": "What evidence supports the diagnosis of latex allergy, such as testing or clinical reaction details?",
+        "query": "hives glove contact"
+      },
+      {
+        "question": "Was the latex allergy confirmed by allergy testing or specialist review, and when?",
+        "query": "allergy testing confirmed"
+      },
+      {
+        "question": "What actions were taken after the latex allergy was flagged for theatre, such as documentation in surgical checklist or alternative equipment ordered?",
+        "query": "theatre flagged latex"
+      },
+      {
+        "question": "Was the discrepancy in latex allergy status (absent vs present) investigated or resolved in a later entry?",
+        "query": "latex conflict resolved"
+      },
+      {
+        "question": "What other allergies or sensitivities are recorded besides latex?",
+        "query": "allergy"
+      }
+    ]
+  }
+}

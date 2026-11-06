@@ -1,0 +1,21 @@
+{
+  "fingerprint": "32f726145784963a340cbcf2ad98dd13068036de44433dbe2f52d8b1cd689da6",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2352,
+    "output_tokens": 100,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [],
+    "open_questions": [
+      "Which medications were started, stopped, held or changed: the record provided contains only an identity-verification staff note with no medication or change information.",
+      "Which allergies or reactions are recorded: no allergy or reaction information appears in the record provided.",
+      "Which follow-ups, referrals or tests are planned or outstanding: no plan, referral or test information appears in the record provided."
+    ],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

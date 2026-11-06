@@ -5,7 +5,7 @@
   "model": "qwen-plus",
   "usage": {
     "input_tokens": 4742,
-    "output_tokens": 290,
+    "output_tokens": 269,
     "cost_usd": null
   },
   "output": {
@@ -15,24 +15,24 @@
         "query": "colonoscopy referral"
       },
       {
-        "question": "Has the patient reported any gastrointestinal symptoms such as bleeding, change in bowel habit, or abdominal pain that prompted the colonoscopy referral?",
+        "question": "Has the patient had any gastrointestinal symptoms such as bleeding, change in bowel habit or abdominal pain that led to the colonoscopy referral?",
         "query": "bleeding bowel habit abdominal pain"
       },
       {
-        "question": "Was a specific colonoscopy indication (e.g., iron deficiency anaemia, positive FOBT, surveillance) documented, and when?",
-        "query": "anaemia FOBT surveillance"
+        "question": "Was a bowel preparation plan or instructions provided for the colonoscopy, and when?",
+        "query": "bowel prep preparation"
       },
       {
-        "question": "Have any relevant investigations (e.g., FBC, ferritin, CRP, calprotectin, imaging) been performed, and what were the results?",
-        "query": "FBC ferritin CRP calprotectin"
+        "question": "Have any diagnostic test results (e.g., FIT, colonoscopy report, imaging) been recorded that relate to the referral?",
+        "query": "FIT colonoscopy result imaging"
       },
       {
-        "question": "Was there a documented discussion with the patient about colonoscopy risks, benefits and alternatives, and when did it occur?",
-        "query": "risks benefits alternatives consent"
+        "question": "Has the patient been assessed for colonoscopy contraindications or risks (e.g., anticoagulants, comorbidities)?",
+        "query": "anticoagulant contraindication risk"
       },
       {
-        "question": "Has the patient been assessed for anticoagulant or antiplatelet use that may affect colonoscopy planning?",
-        "query": "warfarin apixaban clopidogrel aspirin"
+        "question": "Was the colonoscopy referral discussed with or approved by a consultant or specialist, and when?",
+        "query": "consultant specialist approval"
       }
     ]
   }

@@ -1,0 +1,53 @@
+{
+  "fingerprint": "d87c3299c587f6c4fbd34e5cb89b1d712ac0946fe9366e34016a7652e2f15bab",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2482,
+    "output_tokens": 383,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "An AI-generated doctor consult summary states the patient described chest discomfort on exertion, but notes duration and medication history were not discussed and clinician confirmation is required.",
+        "category": "symptom",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "2e6860db-4682-548d-a7be-956a71a110ea",
+            "start": 33,
+            "end": 72,
+            "quote": "Patient described chest discomfort on exertion"
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was chest discomfort on exertion first recorded, and what did earlier entries say about its duration and character?",
+      "What medication history is documented, and were any medications started, stopped, held or changed around the chest discomfort?",
+      "Which cardiac tests, referrals or stress evaluations have been ordered or completed for this chest discomfort?",
+      "Are prior vital signs, ECG or troponin results recorded that relate to this symptom?",
+      "Are any allergies or allergic reactions recorded?",
+      "Were risk factors such as hypertension, diabetes, smoking or previous cardiac events recorded earlier?",
+      "Which follow-ups, referrals or tests are planned or outstanding?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "2e6860db-4682-548d-a7be-956a71a110ea",
+          "start": 33,
+          "end": 72,
+          "quote": "Patient described chest discomfort on exertion"
+        },
+        "risk_reason": "Chest discomfort on exertion is reported, but duration, character and medication history were not discussed in the AI-generated summary, which requires clinician confirmation.",
+        "suggested_action": "Clinician to confirm the symptom history, including onset, duration and character, and review medication history.",
+        "clinical_entities": [
+          "chest discomfort on exertion"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

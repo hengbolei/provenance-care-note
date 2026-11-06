@@ -1,0 +1,39 @@
+{
+  "fingerprint": "9d6b496c2bfe14ca86503c4dc1128ac5125c884facc6a691ee5a42c54c31875b",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 1025,
+    "output_tokens": 237,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was the sulfa allergy first recorded, and what was the reported reaction?",
+        "query": "sulfa allergy reaction"
+      },
+      {
+        "question": "What is the source or basis for the clinician's statement that the patient is not allergic to sulfa?",
+        "query": "sulfa not allergic nausea"
+      },
+      {
+        "question": "When was the pharmacy record indicating sulfa allergy last updated or verified?",
+        "query": "pharmacy sulfa allergy"
+      },
+      {
+        "question": "Has any medication containing sulfa been prescribed or dispensed, and if so, when and what was the outcome?",
+        "query": "sulfa prescription dispense"
+      },
+      {
+        "question": "Were there prior clinical notes or assessments addressing the discrepancy in sulfa allergy status?",
+        "query": "sulfa allergy discrepancy"
+      },
+      {
+        "question": "What other allergy-related entries exist for this patient before July 2026?",
+        "query": "allergy reaction"
+      }
+    ]
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "fingerprint": "e438ce4cc0f7ecbafc6bb6ccc453c59eb44ee5644abc011596e2666a9b58b7ac",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 993,
+    "output_tokens": 171,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was lisinopril first started, and at what dose?",
+        "query": "lisinopril start dose"
+      },
+      {
+        "question": "Was the lisinopril dry cough reported earlier, and when did it first appear?",
+        "query": "lisinopril cough"
+      },
+      {
+        "question": "Was losartan previously tried or documented, and at what dose?",
+        "query": "losartan"
+      },
+      {
+        "question": "What was the blood pressure and renal function at the time of the ACE-inhibitor switch?",
+        "query": "blood pressure potassium creatinine"
+      },
+      {
+        "question": "Are there other antihypertensive agents besides lisinopril that were held or changed?",
+        "query": "antihypertensive hold stop"
+      },
+      {
+        "question": "Has the losartan start been confirmed as dispensed or followed up?",
+        "query": "losartan start follow-up"
+      }
+    ]
+  }
+}

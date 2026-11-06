@@ -1,0 +1,99 @@
+{
+  "fingerprint": "0fc51b50bed2ff2c3a56c2c31b97e6a8dd0e404422cc67e30aba732c1c0b7085",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2768,
+    "output_tokens": 952,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Warfarin 5 mg nightly is prescribed and continued per staff note.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "3054d412-d903-54b4-9121-e427a2b5ec8b",
+            "start": 18,
+            "end": 40,
+            "quote": "Continue warfarin 5 mg nightly"
+          }
+        ]
+      },
+      {
+        "text": "Warfarin is to be held for five days before colonoscopy, with INR rechecked the day before.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "bf9f9f49-b77e-53cb-8526-280ea9b84a34",
+            "start": 0,
+            "end": 68,
+            "quote": "Hold warfarin for five days before the colonoscopy and recheck INR the day before."
+          }
+        ]
+      },
+      {
+        "text": "There is a conflict between continuing warfarin (staff note) and holding it before colonoscopy (clinician note).",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "3054d412-d903-54b4-9121-e427a2b5ec8b",
+            "start": 0,
+            "end": 40,
+            "quote": "Continue warfarin 5 mg nightly; INR checked monthly."
+          },
+          {
+            "entry_id": "bf9f9f49-b77e-53cb-8526-280ea9b84a34",
+            "start": 0,
+            "end": 68,
+            "quote": "Hold warfarin for five days before the colonoscopy and recheck INR the day before."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was warfarin first started, and at what dose?",
+      "What was the most recent INR value before the planned hold, and when was it measured?",
+      "Was the warfarin hold actually carried out, and if so, when was it resumed?",
+      "Was the colonoscopy performed, and if so, on what date?",
+      "Are there any documented bleeding risks, contraindications, or other clinical factors that prompted the warfarin hold?",
+      "Has the INR been rechecked the day before the colonoscopy as instructed?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "bf9f9f49-b77e-53cb-8526-280ea9b84a34",
+          "start": 0,
+          "end": 68,
+          "quote": "Hold warfarin for five days before the colonoscopy and recheck INR the day before."
+        },
+        "risk_reason": "Warfarin hold instruction is time-sensitive and critical for procedural safety; no evidence confirms execution or INR recheck.",
+        "suggested_action": "Confirm whether warfarin was held as instructed and whether pre-procedure INR was obtained.",
+        "clinical_entities": [
+          "warfarin",
+          "colonoscopy",
+          "INR"
+        ]
+      },
+      {
+        "citation": {
+          "entry_id": "3054d412-d903-54b4-9121-e427a2b5ec8b",
+          "start": 0,
+          "end": 40,
+          "quote": "Continue warfarin 5 mg nightly; INR checked monthly."
+        },
+        "risk_reason": "Ongoing warfarin dosing conflicts directly with upcoming procedure instructions, creating risk of bleeding or thrombosis.",
+        "suggested_action": "Resolve discrepancy: clarify whether warfarin should continue or be held, and document updated plan.",
+        "clinical_entities": [
+          "warfarin"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "fingerprint": "416cfddf3921a84da84d71e59f1c25597f761822e3063d865c51a155d66d7c23",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2693,
+    "output_tokens": 441,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "On 2026-08-14 the clinician recorded INR 3.8 and advised reducing warfarin to 2.5 mg nightly with an INR recheck on Friday.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "8c71a5c0-4cf5-5451-b643-adf7280fe836",
+            "start": 0,
+            "end": 68,
+            "quote": "INR 3.8. Reduce warfarin 2.5 mg nightly and recheck INR on Friday."
+          }
+        ]
+      },
+      {
+        "text": "Patient reports on 2026-08-16 still taking warfarin 5 mg every night like before.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "30d178a0-f3f0-54af-af4c-e85ff96b79c0",
+            "start": 0,
+            "end": 50,
+            "quote": "I am still taking warfarin 5 mg every night like before."
+          }
+        ]
+      },
+      {
+        "text": "The record contains a dose conflict for warfarin: the clinician note states warfarin 2.5 mg nightly, while the patient note states warfarin 5 mg every night.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "8c71a5c0-4cf5-5451-b643-adf7280fe836",
+            "start": 19,
+            "end": 45,
+            "quote": "warfarin 2.5 mg nightly"
+          },
+          {
+            "entry_id": "30d178a0-f3f0-54af-af4c-e85ff96b79c0",
+            "start": 24,
+            "end": 50,
+            "quote": "warfarin 5 mg every night"
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Which warfarin dose is the patient currently taking — 2.5 mg nightly per the clinician note of 2026-08-14, or 5 mg nightly per the patient note of 2026-08-16?",
+      "Has the INR been rechecked since the clinician's 2026-08-14 note?"
+    ],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

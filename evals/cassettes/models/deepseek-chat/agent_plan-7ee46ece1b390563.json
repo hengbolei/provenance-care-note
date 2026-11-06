@@ -1,0 +1,35 @@
+{
+  "fingerprint": "7ee46ece1b3905636eb87456ec716889baaca7bc5dd72c13059cb8e554b76c7f",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 988,
+    "output_tokens": 154,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was a latex allergy or reaction first recorded in this record?",
+        "query": "latex allergy reaction first recorded"
+      },
+      {
+        "question": "What details document the hives after glove contact (date, exposure, treatment, severity)?",
+        "query": "hives glove contact urticaria"
+      },
+      {
+        "question": "Was any prior latex exposure, sensitivity or reaction noted before the pre-assessment saying none?",
+        "query": "latex sensitivity exposure history"
+      },
+      {
+        "question": "What was documented at the pre-assessment about allergies and the source of the 'no latex allergy' statement?",
+        "query": "pre-assessment allergy history"
+      },
+      {
+        "question": "Was the latex allergy flag for theatre actually communicated and acted on (alert placed, precautions ordered)?",
+        "query": "latex allergy flag theatre alert precautions"
+      }
+    ]
+  }
+}

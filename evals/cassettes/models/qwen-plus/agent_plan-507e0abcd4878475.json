@@ -5,7 +5,7 @@
   "model": "qwen-plus",
   "usage": {
     "input_tokens": 863,
-    "output_tokens": 226,
+    "output_tokens": 231,
     "cost_usd": null
   },
   "output": {
@@ -19,20 +19,20 @@
         "query": "metformin 850 mg"
       },
       {
-        "question": "What was the most recent HbA1c value and when was it measured?",
+        "question": "What was the most recent HbA1c value, and when was it measured?",
         "query": "HbA1c"
       },
       {
-        "question": "Is there documentation of patient education or adherence discussion regarding metformin?",
-        "query": "metformin education"
-      },
-      {
-        "question": "Are there any documented gastrointestinal side effects or other adverse reactions to metformin?",
+        "question": "Has any gastrointestinal side effect or intolerance to metformin been documented?",
         "query": "metformin side effect"
       },
       {
-        "question": "Was the pharmacy list reconciled with the current prescribing plan, and when?",
-        "query": "pharmacy list reconcile"
+        "question": "Was renal function assessed before or after initiating or up-titrating metformin?",
+        "query": "eGFR creatinine"
+      },
+      {
+        "question": "Is there documentation of patient education or shared decision-making about metformin titration?",
+        "query": "metformin education"
       }
     ]
   }

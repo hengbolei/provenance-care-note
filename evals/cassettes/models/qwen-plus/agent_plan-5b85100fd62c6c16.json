@@ -5,17 +5,17 @@
   "model": "qwen-plus",
   "usage": {
     "input_tokens": 770,
-    "output_tokens": 212,
+    "output_tokens": 208,
     "cost_usd": null
   },
   "output": {
     "questions": [
       {
-        "question": "When was the penicillin allergy first recorded, and what evidence or reaction details were documented?",
+        "question": "When was the penicillin allergy first recorded, and what evidence or reaction details were documented at that time?",
         "query": "penicillin allergy"
       },
       {
-        "question": "What medications were started, stopped, held or changed around the time of the penicillin allergy note?",
+        "question": "What medications were started, stopped, held or changed around the time of the penicillin allergy documentation?",
         "query": "started stopped held changed"
       },
       {
@@ -23,16 +23,16 @@
         "query": "antibiotic prescribe"
       },
       {
-        "question": "What follow-ups, referrals or tests were planned or outstanding before 2026-08-23?",
-        "query": "follow-up referral test"
+        "question": "Has any follow-up or verification been done for the reported penicillin allergy (e.g., testing, clarification, or de-labeling)?",
+        "query": "penicillin allergy verify test"
       },
       {
-        "question": "What allergy-related entries exist before 2026-08-23, especially for beta-lactams or related drugs?",
-        "query": "allergy beta-lactam"
+        "question": "What other allergies or reactions are documented in the record besides penicillin?",
+        "query": "allergy reaction"
       },
       {
-        "question": "Was there any documentation of a prior adverse reaction to penicillin or confirmation of allergy testing?",
-        "query": "reaction testing confirm"
+        "question": "Are there any outstanding referrals, tests or follow-ups related to allergy assessment or medication safety?",
+        "query": "referral test follow-up allergy"
       }
     ]
   }

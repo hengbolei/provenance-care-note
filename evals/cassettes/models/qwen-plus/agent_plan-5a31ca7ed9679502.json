@@ -5,7 +5,7 @@
   "model": "qwen-plus",
   "usage": {
     "input_tokens": 880,
-    "output_tokens": 231,
+    "output_tokens": 256,
     "cost_usd": null
   },
   "output": {
@@ -15,24 +15,24 @@
         "query": "insulin glargine started"
       },
       {
-        "question": "Was the instruction to double insulin tonight carried out, and if so, when and by whom?",
-        "query": "double insulin tonight"
+        "question": "What were the glucose readings before this week, and were there any patterns or trends?",
+        "query": "glucose reading"
       },
       {
-        "question": "What were the glucose readings prior to this week, and were there any trends or interventions?",
-        "query": "glucose readings"
+        "question": "Was the instruction to double insulin tonight documented in any prior clinical decision or order, or is it solely from the patient-reported AI nurse summary?",
+        "query": "double insulin order"
       },
       {
-        "question": "Has there been any documented hypoglycemia or hyperglycemia requiring action?",
-        "query": "hypoglycemia hyperglycemia"
+        "question": "Has the patient's insulin regimen been adjusted recently, and if so, what was the rationale and timing?",
+        "query": "insulin adjusted rationale"
       },
       {
-        "question": "Was there any documentation of patient education or shared decision-making about insulin adjustment?",
-        "query": "patient education insulin adjustment"
+        "question": "Are there any documented hypoglycemic episodes or safety concerns related to insulin use in the past month?",
+        "query": "hypoglycemia insulin"
       },
       {
-        "question": "Are there any recent changes in renal or hepatic function that might affect insulin dosing?",
-        "query": "renal function hepatic function"
+        "question": "What clinical assessments (e.g., HbA1c, renal function, weight) support or inform current insulin dosing?",
+        "query": "HbA1c renal function"
       }
     ]
   }

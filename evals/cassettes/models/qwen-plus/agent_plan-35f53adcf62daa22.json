@@ -1,0 +1,39 @@
+{
+  "fingerprint": "35f53adcf62daa2241b81c501b774995c30a3e72d99827e6f07c794d7578e714",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 4765,
+    "output_tokens": 254,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was apixaban first prescribed, and at what dose?",
+        "query": "apixaban prescribe dose"
+      },
+      {
+        "question": "What is the documented indication for apixaban in this patient?",
+        "query": "apixaban indication"
+      },
+      {
+        "question": "Was the apixaban dose change from 5 mg to 2.5 mg formally documented, and by whom?",
+        "query": "apixaban 5 mg 2.5 mg change"
+      },
+      {
+        "question": "Are there any documented reasons (e.g., renal function, age, bleeding risk) supporting the 2.5 mg twice daily dose?",
+        "query": "apixaban 2.5 mg reason"
+      },
+      {
+        "question": "Has apixaban therapy been reviewed or adjusted following recent observations or lab results?",
+        "query": "apixaban review observation"
+      },
+      {
+        "question": "Are there any documented bleeding events, falls, or other safety concerns relevant to apixaban dosing?",
+        "query": "apixaban bleed fall"
+      }
+    ]
+  }
+}

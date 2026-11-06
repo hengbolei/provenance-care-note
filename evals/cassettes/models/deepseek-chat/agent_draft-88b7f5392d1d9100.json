@@ -1,0 +1,87 @@
+{
+  "fingerprint": "88b7f5392d1d91005e427a01ce79c9f6448172d459fd28950240eceb0d6cc1a0",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2684,
+    "output_tokens": 647,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "A clinician note dated 2026-07-30 states: continue aspirin 75 mg daily after the stent.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "6d20b538-52b8-50ea-88aa-c9472209699d",
+            "start": 0,
+            "end": 55,
+            "quote": "Continue aspirin 75 mg daily after the stent."
+          }
+        ]
+      },
+      {
+        "text": "A clinician note dated 2026-08-25 states: stop aspirin before the dental extraction on Monday.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "e873f474-48c5-5d62-97a7-a18c5056ef6d",
+            "start": 0,
+            "end": 55,
+            "quote": "Stop aspirin before the dental extraction on Monday."
+          }
+        ]
+      },
+      {
+        "text": "The record contains a medication conflict for aspirin: one note says continue and one says stop before the dental extraction on Monday.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "6d20b538-52b8-50ea-88aa-c9472209699d",
+            "start": 0,
+            "end": 55,
+            "quote": "Continue aspirin 75 mg daily after the stent."
+          },
+          {
+            "entry_id": "e873f474-48c5-5d62-97a7-a18c5056ef6d",
+            "start": 0,
+            "end": 55,
+            "quote": "Stop aspirin before the dental extraction on Monday."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "No allergy or reaction is recorded; this question is not answered by the record.",
+      "No follow-up, referral or test is planned or outstanding in the record; this question is not answered.",
+      "When aspirin was first recorded and its original indication and dose are not documented.",
+      "No stent procedure note or antiplatelet duration plan is documented.",
+      "No record shows aspirin was held for the dental extraction or resumed afterwards.",
+      "No bleeding or cardiovascular risks relevant to stopping aspirin are recorded.",
+      "No prior medication holds or interruptions are recorded.",
+      "Only the 2026-08-25 note mentions the dental procedure; no planned resumption of antiplatelets is recorded."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "e873f474-48c5-5d62-97a7-a18c5056ef6d",
+          "start": 0,
+          "end": 55,
+          "quote": "Stop aspirin before the dental extraction on Monday."
+        },
+        "risk_reason": "This instruction to stop aspirin conflicts with the 2026-07-30 note to continue aspirin 75 mg daily after the stent.",
+        "suggested_action": "Clinician to review the aspirin conflict and confirm the intended medication plan before the dental extraction.",
+        "clinical_entities": [
+          "aspirin",
+          "dental extraction"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

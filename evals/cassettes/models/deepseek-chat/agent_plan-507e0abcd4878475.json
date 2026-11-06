@@ -5,30 +5,30 @@
   "model": "deepseek-chat",
   "usage": {
     "input_tokens": 849,
-    "output_tokens": 145,
+    "output_tokens": 148,
     "cost_usd": null
   },
   "output": {
     "questions": [
       {
-        "question": "When was metformin first recorded and at what dose, and was it ever changed to or from Glucophage 850 mg twice daily?",
-        "query": "metformin Glucophage dose"
+        "question": "When was metformin first recorded, and at what dose and frequency?",
+        "query": "metformin dose frequency"
       },
       {
-        "question": "What earlier entries document the HbA1c trend and prior values?",
-        "query": "HbA1c"
+        "question": "When was Glucophage first recorded, and how does it relate to earlier metformin prescriptions?",
+        "query": "Glucophage metformin"
       },
       {
-        "question": "Was the pharmacy list metformin 500 mg discrepancy previously noted or reconciled?",
-        "query": "pharmacy list metformin discrepancy"
+        "question": "Was the dose discrepancy between Glucophage 850 mg and metformin 500 mg previously reconciled or changed?",
+        "query": "metformin 500 850 dose change"
       },
       {
-        "question": "Are any allergies or reactions recorded in earlier entries?",
-        "query": "allergy reaction"
+        "question": "What earlier HbA1c results and trends are recorded?",
+        "query": "HbA1c results trend"
       },
       {
-        "question": "Are there earlier entries documenting renal function or other monitoring relevant to metformin?",
-        "query": "renal function metformin"
+        "question": "Were any other diabetes medications started or stopped earlier in the record?",
+        "query": "diabetes medication started stopped"
       }
     ]
   }

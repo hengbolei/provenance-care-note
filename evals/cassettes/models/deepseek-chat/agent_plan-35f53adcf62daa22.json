@@ -1,0 +1,39 @@
+{
+  "fingerprint": "35f53adcf62daa2241b81c501b774995c30a3e72d99827e6f07c794d7578e714",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 4045,
+    "output_tokens": 212,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was apixaban first recorded, and at what dose and frequency was it originally prescribed?",
+        "query": "apixaban dose frequency"
+      },
+      {
+        "question": "Is there documentation of the prescriber's confirmation of the apixaban dose (2.5 mg vs 5 mg)?",
+        "query": "apixaban prescriber confirm dose"
+      },
+      {
+        "question": "What was the indication for starting apixaban, and when was it documented?",
+        "query": "apixaban indication anticoagulation atrial fibrillation"
+      },
+      {
+        "question": "Have renal function or other labs affecting apixaban dosing (e.g., creatinine, eGFR, weight, age) been recorded?",
+        "query": "creatinine eGFR renal function weight"
+      },
+      {
+        "question": "Are there recorded bleeding events, falls or other adverse effects since apixaban was started?",
+        "query": "bleeding fall bruising adverse"
+      },
+      {
+        "question": "Has anticoagulation monitoring or a medication review been planned or completed for apixaban?",
+        "query": "medication review anticoagulation monitoring plan"
+      }
+    ]
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "fingerprint": "8422cc9031e3c6b8328b51183171c27b02887d848bedc4b7591b2ba7e7eddba5",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 1018,
+    "output_tokens": 149,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was lisinopril first recorded, and at what starting dose?",
+        "query": "lisinopril start dose"
+      },
+      {
+        "question": "Was the lisinopril dose increased from 10 mg to 20 mg, and when?",
+        "query": "lisinopril increase 20 mg"
+      },
+      {
+        "question": "Is there any prior record of dizziness, hypotension or low blood pressure readings?",
+        "query": "dizziness hypotension blood pressure"
+      },
+      {
+        "question": "What home blood pressure readings are recorded over time?",
+        "query": "home blood pressure readings"
+      },
+      {
+        "question": "Were any other antihypertensives or diuretics recorded that could contribute to hypotension?",
+        "query": "antihypertensive diuretic medication"
+      }
+    ]
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "fingerprint": "27920141085b8dea95d35d0c8f920ec4928af478a06a87999eab9d4721c4d771",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2821,
+    "output_tokens": 1076,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports taking metoprolol every morning as usual on 2026-08-17.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "0b1783d6-b8a8-547a-a28c-fd92fb8f28b0",
+            "start": 0,
+            "end": 45,
+            "quote": "I take metoprolol every morning as usual and feel fine."
+          }
+        ]
+      },
+      {
+        "text": "Clinician ordered metoprolol held on 2026-08-15 due to heart rate of 48 bpm, pending review on Thursday (2026-08-17).",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "e2590edf-79a0-57ac-8c06-7edfe42b66fd",
+            "start": 0,
+            "end": 64,
+            "quote": "Heart rate 48. Hold metoprolol until the heart rate is reviewed on Thursday."
+          }
+        ]
+      },
+      {
+        "text": "There is a conflict between clinician instruction to hold metoprolol (2026-08-15) and patient report of continuing it (2026-08-17).",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "e2590edf-79a0-57ac-8c06-7edfe42b66fd",
+            "start": 0,
+            "end": 64,
+            "quote": "Heart rate 48. Hold metoprolol until the heart rate is reviewed on Thursday."
+          },
+          {
+            "entry_id": "0b1783d6-b8a8-547a-a28c-fd92fb8f28b0",
+            "start": 0,
+            "end": 45,
+            "quote": "I take metoprolol every morning as usual and feel fine."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was metoprolol first started, and at what dose?",
+      "Was the hold order for metoprolol carried out after 2026-08-15, and if so, when was it resumed or revised?",
+      "What was the heart rate trend leading up to 2026-08-15, and were prior bradycardia concerns documented?",
+      "Was there a formal review of heart rate on 2026-08-17 (Thursday), as planned, and what was decided about metoprolol?",
+      "Are there any documented adverse reactions or allergies to metoprolol or beta-blockers?",
+      "What other cardiovascular medications or conditions (e.g., hypertension, arrhythmia) are documented that may influence metoprolol use?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "e2590edf-79a0-57ac-8c06-7edfe42b66fd",
+          "start": 0,
+          "end": 64,
+          "quote": "Heart rate 48. Hold metoprolol until the heart rate is reviewed on Thursday."
+        },
+        "risk_reason": "Heart rate of 48 bpm indicates significant bradycardia; holding metoprolol is appropriate, but unresolved status creates risk of continued exposure.",
+        "suggested_action": "Confirm whether metoprolol was held per order and document outcome of Thursday heart rate review.",
+        "clinical_entities": [
+          "metoprolol",
+          "bradycardia",
+          "heart rate"
+        ]
+      },
+      {
+        "citation": {
+          "entry_id": "0b1783d6-b8a8-547a-a28c-fd92fb8f28b0",
+          "start": 0,
+          "end": 45,
+          "quote": "I take metoprolol every morning as usual and feel fine."
+        },
+        "risk_reason": "Patient reports continuing metoprolol despite clinician's hold order, indicating possible communication gap or non-adherence to safety directive.",
+        "suggested_action": "Clarify with patient whether they received and understood the hold instruction, and verify current dosing status.",
+        "clinical_entities": [
+          "metoprolol",
+          "patient adherence",
+          "communication"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

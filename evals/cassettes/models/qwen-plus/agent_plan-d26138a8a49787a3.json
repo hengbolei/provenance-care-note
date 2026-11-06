@@ -1,0 +1,39 @@
+{
+  "fingerprint": "d26138a8a49787a35eb3cc81d65c4a8f8497a4f66615f28099279183ed91ff0f",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 1039,
+    "output_tokens": 264,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was warfarin first started, and at what dose?",
+        "query": "warfarin start dose"
+      },
+      {
+        "question": "When was the last INR test before 2026-08-14, and what was the result?",
+        "query": "INR"
+      },
+      {
+        "question": "Was the warfarin dose change to 2.5 mg implemented after 2026-08-14?",
+        "query": "warfarin 2.5 mg"
+      },
+      {
+        "question": "What was the reason for initiating warfarin, and is there documentation of indication or risk assessment?",
+        "query": "warfarin indication"
+      },
+      {
+        "question": "Has the Friday INR recheck (ordered on 2026-08-14) been performed or documented?",
+        "query": "INR Friday"
+      },
+      {
+        "question": "Are there any documented bleeding events, symptoms, or concerns related to anticoagulation since warfarin initiation?",
+        "query": "bleeding bruising warfarin"
+      }
+    ]
+  }
+}

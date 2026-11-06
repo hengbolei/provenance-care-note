@@ -5,34 +5,34 @@
   "model": "deepseek-chat",
   "usage": {
     "input_tokens": 852,
-    "output_tokens": 170,
+    "output_tokens": 186,
     "cost_usd": null
   },
   "output": {
     "questions": [
       {
-        "question": "When was the amoxicillin allergy first recorded, and what reaction was documented?",
+        "question": "When was the amoxicillin allergy or rash first recorded, and what was the reaction and timing relative to the course?",
         "query": "amoxicillin allergy rash"
       },
       {
-        "question": "When did the rash first appear, and how was it treated or resolved?",
-        "query": "rash onset treatment"
+        "question": "Does any earlier entry document a drug allergy or reaction, given an earlier note said no known drug allergies?",
+        "query": "allergy drug reaction"
       },
       {
-        "question": "Was the earlier 'no known drug allergies' note ever updated, and by whom?",
-        "query": "no known drug allergies update"
+        "question": "What was the amoxicillin prescribed for, and what course dates and dose were recorded?",
+        "query": "amoxicillin course dose"
       },
       {
-        "question": "What was the course that caused the rash on day three, and was it stopped or completed?",
-        "query": "course day three stopped"
+        "question": "Was any alternative antibiotic or allergy management plan documented after the rash?",
+        "query": "rash antibiotic alternative"
       },
       {
-        "question": "Were any antihistamines, steroids or other medications started for the rash?",
-        "query": "antihistamine steroid rash"
-      },
-      {
-        "question": "What blood pressure and weight values were recorded, and are there earlier measurements?",
+        "question": "What were the weight, blood pressure and other vitals from the earlier visit, and were they repeated?",
         "query": "blood pressure weight"
+      },
+      {
+        "question": "Were any follow-up appointments, referrals or tests planned earlier, and were they completed?",
+        "query": "referral follow-up test"
       }
     ]
   }

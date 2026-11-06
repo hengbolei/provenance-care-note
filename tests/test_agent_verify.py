@@ -400,3 +400,16 @@ def test_a_dosed_drug_named_in_a_state_claim_must_still_be_cited(entries, clinic
 
     assert check.failures == [CheckFailure.UNSUPPORTED_ENTITIES]
     assert "warfarin" in check.detail[0]
+
+
+def test_citing_a_conflict_id_names_the_entries_to_cite(entries, clinician_entry, patient_entry):
+    conflict = _conflict("metformin", clinician_entry, patient_entry)
+    cited = _cite(clinician_entry, "started metformin").model_copy(update={"entry_id": conflict.id})
+
+    report = _verify(entries, _claim("Metformin doses conflict.", cited), conflicts=[conflict])
+    check = _only_check(report)
+
+    assert check.failures == [CheckFailure.UNKNOWN_ENTRY]
+    assert "cites a conflict_id, not an entry" in check.detail[0]
+    assert str(clinician_entry.id) in check.detail[0]
+    assert str(patient_entry.id) in check.detail[0]

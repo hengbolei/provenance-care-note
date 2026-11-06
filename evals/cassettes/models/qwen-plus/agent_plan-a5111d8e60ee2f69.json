@@ -5,34 +5,34 @@
   "model": "qwen-plus",
   "usage": {
     "input_tokens": 886,
-    "output_tokens": 280,
+    "output_tokens": 299,
     "cost_usd": null
   },
   "output": {
     "questions": [
       {
         "question": "When was the penicillin allergy first recorded, and what was the nature and timing of the rash reaction?",
-        "query": "penicillin allergy rash 2019"
+        "query": "penicillin rash 2019"
       },
       {
         "question": "Was the penicillin allergy ever re-evaluated, challenged, or de-labelled after 2019?",
-        "query": "penicillin allergy re-evaluated challenged de-labelled"
+        "query": "penicillin allergy re-evaluated challenged de-label"
       },
       {
-        "question": "What evidence supports the clinician instruction to 'write that all allergies are resolved' — was there testing, documentation of resolution, or a formal allergy review?",
-        "query": "allergies resolved testing review"
+        "question": "What medications were prescribed or administered around the time of the 2019 rash, and were any alternatives used due to the allergy?",
+        "query": "penicillin alternative 2019 rash"
       },
       {
-        "question": "What medications were prescribed, administered, or avoided due to the penicillin allergy, and when were those decisions made?",
-        "query": "penicillin avoided medication prescribed"
+        "question": "Has the patient received any beta-lactam antibiotics since 2019, and if so, with what outcome?",
+        "query": "beta-lactam amoxicillin cefalexin 2019"
       },
       {
-        "question": "Is there any record of an allergy action plan, patient education, or allergy alert removal from the record?",
-        "query": "allergy action plan education alert removed"
+        "question": "What clinical evidence or documentation supports the claim that 'all allergies are resolved'?",
+        "query": "allergies resolved confirmed testing"
       },
       {
-        "question": "What other allergies or adverse drug reactions are documented besides penicillin?",
-        "query": "allergy reaction adverse drug"
+        "question": "Were any allergy-related assessments (e.g., skin testing, drug challenge) documented before or after the 2019 reaction?",
+        "query": "skin test drug challenge allergy assessment"
       }
     ]
   }

@@ -5,30 +5,30 @@
   "model": "deepseek-chat",
   "usage": {
     "input_tokens": 873,
-    "output_tokens": 153,
+    "output_tokens": 135,
     "cost_usd": null
   },
   "output": {
     "questions": [
       {
         "question": "When was insulin glargine first recorded, and what doses were documented in earlier entries?",
-        "query": "insulin glargine dose night"
+        "query": "insulin glargine dose"
       },
       {
-        "question": "Were there earlier entries documenting any insulin dose changes or adjustments?",
-        "query": "insulin glargine change adjustment"
+        "question": "Were any changes to insulin made before the August 10 note stating no change planned?",
+        "query": "insulin change"
       },
       {
-        "question": "What do earlier glucose readings show compared with the recent 6 to 9 mmol/L range?",
-        "query": "glucose readings blood sugar"
+        "question": "What glucose or HbA1c readings appear in earlier entries?",
+        "query": "glucose HbA1c readings"
       },
       {
-        "question": "Were any hypo- or hyperglycaemic episodes recorded in earlier entries?",
-        "query": "hypoglycaemia hyperglycaemia symptoms"
+        "question": "Are any hypoglycemic episodes or low glucose readings recorded?",
+        "query": "hypoglycemia low glucose"
       },
       {
-        "question": "What earlier entries document the diabetes care plan and whether it was carried out?",
-        "query": "diabetes plan review follow-up"
+        "question": "Have any insulin-related allergies or adverse reactions been documented?",
+        "query": "insulin allergy reaction"
       }
     ]
   }

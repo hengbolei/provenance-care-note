@@ -1,0 +1,52 @@
+{
+  "fingerprint": "a2a4e2413698c3cc03895052be23412d453b77b2f9bdf976767d25547640652d",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2406,
+    "output_tokens": 418,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports being allergic to ibuprofen, causing wheezing.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "b97ba818-6e0d-54c7-a203-65f69534febb",
+            "start": 27,
+            "end": 65,
+            "quote": "I think I am allergic to ibuprofen, it makes me wheezy."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was the ibuprofen allergy first recorded?",
+      "Has the patient had any prior respiratory reactions to NSAIDs or other medications?",
+      "Was any action taken in response to this reported allergy, such as documenting in allergy list or stopping prescriptions?",
+      "Which medications were started, stopped, held or changed?",
+      "Which follow-ups, referrals or tests are planned or outstanding?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "b97ba818-6e0d-54c7-a203-65f69534febb",
+          "start": 27,
+          "end": 65,
+          "quote": "I think I am allergic to ibuprofen, it makes me wheezy."
+        },
+        "risk_reason": "Respiratory reaction (wheezing) to ibuprofen suggests possible NSAID-exacerbated respiratory disease or IgE-mediated allergy; high risk of recurrence with re-exposure.",
+        "suggested_action": "Formally document ibuprofen as a confirmed allergy in the allergy list and flag for NSAID cross-reactivity.",
+        "clinical_entities": [
+          "ibuprofen",
+          "wheezing"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

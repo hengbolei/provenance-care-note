@@ -1,0 +1,52 @@
+{
+  "fingerprint": "939987196c2b40cf7a8195f7eefa54aa5c6e5dd8d2c4b27b06e49b4631064cbf",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2471,
+    "output_tokens": 388,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Clinician directed continuation of current medications on 2026-08-22.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "71830cd9-8574-548e-80cb-2d2d69100333",
+            "start": 0,
+            "end": 33,
+            "quote": "Continue current medications."
+          }
+        ]
+      },
+      {
+        "text": "Clinician scheduled follow-up review for three months after 2026-08-22.",
+        "category": "follow_up",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "71830cd9-8574-548e-80cb-2d2d69100333",
+            "start": 34,
+            "end": 62,
+            "quote": " Review in three months."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Which specific medications are currently being continued?",
+      "When were the current medications first started?",
+      "Were any medications stopped, held or changed before 2026-08-22?",
+      "Which allergies or reactions are recorded?",
+      "When was the last allergy or reaction documented?",
+      "What clinical findings or symptoms prompted the plan to continue medications and review in three months?",
+      "What follow-up, referral or test was planned for three months from 2026-08-22?"
+    ],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "fingerprint": "87572587dd2f03193fc84ede51b2f6aa48ed53706a28c1e9ef5c6a47948b8a86",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2508,
+    "output_tokens": 420,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports chest discomfort on exertion.",
+        "category": "symptom",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "2e6860db-4682-548d-a7be-956a71a110ea",
+            "start": 26,
+            "end": 55,
+            "quote": "Patient described chest discomfort on exertion."
+          }
+        ]
+      },
+      {
+        "text": "Duration and medication history for chest discomfort were not discussed in this summary.",
+        "category": "other",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "2e6860db-4682-548d-a7be-956a71a110ea",
+            "start": 56,
+            "end": 98,
+            "quote": "Duration and medication history were not discussed."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was chest discomfort first reported, and what was its initial description?",
+      "What medications were prescribed for chest discomfort, and when were they started?",
+      "Was any cardiac investigation (e.g., ECG, troponin, stress test) performed or ordered previously?",
+      "What is the full documented history of exertional symptoms, including onset and progression?",
+      "Which medications are currently active, and when was the most recent regimen confirmed or adjusted?",
+      "Are there documented allergies or reactions relevant to cardiac medications (e.g., beta-blockers, nitrates, aspirin)?",
+      "Which medications were started, stopped, held or changed?",
+      "Which allergies or reactions are recorded?",
+      "Which follow-ups, referrals or tests are planned or outstanding?"
+    ],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

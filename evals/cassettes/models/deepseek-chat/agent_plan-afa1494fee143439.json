@@ -1,0 +1,31 @@
+{
+  "fingerprint": "afa1494fee143439c6b34e7bce21e4d931806dde00333e108c362cbbe700950c",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 1005,
+    "output_tokens": 129,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was metformin first recorded in this patient's record, and at what dose?",
+        "query": "metformin start dose"
+      },
+      {
+        "question": "What dose changes or titration of metformin are documented over time?",
+        "query": "metformin titration change"
+      },
+      {
+        "question": "Is there any clinician documentation supporting a metformin 2000 mg dose, or is that only a patient-reported claim?",
+        "query": "metformin 2000 mg maximum"
+      },
+      {
+        "question": "How long has the metformin 500 mg twice daily plan been in place, and was it ever adjusted?",
+        "query": "metformin twice daily plan"
+      }
+    ]
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "fingerprint": "5f7ba12bcab5d1004389382af0f67071988217bc4e9d25ceca5d99b70c291812",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 1041,
+    "output_tokens": 265,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was atorvastatin first prescribed, and at what dose?",
+        "query": "atorvastatin started dose"
+      },
+      {
+        "question": "Was the dose change from 40 mg to 20 mg intentional, and what was the clinical rationale?",
+        "query": "atorvastatin dose change rationale"
+      },
+      {
+        "question": "What cholesterol values or cardiovascular risk assessment preceded the recommendation for atorvastatin 40 mg?",
+        "query": "cholesterol LDL risk assessment"
+      },
+      {
+        "question": "Has the patient reported any muscle symptoms, liver enzyme changes, or other adverse effects on atorvastatin?",
+        "query": "atorvastatin side effect myalgia LFT"
+      },
+      {
+        "question": "Was pharmacy confirmation of 20 mg documented before or after the AI summary recommending 40 mg?",
+        "query": "pharmacy confirmation timing"
+      },
+      {
+        "question": "Are there earlier notes indicating adherence issues, titration attempts, or shared decision-making about statin dose?",
+        "query": "atorvastatin adherence titration discussion"
+      }
+    ]
+  }
+}

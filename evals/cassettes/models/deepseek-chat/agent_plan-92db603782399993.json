@@ -5,30 +5,30 @@
   "model": "deepseek-chat",
   "usage": {
     "input_tokens": 850,
-    "output_tokens": 156,
+    "output_tokens": 148,
     "cost_usd": null
   },
   "output": {
     "questions": [
       {
-        "question": "When was the new tablet started, and is it metformin or another medication?",
-        "query": "metformin new tablet start"
+        "question": "When was metformin first recorded, and has it been started, stopped or dose-changed since?",
+        "query": "metformin"
       },
       {
-        "question": "Are there earlier entries documenting gastrointestinal symptoms or intolerance before metformin was started?",
-        "query": "stomach upset nausea diarrhea"
+        "question": "Was any baseline test (HbA1c, renal function) recorded before starting metformin?",
+        "query": "HbA1c creatinine eGFR"
       },
       {
-        "question": "What baseline diabetes tests (HbA1c, renal function) were recorded before metformin initiation?",
-        "query": "HbA1c creatinine eGFR baseline"
+        "question": "Is there any prior record of gastrointestinal symptoms or intolerance before the new tablet?",
+        "query": "nausea vomiting diarrhea intolerance"
       },
       {
-        "question": "Is there any earlier record of metformin allergy or intolerance, and what were the details?",
-        "query": "metformin allergy intolerance reaction"
+        "question": "Are there earlier entries indicating which medication 'the new tablet' refers to?",
+        "query": "new tablet start medication"
       },
       {
-        "question": "Were diabetes education, dietitian referral, or follow-up monitoring planned and completed?",
-        "query": "dietitian referral follow-up diabetes education"
+        "question": "Is any follow-up or repeat test planned after metformin initiation?",
+        "query": "follow-up repeat HbA1c review"
       }
     ]
   }

@@ -1,0 +1,97 @@
+{
+  "fingerprint": "e7eabcc6b4abe5572c75ab9eb6bc6497c0af41aafc9974ed2af66de049ea87d7",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2886,
+    "output_tokens": 974,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Warfarin 5 mg each evening was prescribed on 2026-08-01.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "f2d044c1-f89a-5d04-b1b3-737ff68dd764",
+            "start": 0,
+            "end": 32,
+            "quote": "Warfarin 5 mg each evening; INR target 2 to 3."
+          }
+        ]
+      },
+      {
+        "text": "Pharmacy dispensed warfarin 3 mg tablets, one each evening.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "0dedd3b8-932b-5d83-a202-804b9104bdd9",
+            "start": 0,
+            "end": 52,
+            "quote": "Pharmacy dispensed warfarin 3 mg tablets, one each evening."
+          }
+        ]
+      },
+      {
+        "text": "There is a dose conflict for warfarin: 3 mg (dispensed) versus 5 mg (prescribed).",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "f2d044c1-f89a-5d04-b1b3-737ff68dd764",
+            "start": 0,
+            "end": 32,
+            "quote": "Warfarin 5 mg each evening; INR target 2 to 3."
+          },
+          {
+            "entry_id": "0dedd3b8-932b-5d83-a202-804b9104bdd9",
+            "start": 0,
+            "end": 52,
+            "quote": "Pharmacy dispensed warfarin 3 mg tablets, one each evening."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was warfarin first prescribed and at what dose?",
+      "When was the warfarin dose changed from 5 mg to 3 mg, and what was the clinical rationale?",
+      "What INR values were recorded before and after the warfarin dose change?",
+      "Was the warfarin 5 mg dose ever dispensed or administered, or was it only prescribed?",
+      "Are there any documented reasons for reducing the warfarin dose, such as bleeding, INR elevation, or drug interaction?",
+      "Has any patient education or monitoring plan for warfarin been documented (e.g., INR schedule, dietary advice, signs of bleeding)?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "f2d044c1-f89a-5d04-b1b3-737ff68dd764",
+          "start": 0,
+          "end": 32,
+          "quote": "Warfarin 5 mg each evening; INR target 2 to 3."
+        },
+        "risk_reason": "Prescribed warfarin dose (5 mg) conflicts with dispensed dose (3 mg); may lead to subtherapeutic anticoagulation if 3 mg is used without confirmation.",
+        "suggested_action": "Clarify intended warfarin dose and reconcile prescription vs. dispensing records.",
+        "clinical_entities": [
+          "warfarin"
+        ]
+      },
+      {
+        "citation": {
+          "entry_id": "0dedd3b8-932b-5d83-a202-804b9104bdd9",
+          "start": 0,
+          "end": 52,
+          "quote": "Pharmacy dispensed warfarin 3 mg tablets, one each evening."
+        },
+        "risk_reason": "Dispensed warfarin dose (3 mg) differs from prescribed dose (5 mg); no documentation of dose change rationale or INR data supporting reduction.",
+        "suggested_action": "Verify whether dose reduction was intentional and confirm current INR and clinical context.",
+        "clinical_entities": [
+          "warfarin"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

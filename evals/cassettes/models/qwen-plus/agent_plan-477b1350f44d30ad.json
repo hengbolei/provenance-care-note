@@ -5,34 +5,34 @@
   "model": "qwen-plus",
   "usage": {
     "input_tokens": 776,
-    "output_tokens": 251,
+    "output_tokens": 199,
     "cost_usd": null
   },
   "output": {
     "questions": [
       {
-        "question": "When was chest discomfort first recorded, and what was its character, duration and associated features?",
-        "query": "chest discomfort exertion"
+        "question": "When was chest discomfort first reported, and what was its initial description?",
+        "query": "chest discomfort"
       },
       {
-        "question": "What medications were prescribed for chest discomfort or cardiovascular risk, and when were they started?",
+        "question": "What medications were prescribed for chest discomfort, and when were they started?",
         "query": "chest discomfort medication"
       },
       {
-        "question": "Was any cardiac investigation (e.g., ECG, troponin, stress test) ordered or performed, and when?",
+        "question": "Was any cardiac investigation (e.g., ECG, troponin, stress test) performed or ordered previously?",
         "query": "ECG troponin stress test"
       },
       {
-        "question": "Has the patient been referred to cardiology or another specialist for this symptom?",
-        "query": "cardiology referral"
+        "question": "What is the full documented history of exertional symptoms, including onset and progression?",
+        "query": "exertion symptom onset"
       },
       {
-        "question": "What cardiovascular risk factors (e.g., hypertension, diabetes, smoking) are documented, and when were they first noted?",
-        "query": "hypertension diabetes smoking"
+        "question": "Which medications are currently active, and when was the most recent regimen confirmed or adjusted?",
+        "query": "medication started stopped changed"
       },
       {
-        "question": "Was a formal diagnosis (e.g., angina, CAD, GERD) assigned, and when was it first recorded?",
-        "query": "angina CAD GERD diagnosis"
+        "question": "Are there documented allergies or reactions relevant to cardiac medications (e.g., beta-blockers, nitrates, aspirin)?",
+        "query": "allergy aspirin nitrate beta-blocker"
       }
     ]
   }

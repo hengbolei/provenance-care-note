@@ -5,10 +5,15 @@
   "model": "deepseek-chat",
   "usage": {
     "input_tokens": 788,
-    "output_tokens": 5,
+    "output_tokens": 41,
     "cost_usd": null
   },
   "output": {
-    "questions": []
+    "questions": [
+      {
+        "question": "When was Ms Lim's name and contact preference first recorded, and who confirmed the legal name on file?",
+        "query": "name contact preference morning calls"
+      }
+    ]
   }
 }

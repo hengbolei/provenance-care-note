@@ -1,0 +1,52 @@
+{
+  "fingerprint": "99684f675dae027e65a0bcf7c4cde05d0dcc0215330e99775e3e1e13fe9c5ef7",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2512,
+    "output_tokens": 371,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Clinician note records that the patient is allergic to penicillin, with a widespread rash in 2019.",
+        "category": "allergy",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "e8a3991d-cde3-5a61-8f00-b572a213e617",
+            "start": 0,
+            "end": 51,
+            "quote": "Allergic to penicillin; widespread rash in 2019."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was the penicillin allergy first recorded, and what reactions were documented at that time? The record only contains a clinician note dated 2026-08-02 describing a 2019 rash; no earlier allergy entry is present.",
+      "Were any allergy entries later revised, removed or reassessed after the 2019 rash? No revision or reassessment entry appears in the record.",
+      "What symptoms were recorded in earlier entries that explain the recent note of feeling fine? No earlier symptom entries are present in the record.",
+      "The record contains no entries documenting medications started, stopped, held or changed.",
+      "The record contains no follow-up, referral or test entries, so planned or outstanding items cannot be determined."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "e8a3991d-cde3-5a61-8f00-b572a213e617",
+          "start": 0,
+          "end": 51,
+          "quote": "Allergic to penicillin; widespread rash in 2019."
+        },
+        "risk_reason": "Documented penicillin allergy with a prior widespread rash is a high-risk allergy for future antibiotic prescribing.",
+        "suggested_action": "Confirm the penicillin allergy and reaction details with the patient and ensure it is visible before any antibiotic is ordered.",
+        "clinical_entities": [
+          "penicillin",
+          "widespread rash"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

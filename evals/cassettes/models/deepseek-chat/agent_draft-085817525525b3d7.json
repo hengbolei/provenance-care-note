@@ -1,0 +1,70 @@
+{
+  "fingerprint": "085817525525b3d7654a108f9f392a22bb62e9f58e4177cfc069936e2b4d333f",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 5732,
+    "output_tokens": 523,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "The clinician note records low haemoglobin and asks to arrange a colonoscopy referral and repeat blood count in four weeks.",
+        "category": "plan",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "a3590d83-0db4-5e46-ae05-fc20fcc20ddc",
+            "start": 0,
+            "end": 89,
+            "quote": "Low haemoglobin. Arrange a colonoscopy referral and repeat blood count in four weeks."
+          }
+        ]
+      },
+      {
+        "text": "The record states the colonoscopy referral has not been booked.",
+        "category": "follow_up",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "4c968285-a416-5a68-bc6f-e4f144f049db",
+            "start": 0,
+            "end": 41,
+            "quote": "Colonoscopy referral has not been booked."
+          }
+        ]
+      },
+      {
+        "text": "Repeated nurse checks (checks 15 through 52) each record the patient as comfortable with no concerns raised during the call.",
+        "category": "other",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "aa1f02eb-e0ad-5e25-a9f9-4ec3a3c6018d",
+            "start": 0,
+            "end": 76,
+            "quote": "Nurse check 52. Patient comfortable and no concerns raised during the call."
+          },
+          {
+            "entry_id": "92135178-849d-593f-9245-bb28428be598",
+            "start": 0,
+            "end": 76,
+            "quote": "Nurse check 15. Patient comfortable and no concerns raised during the call."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "No medication start, stop, hold or change is documented in the record; confirm the current medication list.",
+      "No allergy or reaction is recorded in the record; confirm allergy status with the patient.",
+      "The first record of a colonoscopy referral is the clinician note of 2026-07-01, which gives low haemoglobin as the indication; earlier discussion of colonoscopy is not documented.",
+      "No bowel preparation, scheduling or pre-procedure instructions for the colonoscopy are documented.",
+      "No earlier consultation documents discussion of alternatives or findings prompting the colonoscopy beyond the low haemoglobin entry.",
+      "The reason for the ongoing nurse check calls and any active symptoms are not documented beyond 'no concerns raised'."
+    ],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

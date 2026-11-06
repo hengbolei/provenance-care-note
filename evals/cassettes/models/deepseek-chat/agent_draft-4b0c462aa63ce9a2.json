@@ -1,0 +1,65 @@
+{
+  "fingerprint": "4b0c462aa63ce9a2ba080a7a42c4df3f2d7f73a064d4e67a151c368bb57d3092",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2541,
+    "output_tokens": 449,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Metformin 500 mg was started with the evening meal for newly diagnosed type 2 diabetes.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "48e355e5-a5e8-5650-b63b-3aa2d1da0107",
+            "start": 0,
+            "end": 88,
+            "quote": "Started metformin 500 mg with the evening meal for newly diagnosed type 2 diabetes."
+          }
+        ]
+      },
+      {
+        "text": "Patient reports mild stomach upset since starting the new tablet.",
+        "category": "symptom",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "bfc48721-2693-5a76-9636-01fbc9ffcb3f",
+            "start": 0,
+            "end": 48,
+            "quote": "I have had mild stomach upset since the new tablet."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "No follow-up, referral or repeat test is recorded after metformin initiation; confirm whether one is planned.",
+      "No HbA1c or renal function result recorded before metformin was started; confirm whether baseline testing was done.",
+      "The record does not explicitly link 'the new tablet' to metformin; confirm which medication the patient means.",
+      "No prior gastrointestinal symptoms or intolerance are recorded before metformin initiation; confirm history.",
+      "No allergies or reactions are recorded in the available entries; confirm allergy status."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "bfc48721-2693-5a76-9636-01fbc9ffcb3f",
+          "start": 0,
+          "end": 48,
+          "quote": "I have had mild stomach upset since the new tablet."
+        },
+        "risk_reason": "Patient-reported stomach upset after a newly started medication; attribution to metformin is not documented.",
+        "suggested_action": "Ask the patient about the stomach upset and confirm which medication 'the new tablet' refers to.",
+        "clinical_entities": [
+          "metformin",
+          "stomach upset"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

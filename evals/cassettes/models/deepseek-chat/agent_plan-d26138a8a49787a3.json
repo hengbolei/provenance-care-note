@@ -1,0 +1,39 @@
+{
+  "fingerprint": "d26138a8a49787a35eb3cc81d65c4a8f8497a4f66615f28099279183ed91ff0f",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 1007,
+    "output_tokens": 223,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was warfarin first recorded and at what doses has it been documented over time?",
+        "query": "warfarin dose history"
+      },
+      {
+        "question": "What was the patient's INR trend before the 3.8 on 2026-08-14, and what were earlier INR values?",
+        "query": "INR values trend"
+      },
+      {
+        "question": "Has the warfarin dose reduction ordered on 2026-08-14 been acknowledged or acted on in any later or earlier entries?",
+        "query": "warfarin 2.5 mg reduction"
+      },
+      {
+        "question": "Was the Friday INR recheck after the 2026-08-14 advice actually performed and what was the result?",
+        "query": "INR recheck Friday"
+      },
+      {
+        "question": "What was the indication for warfarin and any prior bleeding or thrombotic events on record?",
+        "query": "warfarin indication anticoagulation"
+      },
+      {
+        "question": "How long has the patient been self-reporting the 5 mg nightly dose, and was the change ever discussed with them?",
+        "query": "warfarin 5 mg nightly adherence"
+      }
+    ]
+  }
+}

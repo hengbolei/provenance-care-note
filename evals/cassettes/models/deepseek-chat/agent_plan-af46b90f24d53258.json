@@ -1,0 +1,39 @@
+{
+  "fingerprint": "af46b90f24d53258d521613038ffde039d7988f0b5fefd8288240a6757b20173",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 1092,
+    "output_tokens": 203,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was warfarin started and what was the initially prescribed dose and INR target?",
+        "query": "warfarin initiation dose INR"
+      },
+      {
+        "question": "What is the documented reason for the change from warfarin 5 mg to 3 mg, and was it confirmed with an INR result?",
+        "query": "warfarin INR dose change"
+      },
+      {
+        "question": "What INR values have been recorded since warfarin started, and what was the most recent result?",
+        "query": "INR results"
+      },
+      {
+        "question": "Is there any bleeding or adverse effect recorded that prompted dose adjustment of warfarin?",
+        "query": "bleeding adverse effect warfarin"
+      },
+      {
+        "question": "What allergies or reactions to warfarin or other anticoagulants are recorded earlier in the record?",
+        "query": "allergy anticoagulant reaction"
+      },
+      {
+        "question": "Were any follow-up tests or anticoagulation clinic reviews arranged after the dose change, and are they outstanding?",
+        "query": "INR monitoring follow-up anticoagulation clinic"
+      }
+    ]
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "fingerprint": "d3390a87186dfeceb34bfd82b8e177bb033063a9702e5da2b2b234b5261a8547",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2545,
+    "output_tokens": 467,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports taking amlodipine 5 mg daily, as recorded in a staff note on 2026-07-28.",
+        "category": "medication",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "4389a3ac-5129-56df-8fbf-61fed1f7cac4",
+            "start": 15,
+            "end": 39,
+            "quote": "amlodipine 5 mg daily"
+          }
+        ]
+      },
+      {
+        "text": "Clinician note states amlodipine was stopped because of ankle swelling, with blood pressure to be reviewed in two weeks.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "7109649a-a49b-5a60-908a-b93b4c9589ef",
+            "start": 0,
+            "end": 98,
+            "quote": "Amlodipine was stopped because of ankle swelling; review blood pressure in two weeks."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was ankle swelling first recorded, and was it previously linked to amlodipine?",
+      "When was amlodipine first started, and at what dose?",
+      "What antihypertensive medications were tried before amlodipine, and were they stopped and why?",
+      "What are the most recent blood pressure readings before amlodipine was stopped?",
+      "Which allergies or reactions are recorded for this patient?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "7109649a-a49b-5a60-908a-b93b4c9589ef",
+          "start": 0,
+          "end": 98,
+          "quote": "Amlodipine was stopped because of ankle swelling; review blood pressure in two weeks."
+        },
+        "risk_reason": "Adverse effect (ankle swelling) led to stopping amlodipine; blood pressure review is pending.",
+        "suggested_action": "Confirm the blood pressure review in two weeks is scheduled and documented.",
+        "clinical_entities": [
+          "amlodipine",
+          "ankle swelling",
+          "blood pressure review"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

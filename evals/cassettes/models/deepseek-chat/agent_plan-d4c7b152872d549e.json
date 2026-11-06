@@ -5,30 +5,26 @@
   "model": "deepseek-chat",
   "usage": {
     "input_tokens": 4062,
-    "output_tokens": 152,
+    "output_tokens": 121,
     "cost_usd": null
   },
   "output": {
     "questions": [
       {
-        "question": "When was the colonoscopy first requested or recommended, and for what indication?",
+        "question": "When was the colonoscopy first recorded as referred, and what was the indication?",
         "query": "colonoscopy referral indication"
       },
       {
-        "question": "Was any earlier colonoscopy or bowel screening completed, and what did it show?",
-        "query": "colonoscopy bowel screening result"
+        "question": "Has any bowel preparation, scheduling or pre-procedure instruction been documented for the colonoscopy?",
+        "query": "colonoscopy bowel preparation scheduling"
       },
       {
-        "question": "Has the outstanding colonoscopy referral been acted on or declined since it was recorded?",
-        "query": "colonoscopy booked scheduled"
+        "question": "Was the colonoscopy discussed in earlier clinician consultations, and what alternatives or findings prompted it?",
+        "query": "colonoscopy consultation plan"
       },
       {
-        "question": "What earlier entries say about symptoms (e.g. bowel change, bleeding) that prompted the colonoscopy referral?",
-        "query": "rectal bleeding bowel habit change"
-      },
-      {
-        "question": "Where in the record did the colonoscopy plan first appear, and was patient consent or preference documented?",
-        "query": "colonoscopy consent discussed"
+        "question": "What earlier entries document the reason for the ongoing nurse check calls and any active symptoms?",
+        "query": "nurse check symptoms reason monitoring"
       }
     ]
   }

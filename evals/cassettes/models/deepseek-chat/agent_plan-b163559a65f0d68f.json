@@ -5,30 +5,26 @@
   "model": "deepseek-chat",
   "usage": {
     "input_tokens": 769,
-    "output_tokens": 147,
+    "output_tokens": 139,
     "cost_usd": null
   },
   "output": {
     "questions": [
       {
-        "question": "When was the ibuprofen allergy or wheeze first recorded, and how was it documented previously?",
-        "query": "ibuprofen allergy wheeze"
+        "question": "When was the ibuprofen (or NSAID) allergy or wheeze first recorded, and has it been documented before?",
+        "query": "ibuprofen allergy wheeze NSAID"
       },
       {
-        "question": "Has the ibuprofen reaction been assessed or confirmed in earlier entries?",
-        "query": "ibuprofen reaction assessment"
+        "question": "Is the reported ibuprofen allergy documented in the structured allergy list, and how was it handled?",
+        "query": "ibuprofen allergy reaction documented"
       },
       {
-        "question": "Are other NSAIDs or alternative analgesics recorded, and were any stopped or switched because of this reaction?",
-        "query": "NSAID analgesic alternative"
+        "question": "Are there earlier entries of wheeze or asthma symptoms after taking NSAIDs or other medicines?",
+        "query": "wheeze asthma NSAID aspirin"
       },
       {
-        "question": "Is there any recorded asthma or prior respiratory reaction to medications?",
-        "query": "asthma respiratory wheeze medication"
-      },
-      {
-        "question": "Have allergy details been added to the allergy list or communicated to other clinicians?",
-        "query": "allergy list documentation"
+        "question": "Was any prior NSAID or ibuprofen prescription recorded, and was it stopped afterward?",
+        "query": "ibuprofen NSAID prescription stopped"
       }
     ]
   }

@@ -5,34 +5,34 @@
   "model": "qwen-plus",
   "usage": {
     "input_tokens": 760,
-    "output_tokens": 212,
+    "output_tokens": 162,
     "cost_usd": null
   },
   "output": {
     "questions": [
       {
-        "question": "Which medications are currently prescribed, and when were they first started?",
-        "query": "medication start"
+        "question": "When were the current medications first started?",
+        "query": "started medication"
       },
       {
-        "question": "Were any medications stopped, held or changed recently, and what was the reason?",
-        "query": "stopped held changed"
+        "question": "Which specific medications are currently being continued?",
+        "query": "medication"
       },
       {
-        "question": "What allergies or adverse reactions are documented, and when were they first recorded?",
+        "question": "When was the last allergy or reaction documented?",
         "query": "allergy reaction"
       },
       {
-        "question": "Are there any outstanding follow-ups, referrals or tests mentioned in earlier entries?",
-        "query": "follow-up referral test"
-      },
-      {
-        "question": "What was the clinical rationale for continuing current medications, and was it based on recent assessment?",
-        "query": "continue rationale assessment"
-      },
-      {
-        "question": "Was a three-month review previously scheduled or discussed, and has it been done before?",
+        "question": "What follow-up, referral or test was planned for three months from 2026-08-22?",
         "query": "review three months"
+      },
+      {
+        "question": "Were any medications stopped, held or changed before 2026-08-22?",
+        "query": "stopped held changed"
+      },
+      {
+        "question": "What clinical findings or symptoms prompted the plan to continue medications and review in three months?",
+        "query": "symptom finding"
       }
     ]
   }

@@ -5,33 +5,33 @@
   "model": "qwen-plus",
   "usage": {
     "input_tokens": 4640,
-    "output_tokens": 254,
+    "output_tokens": 264,
     "cost_usd": null
   },
   "output": {
     "questions": [
       {
         "question": "When was cefalexin first prescribed, and what was the indication?",
-        "query": "cefalexin prescribed"
+        "query": "cefalexin prescribed indication"
       },
       {
-        "question": "What symptoms or signs were present before the cefalexin dose that led to its prescription?",
-        "query": "infection sore throat fever"
+        "question": "What other antibiotics were tried before cefalexin, and were there prior allergic reactions?",
+        "query": "antibiotic allergy reaction"
       },
       {
-        "question": "Was an alternative antibiotic started after cefalexin was stopped due to allergy?",
-        "query": "alternative antibiotic started"
+        "question": "Was lip swelling assessed clinically (e.g., airway evaluation, epinephrine administered) and documented at the time of reaction?",
+        "query": "lip swelling airway epinephrine assessment"
       },
       {
-        "question": "Was epinephrine, antihistamine, or corticosteroid administered for the lip swelling reaction?",
-        "query": "epinephrine diphenhydramine prednisone"
+        "question": "Was an alternative antibiotic initiated after stopping cefalexin, and when?",
+        "query": "antibiotic alternative started"
       },
       {
-        "question": "Was the cefalexin allergy confirmed with testing or documented as patient-reported vs. observed?",
-        "query": "allergy confirmed testing observed"
+        "question": "Has allergy testing or formal allergy documentation (e.g., severity, mechanism) been performed for cefalexin?",
+        "query": "cefalexin allergy test severity"
       },
       {
-        "question": "Were any follow-up actions ordered after the allergic reaction (e.g., allergist referral, EpiPen prescription)?",
+        "question": "Were any follow-up actions scheduled after the allergic reaction (e.g., allergist referral, re-education, EpiPen prescription)?",
         "query": "allergist referral EpiPen follow-up"
       }
     ]

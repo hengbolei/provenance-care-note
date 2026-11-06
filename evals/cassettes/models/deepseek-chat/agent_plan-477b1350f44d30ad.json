@@ -5,26 +5,30 @@
   "model": "deepseek-chat",
   "usage": {
     "input_tokens": 779,
-    "output_tokens": 116,
+    "output_tokens": 156,
     "cost_usd": null
   },
   "output": {
     "questions": [
       {
-        "question": "When was exertional chest discomfort first recorded, and how has it evolved?",
+        "question": "When was chest discomfort on exertion first recorded, and what did earlier entries say about its duration and character?",
         "query": "chest discomfort exertion"
       },
       {
-        "question": "What cardiac medications or antianginal treatments are recorded for this patient?",
-        "query": "medication cardiac antianginal"
+        "question": "What medication history is documented for this patient, and were any medications started or stopped around the chest discomfort?",
+        "query": "medication history"
       },
       {
-        "question": "Has any prior cardiac evaluation, stress test or angiography been documented?",
-        "query": "stress test angiography cardiac"
+        "question": "Which cardiac tests, referrals or stress evaluations have been ordered or completed for this chest discomfort?",
+        "query": "chest pain tests referral"
       },
       {
-        "question": "Is there a documented plan or referral for further assessment of chest pain that was carried out or remains outstanding?",
-        "query": "referral cardiology chest pain"
+        "question": "Are prior vital signs, ECG or troponin results recorded that relate to this symptom?",
+        "query": "ECG troponin vitals"
+      },
+      {
+        "question": "Were risk factors such as hypertension, diabetes, smoking or previous cardiac events recorded earlier?",
+        "query": "risk factors cardiac history"
       }
     ]
   }

@@ -1,0 +1,51 @@
+{
+  "fingerprint": "e3b7af159bc79d09df1f6994792e01dcb74a03f447634750177f0d304792d909",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2580,
+    "output_tokens": 403,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports developing a rash on day three of an amoxicillin course and being allergic to amoxicillin.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "76296e90-c93b-5a47-b7fd-9ea8358e1ab5",
+            "start": 28,
+            "end": 82,
+            "quote": "Patient developed a rash on day three of the course and is allergic to amoxicillin."
+          }
+        ]
+      },
+      {
+        "text": "Clinician note from 2026-05-02 states no known drug allergies.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "31a3b69d-9d48-512b-b44e-1762ebb44672",
+            "start": 0,
+            "end": 27,
+            "quote": "No known drug allergies. Blood pressure and weight recorded."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was the amoxicillin allergy first documented?",
+      "What was the initial prescription or course of amoxicillin that led to the rash on day three?",
+      "Was the amoxicillin course stopped or changed after the rash appeared?",
+      "What other medications were prescribed around the time the rash developed?",
+      "Was the allergy status updated in the record after the rash, given the earlier note stated 'no known drug allergies'?",
+      "Was any follow-up testing or dermatology referral initiated after the rash?"
+    ],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

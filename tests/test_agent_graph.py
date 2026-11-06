@@ -96,7 +96,10 @@ def test_record_text_reaches_the_model_inside_data_tags(service):
     text = request.input_text
     assert text.startswith("<entry id=")
     assert text.count("<entry ") == text.count("</entry>") == 6
-    assert text.count("<conflict ") == 2
+    assert text.count("<conflict ") == text.count("</conflict>") == 2
+    # Conflicts carry `conflict_id`, never a bare `id`, and name the entries to cite.
+    assert "<conflict id=" not in text
+    assert text.count("<conflict_entry entry=") >= 2
     assert "untrusted record content" in request.instructions
     assert request.safety_subject == str(DEMO_CLINICIAN_ID)
 

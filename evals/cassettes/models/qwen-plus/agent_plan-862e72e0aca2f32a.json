@@ -1,0 +1,39 @@
+{
+  "fingerprint": "862e72e0aca2f32a5964a712a76131a9c9ddd4b267a99bcaa3a7f4c193345154",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 1024,
+    "output_tokens": 246,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was aspirin first started, and what was the original indication?",
+        "query": "aspirin start indication"
+      },
+      {
+        "question": "When was the coronary stent placed, and was aspirin initiated or adjusted at that time?",
+        "query": "stent aspirin initiation"
+      },
+      {
+        "question": "Was the dental extraction carried out, and if so, was aspirin resumed afterward?",
+        "query": "dental extraction aspirin resume"
+      },
+      {
+        "question": "Are there documented bleeding risks, contraindications, or clinical rationale for holding aspirin before dental extraction?",
+        "query": "aspirin hold bleeding risk"
+      },
+      {
+        "question": "What other antiplatelet or anticoagulant medications are recorded, and when were they started or changed?",
+        "query": "antiplatelet anticoagulant"
+      },
+      {
+        "question": "Is there documentation of patient discussion or shared decision-making about stopping aspirin pre-procedure?",
+        "query": "aspirin stop discussion consent"
+      }
+    ]
+  }
+}

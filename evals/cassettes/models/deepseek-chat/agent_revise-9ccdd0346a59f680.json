@@ -1,0 +1,80 @@
+{
+  "fingerprint": "9ccdd0346a59f680154cd0ccdd12b43c65433ab0841e3b28bb970c6d0fd4f7e3",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2666,
+    "output_tokens": 529,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "A clinician note records that TSH remains high and that levothyroxine is to be increased to 75 mcg daily from Monday.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "8f11dc96-d486-5339-ae3b-ab8a987cd1bc",
+            "start": 0,
+            "end": 72,
+            "quote": "TSH remains high. Increase levothyroxine 75 mcg daily from Monday."
+          }
+        ]
+      },
+      {
+        "text": "A staff note lists the medication list as including levothyroxine 50 mcg each morning.",
+        "category": "medication",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "b638fc79-e60d-5a3f-825d-f70d3b607569",
+            "start": 0,
+            "end": 63,
+            "quote": "Medication list includes levothyroxine 50 mcg each morning."
+          }
+        ]
+      },
+      {
+        "text": "The record contains a conflicting levothyroxine dose: the staff note states levothyroxine 50 mcg each morning, and the clinician note states levothyroxine 75 mcg daily from Monday; the conflict is not reconciled in these entries.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "b638fc79-e60d-5a3f-825d-f70d3b607569",
+            "start": 24,
+            "end": 62,
+            "quote": "levothyroxine 50 mcg each morning."
+          },
+          {
+            "entry_id": "8f11dc96-d486-5339-ae3b-ab8a987cd1bc",
+            "start": 18,
+            "end": 60,
+            "quote": "levothyroxine 75 mcg daily from Monday."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Which levothyroxine dose is currently active — 50 mcg each morning per the staff note, or 75 mcg daily started Monday per the clinician note?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "8f11dc96-d486-5339-ae3b-ab8a987cd1bc",
+          "start": 0,
+          "end": 72,
+          "quote": "TSH remains high. Increase levothyroxine 75 mcg daily from Monday."
+        },
+        "risk_reason": "Levothyroxine dose differs between entries (50 mcg versus 75 mcg); current dose needs confirmation.",
+        "suggested_action": "Verify the active levothyroxine dose and reconcile the medication list.",
+        "clinical_entities": [
+          "levothyroxine 75 mcg",
+          "levothyroxine 50 mcg"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

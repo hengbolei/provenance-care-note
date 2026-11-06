@@ -5,7 +5,7 @@
   "model": "qwen-plus",
   "usage": {
     "input_tokens": 772,
-    "output_tokens": 178,
+    "output_tokens": 179,
     "cost_usd": null
   },
   "output": {
@@ -19,20 +19,20 @@
         "query": "INR"
       },
       {
-        "question": "Was there a documented reason for changing the warfarin dose to 4 mg?",
-        "query": "warfarin dose change reason"
+        "question": "Has there been any documented bleeding or bruising since warfarin initiation or dose change?",
+        "query": "bleeding bruising"
       },
       {
-        "question": "Are there any documented bleeding risks or contraindications that preceded this dose change?",
-        "query": "bleeding risk contraindication"
+        "question": "Was a fall risk assessment or mobility evaluation performed given anticoagulation?",
+        "query": "fall risk mobility"
       },
       {
-        "question": "Has the patient been given warfarin education or monitoring instructions, and when?",
-        "query": "warfarin education monitoring"
+        "question": "Are there any documented drug interactions with warfarin (e.g., antibiotics, NSAIDs, amiodarone)?",
+        "query": "interaction antibiotic NSAID amiodarone"
       },
       {
-        "question": "Were there prior dose adjustments to warfarin, and what were they?",
-        "query": "warfarin dose adjustment"
+        "question": "Was patient education on warfarin provided, and when?",
+        "query": "warfarin education"
       }
     ]
   }

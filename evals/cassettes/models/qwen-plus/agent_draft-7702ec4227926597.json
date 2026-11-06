@@ -1,0 +1,87 @@
+{
+  "fingerprint": "7702ec422792659767bc9cd2f3c5004ce22d9e2c52053d0797c607308c3c4f4d",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2799,
+    "output_tokens": 904,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Levothyroxine dose was increased from 50 mcg daily to 75 mcg daily on 2026-08-05 due to persistently high TSH.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "8f11dc96-d486-5339-ae3b-ab8a987cd1bc",
+            "start": 0,
+            "end": 54,
+            "quote": "TSH remains high. Increase levothyroxine 75 mcg daily from Monday."
+          }
+        ]
+      },
+      {
+        "text": "Levothyroxine 50 mcg daily was documented as active in the medication list on 2026-07-01.",
+        "category": "medication",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "b638fc79-e60d-5a3f-825d-f70d3b607569",
+            "start": 0,
+            "end": 44,
+            "quote": "Medication list includes levothyroxine 50 mcg each morning."
+          }
+        ]
+      },
+      {
+        "text": "There is a conflict between documented levothyroxine doses: 50 mcg (staff note, 2026-07-01) and 75 mcg (clinician note, 2026-08-05).",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "b638fc79-e60d-5a3f-825d-f70d3b607569",
+            "start": 0,
+            "end": 44,
+            "quote": "Medication list includes levothyroxine 50 mcg each morning."
+          },
+          {
+            "entry_id": "8f11dc96-d486-5339-ae3b-ab8a987cd1bc",
+            "start": 23,
+            "end": 47,
+            "quote": "levothyroxine 75 mcg daily"
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was levothyroxine first started, and at what dose?",
+      "When was the levothyroxine dose last changed before the 75 mcg increase on 2026-08-05?",
+      "What was the TSH value that prompted the dose increase to 75 mcg?",
+      "Was the levothyroxine 50 mcg dose confirmed as active and ongoing before the 2026-08-05 note?",
+      "Are there any documented reasons for non-adherence or missed doses prior to the TSH elevation?",
+      "Has a repeat TSH test been ordered or performed since the dose increase?",
+      "Which allergies or reactions are recorded?",
+      "Which follow-ups, referrals or tests are planned or outstanding?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "8f11dc96-d486-5339-ae3b-ab8a987cd1bc",
+          "start": 0,
+          "end": 54,
+          "quote": "TSH remains high. Increase levothyroxine 75 mcg daily from Monday."
+        },
+        "risk_reason": "Dose change lacks supporting TSH value, timing of prior dose confirmation, or adherence assessment.",
+        "suggested_action": "Confirm current TSH result, verify prior levothyroxine adherence, and document rationale for dose escalation.",
+        "clinical_entities": [
+          "levothyroxine",
+          "TSH"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

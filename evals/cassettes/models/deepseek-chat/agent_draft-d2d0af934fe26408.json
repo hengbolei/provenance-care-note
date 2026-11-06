@@ -1,0 +1,100 @@
+{
+  "fingerprint": "d2d0af934fe26408f3040a29e4323a039615c383830a4d2d4d4617dd419fafcf",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2768,
+    "output_tokens": 934,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "On 2026-08-14 the clinician recorded INR 3.8 and advised reducing warfarin to 2.5 mg nightly with an INR recheck on Friday.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "8c71a5c0-4cf5-5451-b643-adf7280fe836",
+            "start": 0,
+            "end": 68,
+            "quote": "INR 3.8. Reduce warfarin 2.5 mg nightly and recheck INR on Friday."
+          }
+        ]
+      },
+      {
+        "text": "Patient reports on 2026-08-16 still taking warfarin 5 mg every night, which conflicts with the documented 2.5 mg nightly dose.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "30d178a0-f3f0-54af-af4c-e85ff96b79c0",
+            "start": 0,
+            "end": 50,
+            "quote": "I am still taking warfarin 5 mg every night like before."
+          }
+        ]
+      },
+      {
+        "text": "The record contains a dose conflict for warfarin: 2.5 mg in the clinician note versus 5 mg in the patient note.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "8c71a5c0-4cf5-5451-b643-adf7280fe836",
+            "start": 19,
+            "end": 45,
+            "quote": "warfarin 2.5 mg nightly"
+          },
+          {
+            "entry_id": "30d178a0-f3f0-54af-af4c-e85ff96b79c0",
+            "start": 24,
+            "end": 50,
+            "quote": "warfarin 5 mg every night"
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was warfarin first recorded, and what doses have been documented over time? Only the 2026-08-14 and 2026-08-16 entries are present.",
+      "What was the INR trend before the 3.8 on 2026-08-14? No earlier INR values appear in the record.",
+      "Has the warfarin dose reduction ordered on 2026-08-14 been acknowledged or acted on? The later patient note indicates 5 mg is still being taken.",
+      "Was the Friday INR recheck performed, and what was the result? No result is recorded.",
+      "What was the indication for warfarin, and are there prior bleeding or thrombotic events on record? Neither is documented.",
+      "How long has the patient been self-reporting 5 mg nightly, and was the dose change discussed with the patient? The record does not say.",
+      "Are any allergies or reactions recorded? None appear in the record.",
+      "Are any other follow-ups, referrals or tests planned besides the INR recheck? None are documented."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "30d178a0-f3f0-54af-af4c-e85ff96b79c0",
+          "start": 0,
+          "end": 50,
+          "quote": "I am still taking warfarin 5 mg every night like before."
+        },
+        "risk_reason": "Patient reports taking warfarin 5 mg nightly two days after a clinician note advising 2.5 mg nightly, a dose conflict with possible bleeding risk after INR 3.8.",
+        "suggested_action": "Have the clinician confirm the intended warfarin dose and that the dose change was communicated to the patient.",
+        "clinical_entities": [
+          "warfarin"
+        ]
+      },
+      {
+        "citation": {
+          "entry_id": "8c71a5c0-4cf5-5451-b643-adf7280fe836",
+          "start": 0,
+          "end": 68,
+          "quote": "INR 3.8. Reduce warfarin 2.5 mg nightly and recheck INR on Friday."
+        },
+        "risk_reason": "INR 3.8 above range and the ordered Friday INR recheck has no recorded result.",
+        "suggested_action": "Check whether the Friday INR recheck was performed and obtain the result.",
+        "clinical_entities": [
+          "INR",
+          "warfarin"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

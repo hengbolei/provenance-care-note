@@ -1,0 +1,35 @@
+{
+  "fingerprint": "3c9411adf0561e695fa6bfce4255e951d0fe25813efa67df640935257685af3b",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 993,
+    "output_tokens": 139,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was levothyroxine first recorded, and at what dose?",
+        "query": "levothyroxine"
+      },
+      {
+        "question": "Was the previous dose increase to 75 mcg daily ever reconciled with the recorded 50 mcg medication list?",
+        "query": "levothyroxine dose increase"
+      },
+      {
+        "question": "What earlier TSH results prompted the levothyroxine dose changes?",
+        "query": "TSH thyroid function"
+      },
+      {
+        "question": "Have there been any prior dose adjustments or missed doses of levothyroxine?",
+        "query": "levothyroxine adjustment adherence"
+      },
+      {
+        "question": "Are there earlier entries documenting hypothyroidism diagnosis or thyroid history?",
+        "query": "hypothyroidism thyroid"
+      }
+    ]
+  }
+}

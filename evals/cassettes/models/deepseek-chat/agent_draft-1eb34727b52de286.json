@@ -1,0 +1,104 @@
+{
+  "fingerprint": "1eb34727b52de286add2207cd04284c97ecc9d2f72eff6259fb7865587e77535",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2599,
+    "output_tokens": 703,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Clinician note documents lisinopril 10 mg each morning as continuing, with home readings around 150/90.",
+        "category": "medication",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "af98e831-de2b-57d2-a67f-c5480d2871c3",
+            "start": 0,
+            "end": 51,
+            "quote": "Lisinopril 10 mg each morning continues."
+          }
+        ]
+      },
+      {
+        "text": "Home blood pressure readings are reported around 150/90.",
+        "category": "symptom",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "af98e831-de2b-57d2-a67f-c5480d2871c3",
+            "start": 52,
+            "end": 81,
+            "quote": "Home readings around 150/90."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was lisinopril first started, and have the dose or timing changed since then?",
+      "Have earlier blood pressure readings been higher or lower than the recent 150/90 home readings?",
+      "Has any antihypertensive besides lisinopril been tried or considered previously?",
+      "Which medications were started, stopped, held or changed? The record contains only a note that lisinopril 10 mg each morning continues.",
+      "Which allergies or reactions are recorded? No allergy information appears in the record.",
+      "Which follow-ups, referrals or tests are planned or outstanding? No follow-up, referral or test plan appears in the record.",
+      "No kidney function or potassium results are documented in the record."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "af98e831-de2b-57d2-a67f-c5480d2871c3",
+          "start": 52,
+          "end": 81,
+          "quote": "Home readings around 150/90."
+        },
+        "risk_reason": "Home blood pressure readings around 150/90 are recorded while on lisinopril 10 mg each morning.",
+        "suggested_action": "Review the home blood pressure readings and confirm whether kidney function and potassium have been checked.",
+        "clinical_entities": [
+          "lisinopril",
+          "blood pressure"
+        ]
+      }
+    ],
+    "check_points": [
+      {
+        "text": "Check whether kidney function and potassium have been checked after starting or changing an ACE inhibitor dose for this patient on lisinopril.",
+        "reference": {
+          "document_id": "7a98c82c-c42a-53d7-bd25-859316014fb1",
+          "version": 1,
+          "start": 51,
+          "end": 126,
+          "quote": "Check kidney function and potassium after starting or changing an ACE inhibitor dose."
+        },
+        "citations": [
+          {
+            "entry_id": "af98e831-de2b-57d2-a67f-c5480d2871c3",
+            "start": 0,
+            "end": 51,
+            "quote": "Lisinopril 10 mg each morning continues."
+          }
+        ]
+      },
+      {
+        "text": "Check that home blood pressure readings are reviewed at each visit.",
+        "reference": {
+          "document_id": "7a98c82c-c42a-53d7-bd25-859316014fb1",
+          "version": 1,
+          "start": 0,
+          "end": 50,
+          "quote": "Review home blood pressure readings at each visit."
+        },
+        "citations": [
+          {
+            "entry_id": "af98e831-de2b-57d2-a67f-c5480d2871c3",
+            "start": 52,
+            "end": 81,
+            "quote": "Home readings around 150/90."
+          }
+        ]
+      }
+    ]
+  }
+}

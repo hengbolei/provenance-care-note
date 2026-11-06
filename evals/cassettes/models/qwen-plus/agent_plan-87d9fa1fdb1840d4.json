@@ -1,0 +1,39 @@
+{
+  "fingerprint": "87d9fa1fdb1840d43ce1ac2cf2ebcf2f2c29e4795fc8aa3446420afe698821d3",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 1008,
+    "output_tokens": 224,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was codeine first recorded as an allergy in the record?",
+        "query": "codeine allergy"
+      },
+      {
+        "question": "When did the patient first report no allergy to codeine or feeling sick after it?",
+        "query": "codeine not allergic sick"
+      },
+      {
+        "question": "What does the pharmacy record say about codeine allergy, and when was that documented?",
+        "query": "pharmacy codeine allergy"
+      },
+      {
+        "question": "Was codeine ever prescribed, administered, or avoided due to allergy concerns, and when?",
+        "query": "codeine prescribed avoided"
+      },
+      {
+        "question": "Are there earlier entries documenting a reaction to codeine, such as nausea or vomiting?",
+        "query": "codeine reaction nausea vomiting"
+      },
+      {
+        "question": "Has the allergy status for codeine been resolved or updated in any subsequent entry?",
+        "query": "codeine allergy resolved updated"
+      }
+    ]
+  }
+}

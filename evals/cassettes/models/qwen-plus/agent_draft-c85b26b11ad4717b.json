@@ -1,0 +1,80 @@
+{
+  "fingerprint": "c85b26b11ad4717b9f90184db54eb03980b0ef45efdfbe2e47c499c6afc65b4e",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2790,
+    "output_tokens": 784,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Atorvastatin 20 mg nightly is confirmed with the pharmacy per clinician note.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "d9b399ed-c958-5803-b199-2bbf5ef71937",
+            "start": 0,
+            "end": 40,
+            "quote": "Atorvastatin 20 mg nightly confirmed with the pharmacy."
+          }
+        ]
+      },
+      {
+        "text": "An AI-generated summary recommends atorvastatin 40 mg nightly for cholesterol, pending clinician confirmation.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "6310eed0-57e8-5088-ade1-4ab30c7db69c",
+            "start": 0,
+            "end": 55,
+            "quote": "Discussed atorvastatin 40 mg nightly for cholesterol. AI-generated summary; clinician confirmation required."
+          }
+        ]
+      },
+      {
+        "text": "There is a documented conflict between atorvastatin doses: 20 mg (clinician-confirmed) and 40 mg (AI-recommended).",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "3316fa43-a29c-5a6b-bfe5-dbacf8c32b43",
+            "start": 0,
+            "end": 57,
+            "quote": "Conflicting dose facts for atorvastatin: 20mg versus 40mg."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was atorvastatin first prescribed, and at what dose?",
+      "Was the dose change from 40 mg to 20 mg intentional, and what was the clinical rationale?",
+      "What cholesterol values or cardiovascular risk assessment preceded the recommendation for atorvastatin 40 mg?",
+      "Has the patient reported any muscle symptoms, liver enzyme changes, or other adverse effects on atorvastatin?",
+      "Was pharmacy confirmation of 20 mg documented before or after the AI summary recommending 40 mg?",
+      "Are there earlier notes indicating adherence issues, titration attempts, or shared decision-making about statin dose?",
+      "Which allergies or reactions are recorded?",
+      "Which follow-ups, referrals or tests are planned or outstanding?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "3316fa43-a29c-5a6b-bfe5-dbacf8c32b43",
+          "start": 0,
+          "end": 57,
+          "quote": "Conflicting dose facts for atorvastatin: 20mg versus 40mg."
+        },
+        "risk_reason": "Dose discrepancy between AI recommendation (40 mg) and clinician-confirmed dose (20 mg) creates risk of medication error or suboptimal therapy.",
+        "suggested_action": "Clarify and document intended atorvastatin dose, rationale for selection, and whether 40 mg was rejected or deferred.",
+        "clinical_entities": [
+          "atorvastatin"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

@@ -80,9 +80,9 @@ from carenote.knowledge.service import KnowledgeService
 from carenote.privacy.redaction import RedactionResult
 from carenote.services.care_notes import CareNoteService
 
-PROMPT_VERSION = "draft_v5"
+PROMPT_VERSION = "draft_v6"
 PLAN_PROMPT_VERSION = "plan_v2"
-REVISE_PROMPT_VERSION = "revise_v4"
+REVISE_PROMPT_VERSION = "revise_v5"
 MAX_CONTEXT_ENTRIES = 40
 # Hits kept per question, and the share of the context window older retrieved entries may take.
 RETRIEVE_K = 5
@@ -367,12 +367,20 @@ def build_review_graph(
                 tools.redactions[ref.entry_id],
                 DataTag.close("entry"),
             ]
+        in_context = {ref.entry_id for ref in state["context"]}
         for conflict in state["conflicts"]:
             inputs += [
-                DataTag.open("conflict", id=conflict.id, category=conflict.category),
+                # `conflict_id`, not `id`: a model that sees two kinds of `id` cites the wrong one.
+                DataTag.open("conflict", conflict_id=conflict.id, category=conflict.category),
                 tools.redactor.redact(conflict.summary, names),
-                DataTag.close("conflict"),
             ]
+            for entry_id in conflict.entry_ids:
+                if entry_id in in_context:
+                    inputs += [
+                        DataTag.open("conflict_entry", entry=entry_id),
+                        DataTag.close("conflict_entry"),
+                    ]
+            inputs.append(DataTag.close("conflict"))
         for reference in _reference_passages(state.get("references") or {}):
             flags = {"instruction_like": True} if flagged_passages(reference.text) else {}
             inputs += [
@@ -455,7 +463,7 @@ def build_review_graph(
                 ]
             inputs.append(DataTag.close("previous_claim"))
         for conflict_id in report.uncovered_conflict_ids:
-            inputs.append(DataTag.open("uncovered_conflict", id=conflict_id))
+            inputs.append(DataTag.open("uncovered_conflict", conflict_id=conflict_id))
             inputs.append(DataTag.close("uncovered_conflict"))
         for check in report.check_points:
             item = previous.check_points[check.check_point_index]

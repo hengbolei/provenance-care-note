@@ -5,34 +5,22 @@
   "model": "qwen-plus",
   "usage": {
     "input_tokens": 764,
-    "output_tokens": 246,
+    "output_tokens": 97,
     "cost_usd": null
   },
   "output": {
     "questions": [
       {
         "question": "When was the ibuprofen allergy first recorded?",
-        "query": "ibuprofen allergic wheeze"
+        "query": "ibuprofen allergic wheezy"
       },
       {
-        "question": "Has the patient been prescribed or dispensed ibuprofen since reporting this reaction?",
-        "query": "ibuprofen prescribed dispensed"
+        "question": "Has the patient had any prior respiratory reactions to NSAIDs or other medications?",
+        "query": "wheezy NSAID reaction"
       },
       {
-        "question": "What other NSAIDs or analgesics have been used, and were there similar reactions?",
-        "query": "NSAID aspirin naproxen reaction"
-      },
-      {
-        "question": "Was any diagnostic testing (e.g., spirometry, challenge test) done to confirm ibuprofen-induced bronchospasm?",
-        "query": "spirometry challenge test ibuprofen"
-      },
-      {
-        "question": "Has a formal allergy alert or documentation been added to the record beyond this patient note?",
-        "query": "allergy alert confirmed"
-      },
-      {
-        "question": "Were alternative analgesics or management strategies recommended after this report?",
-        "query": "alternative analgesic paracetamol acetaminophen"
+        "question": "Was any action taken in response to this reported allergy, such as documenting in allergy list or stopping prescriptions?",
+        "query": "allergy list ibuprofen stopped"
       }
     ]
   }
