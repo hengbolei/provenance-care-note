@@ -15,7 +15,7 @@ from carenote.agent.state import (
     ReviewPlan,
     RunStatus,
 )
-from carenote.api import routes
+from carenote.api.container import container
 from carenote.core.identity import session_service
 from carenote.data.seed import DEMO_CLINIC_ID, DEMO_CLINICIAN_ID, DEMO_PATIENT_ID, seed_demo_data
 from carenote.domain.models import Actor, ReviewStatus, RiskLevel, Role
@@ -203,9 +203,9 @@ def test_claim_decision_models_are_accepted_directly(service):
 
 
 def test_api_commit_writes_the_review(monkeypatch, service):
-    monkeypatch.setattr(routes, "repository", service.repository)
-    monkeypatch.setattr(routes, "service", service)
-    monkeypatch.setattr(routes, "agent_runs", _runs(service))
+    monkeypatch.setattr(container, "repository", service.repository)
+    monkeypatch.setattr(container, "service", service)
+    monkeypatch.setattr(container, "agent_runs", _runs(service))
     token, _ = session_service.issue(CLINICIAN)
     headers = {"authorization": f"Bearer {token}"}
     client = TestClient(app)

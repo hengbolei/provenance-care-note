@@ -31,5 +31,16 @@ patient audit generation drive online state and automatic refresh. Audit events 
 PostgreSQL anchors make changes detectable, while production non-repudiation still requires
 external immutable/WORM export.
 
+The Clinical Review Agent (`agent/`) is a LangGraph state machine that reads the record through
+`CareNoteService` as the requesting clinician, so it sees exactly what that clinician may see and
+has no write access of its own. It plans questions, retrieves evidence (`retrieval/`, BM25 with a
+synonym table) from the record and from the clinic's reference library (`knowledge/`), drafts a
+cited review through a provider-agnostic model gateway, verifies every citation in code, and
+pauses for a clinician, whose decisions are the only path into the record. Model input is always
+redacted and framed as data; runs are checkpointed encrypted in PostgreSQL and traced with
+OpenTelemetry. Reference documents are clinic-scoped, versioned and encrypted, and support only
+separate "points to check", never claims about the patient. `evals/` measures all of this on
+synthetic cases and gates CI.
+
 See `TECHNICAL_BRIEF.md` for the full schema, safety decisions, performance evidence, trade-offs,
-and environment-gated production gaps.
+and environment-gated production gaps, and `AGENT_DESIGN.md` with `AGENT_ROADMAP.md` for the agent.

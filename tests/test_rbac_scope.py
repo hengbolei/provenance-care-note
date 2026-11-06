@@ -4,7 +4,7 @@ from uuid import uuid4
 import pytest
 from fastapi.testclient import TestClient
 
-from carenote.api import routes
+from carenote.api.container import container
 from carenote.core.identity import AuthenticationError, session_service
 from carenote.data.seed import DEMO_CLINIC_ID, DEMO_PATIENT_ID
 from carenote.domain.models import (
@@ -167,4 +167,4 @@ def test_patient_section_write_is_rejected_by_the_api():
     )
 
     assert response.status_code == 403
-    assert routes.repository.get_section(DEMO_PATIENT_ID, "patient_injected") is None
+    assert container.repository.get_section(DEMO_PATIENT_ID, "patient_injected") is None

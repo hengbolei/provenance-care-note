@@ -3,7 +3,7 @@ from datetime import date
 import pytest
 from fastapi.testclient import TestClient
 
-from carenote.api import routes
+from carenote.api.container import container
 from carenote.core.identity import session_service
 from carenote.domain.models import (
     Actor,
@@ -131,7 +131,7 @@ def test_manual_note_and_highlight_api_round_trip(
             medical_record_number="SYN-API",
         )
     )
-    monkeypatch.setattr(routes, "service", service)
+    monkeypatch.setattr(container, "service", service)
     client = TestClient(app)
     staff_token, _ = session_service.issue(staff)
     clinician_token, _ = session_service.issue(clinician)

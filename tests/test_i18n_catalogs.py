@@ -91,7 +91,12 @@ CATALOGS = {name: _catalog(name) for name in LANGUAGES}
 
 
 def _used_keys():
-    scripts = "".join((STATIC / name).read_text(encoding="utf-8") for name in ("app.js", "api.js"))
+    # Every page module except the catalog itself.
+    scripts = "".join(
+        path.read_text(encoding="utf-8")
+        for path in sorted(STATIC.glob("*.js"))
+        if path.name not in {"i18n.js", "service-worker.js"}
+    )
     html = (STATIC / "index.html").read_text(encoding="utf-8")
     used = set(re.findall(r'\bt\("([\w.]+)"', scripts))
     used |= set(re.findall(r'data-i18n(?:-[\w-]+)?="([\w.]+)"', html))

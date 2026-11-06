@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "provenance-care-note"
-version = "0.1.0"
-description = "A provenance-first longitudinal care note prototype."
+dynamic = ["version"]
+description = "A provenance-first care record with a cited, clinician-reviewed clinical review agent."
 requires-python = ">=3.11"
 dependencies = [
   "fastapi>=0.115,<1.0",
@@ -30,6 +30,9 @@ dev = [
   "pyyaml>=6.0,<7.0",
   "ruff>=0.8,<1.0",
 ]
+
+[tool.hatch.version]
+path = "src/carenote/__init__.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/carenote"]

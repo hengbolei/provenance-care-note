@@ -16,8 +16,16 @@ def test_patient_page_serves_accessible_app_shell_and_modules():
     page = client.get("/")
     api_module = client.get("/static/api.js")
     app_module = client.get("/static/app.js")
+    modules = [
+        client.get(f"/static/{name}")
+        for name in ("dom.js", "agent-panel.js", "knowledge-panel.js", "service-worker.js")
+    ]
 
     assert page.status_code == api_module.status_code == app_module.status_code == 200
+    assert all(module.status_code == 200 for module in modules)
+    for name in ("dom.js", "agent-panel.js", "knowledge-panel.js"):
+        assert f'from "/static/{name}"' in app_module.text
+        assert f'"/static/{name}"' in modules[-1].text
     assert 'aria-labelledby="patient-name"' in page.text
     assert 'id="screen-state"' in page.text
     assert 'id="highlight-list"' in page.text

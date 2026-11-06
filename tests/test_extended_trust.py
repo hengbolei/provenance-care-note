@@ -4,7 +4,7 @@ from uuid import uuid4
 import pytest
 from fastapi.testclient import TestClient
 
-from carenote.api import routes
+from carenote.api.container import container
 from carenote.core.identity import AuthenticationError, SignedSessionService, session_service
 from carenote.data.seed import DEMO_CLINIC_ID, DEMO_CLINICIAN_ID, DEMO_PATIENT_ID
 from carenote.domain.models import (
@@ -100,8 +100,8 @@ def test_signed_session_expiry_and_logout_revocation():
 
 
 def test_seeded_highlight_priority_matches_initial_snapshot():
-    for highlight in routes.repository.highlights.values():
-        initial = routes.repository.list_resource_revisions("highlight", str(highlight.id))[0]
+    for highlight in container.repository.highlights.values():
+        initial = container.repository.list_resource_revisions("highlight", str(highlight.id))[0]
         assert initial.snapshot["priority"] == highlight.priority
         assert initial.snapshot["priority_factors"] == [
             item.model_dump(mode="json") for item in highlight.priority_factors
@@ -110,9 +110,9 @@ def test_seeded_highlight_priority_matches_initial_snapshot():
 
 def test_ai_ingestion_sends_redacted_text_and_marks_result_unconfirmed(monkeypatch):
     captured: dict[str, str] = {}
-    entry_ids_before = set(routes.repository.entries)
-    source_ids_before = set(routes.repository.source_artifacts)
-    audit_count_before = len(routes.repository.audit_events)
+    entry_ids_before = set(container.repository.entries)
+    source_ids_before = set(container.repository.source_artifacts)
+    audit_count_before = len(container.repository.audit_events)
 
     class FakeGateway:
         model = "fake-clinical-model"
@@ -124,7 +124,7 @@ def test_ai_ingestion_sends_redacted_text_and_marks_result_unconfirmed(monkeypat
                 text=captured["external"], counts={"name": 1}
             )
 
-    monkeypatch.setattr(routes.service, "ai_gateway", FakeGateway())
+    monkeypatch.setattr(container.service, "ai_gateway", FakeGateway())
     response = TestClient(app).post(
         f"/api/patients/{DEMO_PATIENT_ID}/ai-ingest",
         headers=_clinician_headers(),
@@ -138,11 +138,11 @@ def test_ai_ingestion_sends_redacted_text_and_marks_result_unconfirmed(monkeypat
     assert "Maya Chen" not in captured["external"]
     assert response.json()["entry"]["review_status"] == "ai_suggested"
     assert response.json()["externally_stored"] is False
-    for entry_id in set(routes.repository.entries) - entry_ids_before:
-        routes.repository.entries.pop(entry_id)
-    for source_id in set(routes.repository.source_artifacts) - source_ids_before:
-        routes.repository.source_artifacts.pop(source_id)
-    del routes.repository.audit_events[audit_count_before:]
+    for entry_id in set(container.repository.entries) - entry_ids_before:
+        container.repository.entries.pop(entry_id)
+    for source_id in set(container.repository.source_artifacts) - source_ids_before:
+        container.repository.source_artifacts.pop(source_id)
+    del container.repository.audit_events[audit_count_before:]
 
 
 def test_websocket_reports_authenticated_presence():

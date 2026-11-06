@@ -1,4 +1,4 @@
-﻿# Visual Studio
+# Visual Studio
 .vs/
 *.user
 *.suo
@@ -29,9 +29,10 @@ build/
 .env.*
 !.env.example
 
-# IDEs
+# IDEs and local agent tooling
 .vscode/
 .idea/
+.claude/
 
 # Logs
 logs/
