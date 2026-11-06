@@ -1,4 +1,4 @@
-const CACHE = "carenote-shell-v3";
+const CACHE = "carenote-shell-v4";
 const SHELL = [
   "/",
   "/static/styles.css",
@@ -8,6 +8,7 @@ const SHELL = [
   "/static/dom.js",
   "/static/agent-panel.js",
   "/static/knowledge-panel.js",
+  "/static/demo.js",
 ];
 
 self.addEventListener("install", (event) => {

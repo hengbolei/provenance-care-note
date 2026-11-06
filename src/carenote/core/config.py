@@ -30,12 +30,25 @@ class Settings:
     agent_fallback: str = os.getenv("CARENOTE_AGENT_FALLBACK", "")
     audit_retention_days: int = int(os.getenv("CARENOTE_AUDIT_RETENTION_DAYS", "2555"))
     public_base_url: str = os.getenv("CARENOTE_PUBLIC_BASE_URL", "http://127.0.0.1:8000")
+    # A shared public demo (e.g. a hosted Space): shows a banner, resets the in-memory store to
+    # the synthetic seed every `demo_reset_minutes`, and serves cookies over HTTPS only.
+    public_demo: bool = os.getenv("CARENOTE_PUBLIC_DEMO", "") == "1"
+    demo_reset_minutes: int = int(os.getenv("CARENOTE_DEMO_RESET_MINUTES", "30"))
 
     @property
     def secure_cookies(self) -> bool:
-        return self.environment not in {"development", "test"}
+        return self.public_demo or self.environment not in {"development", "test"}
 
     def validate_production(self) -> None:
+        if self.public_demo:
+            # Visitors share one store that is wiped on a timer: never a place for real data.
+            if self.environment == "production" or self.database_url:
+                raise RuntimeError(
+                    "CARENOTE_PUBLIC_DEMO runs on the in-memory demo store only; unset "
+                    "CARENOTE_DATABASE_URL and use a non-production environment"
+                )
+            if self.demo_reset_minutes < 1:
+                raise RuntimeError("CARENOTE_DEMO_RESET_MINUTES must be at least 1")
         if self.environment != "production":
             return
         missing = [
