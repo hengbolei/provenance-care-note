@@ -1,0 +1,14 @@
+{
+  "fingerprint": "5b85100fd62c6c166af715cb22491fa9456fbff9ec14fa1970998f32314d9a60",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 775,
+    "output_tokens": 5,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": []
+  }
+}

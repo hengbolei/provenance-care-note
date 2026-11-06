@@ -1,0 +1,87 @@
+{
+  "fingerprint": "5a229168c3a14483efaacefa433d3c2116037dee7b766e4a1fff6da3b7b1f063",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2476,
+    "output_tokens": 773,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Warfarin dose was changed to 4 mg each evening on 2026-08-10.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "87500383-9a47-5a94-af58-5a77fd348186",
+            "start": 0,
+            "end": 37,
+            "quote": "Warfarin dose changed to 4 mg each evening."
+          }
+        ]
+      },
+      {
+        "text": "INR was 3.4 measured last week before the dose change on 2026-08-10.",
+        "category": "follow_up",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "87500383-9a47-5a94-af58-5a77fd348186",
+            "start": 38,
+            "end": 56,
+            "quote": "INR 3.4 last week."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was warfarin first started?",
+      "What was the INR value before the most recent one, and when was it measured?",
+      "Was there a documented reason for changing the warfarin dose to 4 mg?",
+      "Are there any documented bleeding risks or contraindications that preceded this dose change?",
+      "Has the patient been given warfarin education or monitoring instructions, and when?",
+      "Were there prior dose adjustments to warfarin, and what were they?",
+      "Which allergies or reactions are recorded?",
+      "Which follow-ups, referrals or tests are planned or outstanding?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "87500383-9a47-5a94-af58-5a77fd348186",
+          "start": 0,
+          "end": 37,
+          "quote": "Warfarin dose changed to 4 mg each evening."
+        },
+        "risk_reason": "Dose change requires INR recheck within one week per clinic policy.",
+        "suggested_action": "Confirm INR is scheduled or completed within 7 days of 2026-08-10.",
+        "clinical_entities": [
+          "warfarin",
+          "INR"
+        ]
+      }
+    ],
+    "check_points": [
+      {
+        "text": "Check the INR within one week of any warfarin dose change.",
+        "reference": {
+          "document_id": "f9fef278-52c5-57a3-afe8-68ee9ced2bcc",
+          "version": 1,
+          "start": 0,
+          "end": 48,
+          "quote": "Check the INR within one week of any warfarin dose change."
+        },
+        "citations": [
+          {
+            "entry_id": "87500383-9a47-5a94-af58-5a77fd348186",
+            "start": 0,
+            "end": 37,
+            "quote": "Warfarin dose changed to 4 mg each evening."
+          }
+        ]
+      }
+    ]
+  }
+}

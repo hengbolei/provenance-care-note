@@ -1,0 +1,39 @@
+{
+  "fingerprint": "e248100dba6a5e0effa597014dc3b8f3ba43fd70ee849359809b012edc498cb9",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 863,
+    "output_tokens": 262,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was the amoxicillin allergy first documented, given the recent rash report and prior 'no known drug allergies' note?",
+        "query": "amoxicillin allergy"
+      },
+      {
+        "question": "What was the medication regimen that included amoxicillin, and when was it prescribed?",
+        "query": "amoxicillin rash day three"
+      },
+      {
+        "question": "Was the amoxicillin course stopped or changed after the rash appeared, and when?",
+        "query": "amoxicillin stopped rash"
+      },
+      {
+        "question": "What other medications were active around May 2026 or August 2026 that might relate to the rash or treatment?",
+        "query": "medication"
+      },
+      {
+        "question": "Were there any earlier entries documenting rash, skin reaction, or adverse drug reaction before August 2026?",
+        "query": "rash skin reaction ADR"
+      },
+      {
+        "question": "Was the allergy status updated in the record after the August 2026 rash, and if so, when and by whom?",
+        "query": "allergy updated"
+      }
+    ]
+  }
+}

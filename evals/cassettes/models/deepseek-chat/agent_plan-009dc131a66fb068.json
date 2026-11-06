@@ -1,0 +1,39 @@
+{
+  "fingerprint": "009dc131a66fb06840d4204a9f0c47bf78a9f1f0eeefd6c426374f8ff63f7422",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 1021,
+    "output_tokens": 181,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was warfarin first recorded, and what starting dose was documented?",
+        "query": "warfarin initiation start dose"
+      },
+      {
+        "question": "What is the documented history of warfarin dose changes, including any INR results tied to each dose?",
+        "query": "warfarin dose change INR"
+      },
+      {
+        "question": "Why was the warfarin dose reduced from 5 mg to 3 mg, and was that change documented by a clinician?",
+        "query": "warfarin dose reduction reason"
+      },
+      {
+        "question": "What were the most recent INR values and their dates?",
+        "query": "INR result"
+      },
+      {
+        "question": "Was any bleeding, bruising or adverse reaction to warfarin recorded previously?",
+        "query": "warfarin bleeding adverse reaction"
+      },
+      {
+        "question": "Are there earlier entries documenting a monitoring plan or follow-up for anticoagulation?",
+        "query": "anticoagulation monitoring follow-up"
+      }
+    ]
+  }
+}

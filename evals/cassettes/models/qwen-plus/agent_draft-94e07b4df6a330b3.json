@@ -1,0 +1,40 @@
+{
+  "fingerprint": "94e07b4df6a330b319e143dad7a41f6d1e423486009fc1f9929388a99e4e6d02",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2415,
+    "output_tokens": 296,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports allergy to ibuprofen causing wheezing.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "b97ba818-6e0d-54c7-a203-65f69534febb",
+            "start": 0,
+            "end": 47,
+            "quote": "I think I am allergic to ibuprofen, it makes me wheezy."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was the ibuprofen allergy first recorded?",
+      "Has the patient been prescribed or dispensed ibuprofen since reporting this reaction?",
+      "What other NSAIDs or analgesics have been used, and were there similar reactions?",
+      "Was any diagnostic testing (e.g., spirometry, challenge test) done to confirm ibuprofen-induced bronchospasm?",
+      "Has a formal allergy alert or documentation been added to the record beyond this patient note?",
+      "Were alternative analgesics or management strategies recommended after this report?",
+      "Which medications were started, stopped, held or changed?",
+      "Which follow-ups, referrals or tests are planned or outstanding?"
+    ],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

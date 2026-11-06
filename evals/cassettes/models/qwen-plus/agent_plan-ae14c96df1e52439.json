@@ -1,0 +1,39 @@
+{
+  "fingerprint": "ae14c96df1e5243910d76ae9775ca0add1de58885bea4ad184e5a510bc124672",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 863,
+    "output_tokens": 279,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was apixaban first started, and was the dose adjusted based on renal function or weight?",
+        "query": "apixaban 5 mg"
+      },
+      {
+        "question": "What was the creatinine level before today's result of 140 umol/L, and when was it last measured?",
+        "query": "creatinine"
+      },
+      {
+        "question": "Was renal function assessed prior to initiating apixaban, and what was the estimated CrCl or eGFR at that time?",
+        "query": "CrCl eGFR renal"
+      },
+      {
+        "question": "Has apixaban been held, reduced, or discontinued in response to elevated creatinine or other concerns?",
+        "query": "apixaban hold reduce stop"
+      },
+      {
+        "question": "Are there any documented bleeding risks, falls history, or other contraindications relevant to apixaban use in this 84-year-old patient?",
+        "query": "bleeding fall risk"
+      },
+      {
+        "question": "What follow-up actions were planned after the creatinine result — e.g., repeat test, nephrology referral, dose review?",
+        "query": "follow up creatinine referral"
+      }
+    ]
+  }
+}

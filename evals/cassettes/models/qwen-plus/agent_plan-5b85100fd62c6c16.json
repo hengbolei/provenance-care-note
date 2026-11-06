@@ -1,0 +1,39 @@
+{
+  "fingerprint": "5b85100fd62c6c166af715cb22491fa9456fbff9ec14fa1970998f32314d9a60",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 770,
+    "output_tokens": 212,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was the penicillin allergy first recorded, and what evidence or reaction details were documented?",
+        "query": "penicillin allergy"
+      },
+      {
+        "question": "What medications were started, stopped, held or changed around the time of the penicillin allergy note?",
+        "query": "started stopped held changed"
+      },
+      {
+        "question": "Were any antibiotics prescribed before or after the penicillin allergy claim, and which ones?",
+        "query": "antibiotic prescribe"
+      },
+      {
+        "question": "What follow-ups, referrals or tests were planned or outstanding before 2026-08-23?",
+        "query": "follow-up referral test"
+      },
+      {
+        "question": "What allergy-related entries exist before 2026-08-23, especially for beta-lactams or related drugs?",
+        "query": "allergy beta-lactam"
+      },
+      {
+        "question": "Was there any documentation of a prior adverse reaction to penicillin or confirmation of allergy testing?",
+        "query": "reaction testing confirm"
+      }
+    ]
+  }
+}

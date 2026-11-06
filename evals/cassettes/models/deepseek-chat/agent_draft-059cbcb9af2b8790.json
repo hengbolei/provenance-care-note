@@ -1,0 +1,63 @@
+{
+  "fingerprint": "059cbcb9af2b87906ff2bf46405e7e1f3bccbf7cae364783d06171e6932435c3",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2486,
+    "output_tokens": 448,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient takes amlodipine 5 mg daily, as recorded in a staff note.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "4389a3ac-5129-56df-8fbf-61fed1f7cac4",
+            "start": 14,
+            "end": 40,
+            "quote": "amlodipine 5 mg daily"
+          }
+        ]
+      },
+      {
+        "text": "Amlodipine was stopped because of ankle swelling; blood pressure is to be reviewed in two weeks.",
+        "category": "plan",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "7109649a-a49b-5a60-908a-b93b4c9589ef",
+            "start": 0,
+            "end": 73,
+            "quote": "Amlodipine was stopped because of ankle swelling"
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was the ankle swelling first recorded, and how did it evolve before amlodipine was stopped? The record does not document this.",
+      "Was amlodipine the only antihypertensive tried, and what was the blood pressure control history before it was stopped? The record does not say.",
+      "Was the two-week blood pressure review arranged, completed or rescheduled? The record only notes the plan, with no outcome.",
+      "Was any alternative antihypertensive started after amlodipine was stopped? The record does not say.",
+      "What was the amlodipine start date and were there earlier dose changes? Only the current 5 mg daily dose is recorded.",
+      "Which allergies or reactions are recorded? No allergy entries appear in the record."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "7109649a-a49b-5a60-908a-b93b4c9589ef",
+          "start": 0,
+          "end": 73,
+          "quote": "Amlodipine was stopped because of ankle swelling"
+        },
+        "risk_reason": "Record shows a stopped antihypertensive with a pending blood pressure review, which carries cardiovascular risk if follow-up is missed.",
+        "suggested_action": "Confirm the two-week blood pressure review has been scheduled and documented.",
+        "clinical_entities": []
+      }
+    ],
+    "check_points": []
+  }
+}

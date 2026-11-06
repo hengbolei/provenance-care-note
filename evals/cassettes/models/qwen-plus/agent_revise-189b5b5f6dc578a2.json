@@ -1,0 +1,57 @@
+{
+  "fingerprint": "189b5b5f6dc578a253636d6c21ab5bec8cbbdb202c2e66d26d69817575008cc5",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2536,
+    "output_tokens": 469,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Levothyroxine 50 mcg daily was documented as part of the medication list on 2026-07-01.",
+        "category": "medication",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "b638fc79-e60d-5a3f-825d-f70d3b607569",
+            "start": 26,
+            "end": 57,
+            "quote": "Medication list includes levothyroxine 50 mcg each morning."
+          }
+        ]
+      },
+      {
+        "text": "Levothyroxine 75 mcg daily was ordered on 2026-08-05 due to high TSH.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "8f11dc96-d486-5339-ae3b-ab8a987cd1bc",
+            "start": 0,
+            "end": 55,
+            "quote": "TSH remains high. Increase levothyroxine 75 mcg daily from Monday."
+          }
+        ]
+      },
+      {
+        "text": "The record contains a deterministic conflict: levothyroxine dose is reported as both 50 mcg and 75 mcg.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "7a3054fd-5557-55e7-8652-d876285c6fab",
+            "start": 0,
+            "end": 70,
+            "quote": "Conflicting dose facts for levothyroxine: 50mcg versus 75mcg."
+          }
+        ]
+      }
+    ],
+    "open_questions": [],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

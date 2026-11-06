@@ -1,0 +1,39 @@
+{
+  "fingerprint": "e8325caae42f5fd26349e9bc02c263c6af3900d8d041ef6bcdf8f65c090de9f5",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 772,
+    "output_tokens": 178,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was warfarin first started?",
+        "query": "warfarin started"
+      },
+      {
+        "question": "What was the INR value before the most recent one, and when was it measured?",
+        "query": "INR"
+      },
+      {
+        "question": "Was there a documented reason for changing the warfarin dose to 4 mg?",
+        "query": "warfarin dose change reason"
+      },
+      {
+        "question": "Are there any documented bleeding risks or contraindications that preceded this dose change?",
+        "query": "bleeding risk contraindication"
+      },
+      {
+        "question": "Has the patient been given warfarin education or monitoring instructions, and when?",
+        "query": "warfarin education monitoring"
+      },
+      {
+        "question": "Were there prior dose adjustments to warfarin, and what were they?",
+        "query": "warfarin dose adjustment"
+      }
+    ]
+  }
+}

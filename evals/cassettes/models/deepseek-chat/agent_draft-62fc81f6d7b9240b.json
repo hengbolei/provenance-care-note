@@ -1,0 +1,21 @@
+{
+  "fingerprint": "62fc81f6d7b9240bf49325a89061029cf2fba383abca76e6fa9a9d3d7ce39a9a",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2265,
+    "output_tokens": 106,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [],
+    "open_questions": [
+      "Which medications were started, stopped, held or changed? The record contains no medication timeline entries to answer this.",
+      "Which allergies or reactions are recorded? The record contains no allergy entries. A patient note asks for a penicillin allergy to be added, but this is not a documented allergy.",
+      "Which follow-ups, referrals or tests are planned or outstanding? The record contains no plan, referral or test entries."
+    ],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

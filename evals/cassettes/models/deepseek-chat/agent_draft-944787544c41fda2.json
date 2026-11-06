@@ -1,0 +1,87 @@
+{
+  "fingerprint": "944787544c41fda288da21e4bd96aaff141138c5a798591679e219485bea3da7",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2562,
+    "output_tokens": 681,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "A clinician note from 2 June 2026 records continuing lisinopril 10 mg daily, with blood pressure at target.",
+        "category": "medication",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "4531a170-1e0d-5351-bc98-b312d0ee171a",
+            "start": 0,
+            "end": 52,
+            "quote": "Continue lisinopril 10 mg daily; blood pressure at target."
+          }
+        ]
+      },
+      {
+        "text": "A later clinician note from 12 August 2026 records stopping lisinopril because of a dry cough and starting losartan 50 mg daily.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "4725b068-965c-58cd-9179-b6d59cc88a17",
+            "start": 0,
+            "end": 72,
+            "quote": "Stop lisinopril because of a dry cough. Start losartan 50 mg daily."
+          }
+        ]
+      },
+      {
+        "text": "The record contains a medication conflict for lisinopril, described as hold versus take.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "4725b068-965c-58cd-9179-b6d59cc88a17",
+            "start": 0,
+            "end": 15,
+            "quote": "Stop lisinopril"
+          },
+          {
+            "entry_id": "4531a170-1e0d-5351-bc98-b312d0ee171a",
+            "start": 0,
+            "end": 28,
+            "quote": "Continue lisinopril 10 mg daily"
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "The record does not answer when lisinopril was first recorded other than the 2 June 2026 entry; was there an earlier start entry?",
+      "The record contains the 12 August 2026 instruction to start losartan 50 mg daily, but whether it was actually started and confirmed later is not documented.",
+      "The record does not document the dry cough's onset date or its timing relative to lisinopril beyond the 12 August 2026 note.",
+      "No earlier entry documenting a hold or stop of lisinopril is present; the source of the hold-versus-take conflict is unresolved.",
+      "The most recent blood pressure values are not given; the 2 June 2026 note only states blood pressure was at target.",
+      "No follow-up appointment, referral or repeat blood pressure check after the 12 August 2026 switch is documented.",
+      "No allergies or allergic reactions are recorded in the provided entries."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "4725b068-965c-58cd-9179-b6d59cc88a17",
+          "start": 0,
+          "end": 15,
+          "quote": "Stop lisinopril"
+        },
+        "risk_reason": "Lisinopril appears as both continued (2 June 2026) and stopped (12 August 2026), and a medication conflict for lisinopril (hold versus take) is flagged; unclear current status.",
+        "suggested_action": "Clinician to reconcile the lisinopril conflict and confirm the current medication list, including whether losartan 50 mg daily was started.",
+        "clinical_entities": [
+          "lisinopril",
+          "losartan",
+          "dry cough"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

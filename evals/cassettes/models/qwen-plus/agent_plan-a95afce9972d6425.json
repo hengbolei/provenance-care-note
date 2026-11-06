@@ -1,0 +1,39 @@
+{
+  "fingerprint": "a95afce9972d64251f19eb236f1345825063294b117fc1015b7ad036c519aad3",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 946,
+    "output_tokens": 285,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was metoprolol first prescribed, and at what dose?",
+        "query": "metoprolol prescribed dose"
+      },
+      {
+        "question": "What was the heart rate before the hold instruction on 2026-08-15?",
+        "query": "heart rate"
+      },
+      {
+        "question": "Was the metoprolol hold actioned after 2026-08-15, and if so, when was it resumed?",
+        "query": "metoprolol resume restarted"
+      },
+      {
+        "question": "What clinical rationale or symptoms led to the decision to hold metoprolol on 2026-08-15?",
+        "query": "bradycardia fatigue dizziness"
+      },
+      {
+        "question": "Was the Thursday review (2026-08-17) documented, and what was the outcome regarding metoprolol?",
+        "query": "Thursday review metoprolol"
+      },
+      {
+        "question": "Are there any prior episodes of bradycardia or heart rate <50 while on metoprolol?",
+        "query": "bradycardia heart rate 50"
+      }
+    ]
+  }
+}

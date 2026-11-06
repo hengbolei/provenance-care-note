@@ -1,0 +1,23 @@
+{
+  "fingerprint": "03d993dfd4d13b8ed80310817167b128d2ce5978cc209e21b84241d197d71c12",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 774,
+    "output_tokens": 66,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was lisinopril first started and at what dose, and has the dose changed since?",
+        "query": "lisinopril dose start"
+      },
+      {
+        "question": "How long have home blood pressure readings been elevated, and what are the earlier readings?",
+        "query": "blood pressure home readings"
+      }
+    ]
+  }
+}

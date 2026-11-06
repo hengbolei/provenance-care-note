@@ -1,0 +1,39 @@
+{
+  "fingerprint": "e248100dba6a5e0effa597014dc3b8f3ba43fd70ee849359809b012edc498cb9",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 852,
+    "output_tokens": 170,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was the amoxicillin allergy first recorded, and what reaction was documented?",
+        "query": "amoxicillin allergy rash"
+      },
+      {
+        "question": "When did the rash first appear, and how was it treated or resolved?",
+        "query": "rash onset treatment"
+      },
+      {
+        "question": "Was the earlier 'no known drug allergies' note ever updated, and by whom?",
+        "query": "no known drug allergies update"
+      },
+      {
+        "question": "What was the course that caused the rash on day three, and was it stopped or completed?",
+        "query": "course day three stopped"
+      },
+      {
+        "question": "Were any antihistamines, steroids or other medications started for the rash?",
+        "query": "antihistamine steroid rash"
+      },
+      {
+        "question": "What blood pressure and weight values were recorded, and are there earlier measurements?",
+        "query": "blood pressure weight"
+      }
+    ]
+  }
+}

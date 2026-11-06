@@ -1,0 +1,39 @@
+{
+  "fingerprint": "5d107e70b136b8d679004860b027a70bee3d5add1f46dafd08132c61dbd9cc5d",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 3954,
+    "output_tokens": 191,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was furosemide first recorded and what was the original indication and dose?",
+        "query": "furosemide start dose indication"
+      },
+      {
+        "question": "Was the plan to repeat kidney function in 48 hours after the creatinine rise carried out, and what were the results?",
+        "query": "creatinine kidney function repeat"
+      },
+      {
+        "question": "What is the baseline creatinine trend before this episode of rising creatinine with dehydration?",
+        "query": "creatinine baseline trend dehydration"
+      },
+      {
+        "question": "Was there any prior episode of furosemide being held or restarted, and how did kidney function respond?",
+        "query": "furosemide held restart creatinine"
+      },
+      {
+        "question": "What diuretic or fluid plan preceded the dehydration and creatinine rise?",
+        "query": "diuretic fluid dehydration weight"
+      },
+      {
+        "question": "Have weight changes or fluid status been documented beyond the recent unchanged vitals entries?",
+        "query": "weight fluid status vitals"
+      }
+    ]
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "fingerprint": "096bc9b7c84dfc37c9308787829edc6211db9ef31f5f181d484d578d9aeecb14",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2452,
+    "output_tokens": 467,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "The patient states they are not allergic to codeine and that they just felt sick once.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "f7c8bcd4-b828-5bcf-a73c-d6fa383670ea",
+            "start": 0,
+            "end": 52,
+            "quote": "I am not allergic to codeine, I just felt sick once."
+          }
+        ]
+      },
+      {
+        "text": "A staff note records that the patient is allergic to codeine per the pharmacy record.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "16749069-ad3c-5cef-b03b-7132d28750d6",
+            "start": 0,
+            "end": 48,
+            "quote": "Allergic to codeine per the pharmacy record."
+          }
+        ]
+      },
+      {
+        "text": "The record contains conflicting allergy information for codeine: the patient reports not being allergic, while a staff note documents allergy to codeine per the pharmacy record.",
+        "category": "allergy",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "f7c8bcd4-b828-5bcf-a73c-d6fa383670ea",
+            "start": 0,
+            "end": 52,
+            "quote": "I am not allergic to codeine, I just felt sick once."
+          },
+          {
+            "entry_id": "16749069-ad3c-5cef-b03b-7132d28750d6",
+            "start": 0,
+            "end": 48,
+            "quote": "Allergic to codeine per the pharmacy record."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Is the codeine allergy documented in the pharmacy record accurate, or was the prior reaction limited to nausea?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "f7c8bcd4-b828-5bcf-a73c-d6fa383670ea",
+          "start": 0,
+          "end": 52,
+          "quote": "I am not allergic to codeine, I just felt sick once."
+        },
+        "risk_reason": "Patient-reported allergy status conflicts with a staff note documenting codeine allergy.",
+        "suggested_action": "Clarify the codeine allergy history, including the nature of the prior reaction, and reconcile the allergy list.",
+        "clinical_entities": [
+          "codeine"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

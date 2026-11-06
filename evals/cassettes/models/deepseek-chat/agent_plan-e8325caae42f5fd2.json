@@ -1,0 +1,35 @@
+{
+  "fingerprint": "e8325caae42f5fd26349e9bc02c263c6af3900d8d041ef6bcdf8f65c090de9f5",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 774,
+    "output_tokens": 140,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was warfarin first started and at what doses has it been titrated over time?",
+        "query": "warfarin dose change"
+      },
+      {
+        "question": "What is the recent INR trend and what prior INR values prompted this dose change?",
+        "query": "INR warfarin"
+      },
+      {
+        "question": "What was the indication for anticoagulation with warfarin?",
+        "query": "warfarin indication anticoagulation"
+      },
+      {
+        "question": "Have there been prior bleeding events or adverse reactions on warfarin?",
+        "query": "warfarin bleeding adverse reaction"
+      },
+      {
+        "question": "Were there previous dose adjustments for warfarin and what was the response?",
+        "query": "warfarin adjustment INR response"
+      }
+    ]
+  }
+}

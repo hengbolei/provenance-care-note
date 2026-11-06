@@ -1,0 +1,39 @@
+{
+  "fingerprint": "5d107e70b136b8d679004860b027a70bee3d5add1f46dafd08132c61dbd9cc5d",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 4680,
+    "output_tokens": 258,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was furosemide first prescribed, and what was the initial dose and indication?",
+        "query": "furosemide prescribe dose"
+      },
+      {
+        "question": "When was the first sign of rising creatinine or kidney dysfunction noted?",
+        "query": "creatinine kidney function"
+      },
+      {
+        "question": "Was dehydration documented before 2026-08-20, and if so, when and how was it assessed?",
+        "query": "dehydration assessment"
+      },
+      {
+        "question": "What were the most recent kidney function test results before the 2026-08-20 note, and when were they obtained?",
+        "query": "kidney function creatinine result"
+      },
+      {
+        "question": "Has furosemide been held or adjusted previously, and if so, when and why?",
+        "query": "furosemide hold adjust"
+      },
+      {
+        "question": "Were there any prior episodes of acute kidney injury or electrolyte disturbances linked to furosemide?",
+        "query": "AKI electrolyte disturbance"
+      }
+    ]
+  }
+}

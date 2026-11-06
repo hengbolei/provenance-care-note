@@ -1,0 +1,39 @@
+{
+  "fingerprint": "0361bd16032cea883187fa83cfc43e8a94e2e8947a5137d19298474f5f5329f0",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 4640,
+    "output_tokens": 254,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was cefalexin first prescribed, and what was the indication?",
+        "query": "cefalexin prescribed"
+      },
+      {
+        "question": "What symptoms or signs were present before the cefalexin dose that led to its prescription?",
+        "query": "infection sore throat fever"
+      },
+      {
+        "question": "Was an alternative antibiotic started after cefalexin was stopped due to allergy?",
+        "query": "alternative antibiotic started"
+      },
+      {
+        "question": "Was epinephrine, antihistamine, or corticosteroid administered for the lip swelling reaction?",
+        "query": "epinephrine diphenhydramine prednisone"
+      },
+      {
+        "question": "Was the cefalexin allergy confirmed with testing or documented as patient-reported vs. observed?",
+        "query": "allergy confirmed testing observed"
+      },
+      {
+        "question": "Were any follow-up actions ordered after the allergic reaction (e.g., allergist referral, EpiPen prescription)?",
+        "query": "allergist referral EpiPen follow-up"
+      }
+    ]
+  }
+}

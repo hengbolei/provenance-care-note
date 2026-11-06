@@ -1,0 +1,39 @@
+{
+  "fingerprint": "2fba8e7fd8af19cee3c359af3fa9a83ad195a06f3cbc5936d23993aa05fd3864",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 976,
+    "output_tokens": 248,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was the rash first noted and what was the clinical assessment?",
+        "query": "rash"
+      },
+      {
+        "question": "When was the diet sheet issued and what changes were made to dietary advice?",
+        "query": "diet sheet"
+      },
+      {
+        "question": "When was orthostatic hypotension (BP <90 systolic on standing) first documented and how was it managed?",
+        "query": "BP <90 systolic standing"
+      },
+      {
+        "question": "What medications were started, stopped, held or changed around the time of the diet advice or orthostatic BP finding?",
+        "query": "medication change"
+      },
+      {
+        "question": "What allergies or reactions were recorded prior to the most recent notes, especially if related to diet or medications?",
+        "query": "allergy reaction"
+      },
+      {
+        "question": "Which follow-ups, referrals or tests were planned before 2026-08-05, and were any completed or cancelled?",
+        "query": "follow-up referral test"
+      }
+    ]
+  }
+}

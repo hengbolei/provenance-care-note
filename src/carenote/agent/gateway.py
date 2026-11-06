@@ -45,6 +45,8 @@ T = TypeVar("T", bound=BaseModel)
 R = TypeVar("R")
 
 CASSETTE_DIR = Path(__file__).resolve().parents[3] / "evals" / "cassettes"
+# One directory per evaluated model: the request fingerprint does not name the model.
+MODEL_CASSETTE_DIR = CASSETTE_DIR / "models"
 # Retried with backoff: timeouts, conflicts, rate limits, server errors and Anthropic's overload.
 RETRY_STATUS = frozenset({408, 409, 429, 500, 502, 503, 504, 529})
 

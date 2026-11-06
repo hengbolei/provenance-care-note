@@ -1,0 +1,35 @@
+{
+  "fingerprint": "5a31ca7ed967950293203a1cc7acfa6164e30eaee83815f6b189dfce35095c12",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 873,
+    "output_tokens": 153,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was insulin glargine first recorded, and what doses were documented in earlier entries?",
+        "query": "insulin glargine dose night"
+      },
+      {
+        "question": "Were there earlier entries documenting any insulin dose changes or adjustments?",
+        "query": "insulin glargine change adjustment"
+      },
+      {
+        "question": "What do earlier glucose readings show compared with the recent 6 to 9 mmol/L range?",
+        "query": "glucose readings blood sugar"
+      },
+      {
+        "question": "Were any hypo- or hyperglycaemic episodes recorded in earlier entries?",
+        "query": "hypoglycaemia hyperglycaemia symptoms"
+      },
+      {
+        "question": "What earlier entries document the diabetes care plan and whether it was carried out?",
+        "query": "diabetes plan review follow-up"
+      }
+    ]
+  }
+}

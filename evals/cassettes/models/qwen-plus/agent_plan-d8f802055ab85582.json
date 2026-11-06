@@ -1,0 +1,14 @@
+{
+  "fingerprint": "d8f802055ab855824e81ed20d85998ea675feb5d11728bdcaf8f42d464270650",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 786,
+    "output_tokens": 5,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": []
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "fingerprint": "27af3be15f254d8f5e00367fa0f2ba3d9610cb7fdcd394407cb8fc9dc755b10e",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2571,
+    "output_tokens": 669,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient has a confirmed allergy to latex, with hives occurring after glove contact.",
+        "category": "allergy",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "e22fc2f9-c648-5976-ae2b-e9bcff1dd157",
+            "start": 0,
+            "end": 52,
+            "quote": "Hives after glove contact; allergy to latex confirmed and flagged for theatre."
+          }
+        ]
+      },
+      {
+        "text": "Latex allergy was not reported at pre-assessment on 2026-03-03.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "a5c5fb78-0b62-5c25-8627-ed6fd50a4c4f",
+            "start": 0,
+            "end": 45,
+            "quote": "No allergy to latex reported at pre-assessment."
+          }
+        ]
+      },
+      {
+        "text": "There is a documented conflict in the record regarding latex allergy: present versus absent.",
+        "category": "allergy",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "2dcbf705-e0ee-50a9-8daf-0a2a64d47ce3",
+            "start": 0,
+            "end": 68,
+            "quote": "Conflicting allergy facts for latex: absent versus present."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was the latex allergy first documented as present?",
+      "When was the latex allergy first documented as absent or not reported?",
+      "What clinical evidence or testing supported the confirmation of latex allergy?",
+      "Was the hives reaction after glove contact assessed for severity, timing or reproducibility?",
+      "Was the latex allergy flag implemented in theatre systems after 2026-08-19, and when was it first added?",
+      "Are there entries documenting patient education or avoidance plans for latex allergy?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "e22fc2f9-c648-5976-ae2b-e9bcff1dd157",
+          "start": 0,
+          "end": 52,
+          "quote": "Hives after glove contact; allergy to latex confirmed and flagged for theatre."
+        },
+        "risk_reason": "Latex allergy confirmed with acute reaction (hives), yet prior pre-assessment denied it — high risk for intraoperative exposure if flagging or communication fails.",
+        "suggested_action": "Verify current latex allergy flag status in theatre EHR and confirm real-time alerting is active.",
+        "clinical_entities": [
+          "latex allergy"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

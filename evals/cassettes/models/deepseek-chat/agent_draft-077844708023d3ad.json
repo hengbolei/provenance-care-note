@@ -1,0 +1,83 @@
+{
+  "fingerprint": "077844708023d3ad3d8c6660cd5cb9bec2d2ce917f2746d588369ef5fecec28d",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2536,
+    "output_tokens": 663,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "A clinician note dated 2026-07-30 instructs to continue aspirin 75 mg daily after the stent.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "6d20b538-52b8-50ea-88aa-c9472209699d",
+            "start": 0,
+            "end": 51,
+            "quote": "Continue aspirin 75 mg daily after the stent."
+          }
+        ]
+      },
+      {
+        "text": "A clinician note dated 2026-08-25 instructs to stop aspirin before the dental extraction on Monday.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "e873f474-48c5-5d62-97a7-a18c5056ef6d",
+            "start": 0,
+            "end": 55,
+            "quote": "Stop aspirin before the dental extraction on Monday."
+          }
+        ]
+      },
+      {
+        "text": "Deterministic checks flag a medication conflict for aspirin: the record contains both a hold instruction and a take instruction.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "6d20b538-52b8-50ea-88aa-c9472209699d",
+            "start": 0,
+            "end": 51,
+            "quote": "Continue aspirin 75 mg daily after the stent."
+          },
+          {
+            "entry_id": "e873f474-48c5-5d62-97a7-a18c5056ef6d",
+            "start": 0,
+            "end": 55,
+            "quote": "Stop aspirin before the dental extraction on Monday."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "The record does not state when aspirin was first started or the date/dose at initiation beyond the 75 mg daily noted on 2026-07-30.",
+      "The record does not give the date or reason for the coronary stent placement, nor the planned duration of antiplatelet therapy.",
+      "The record does not say whether the dental extraction was performed and whether aspirin was actually stopped before it.",
+      "The record does not document any bleeding, gastrointestinal or other adverse event on aspirin.",
+      "The record does not list any other antiplatelet or anticoagulant medications prescribed alongside aspirin.",
+      "The record contains no documented aspirin allergy or intolerance; allergy history is otherwise not recorded.",
+      "The record does not list follow-ups, referrals or tests planned or outstanding."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "26bd05e0-7952-5d41-b058-ba0eb0bcee93",
+          "start": 0,
+          "end": 1,
+          "quote": "C"
+        },
+        "risk_reason": "The record holds contradictory aspirin instructions: a 2026-07-30 note to continue aspirin 75 mg daily after the stent and a 2026-08-25 note to stop aspirin before the dental extraction on Monday.",
+        "suggested_action": "Reconcile the conflicting aspirin instructions and confirm the intended current regimen.",
+        "clinical_entities": []
+      }
+    ],
+    "check_points": []
+  }
+}

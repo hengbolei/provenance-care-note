@@ -1,0 +1,57 @@
+{
+  "fingerprint": "12449ae67942e1bf202f3f82e24a071bbefaafab36782d6d7c45d093cf86b5b9",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2523,
+    "output_tokens": 459,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Lisinopril 10 mg daily was continued as of 2026-06-02, with blood pressure reported at target.",
+        "category": "medication",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "4531a170-1e0d-5351-bc98-b312d0ee171a",
+            "start": 0,
+            "end": 48,
+            "quote": "Continue lisinopril 10 mg daily; blood pressure at target."
+          }
+        ]
+      },
+      {
+        "text": "Lisinopril was stopped on 2026-08-12 due to dry cough, and losartan 50 mg daily was started.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "4725b068-965c-58cd-9179-b6d59cc88a17",
+            "start": 0,
+            "end": 62,
+            "quote": "Stop lisinopril because of a dry cough. Start losartan 50 mg daily."
+          }
+        ]
+      },
+      {
+        "text": "There is a documented conflict in the record regarding lisinopril: 'hold versus take'.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "6e076e21-8471-58c2-830d-db73ae45657b",
+            "start": 0,
+            "end": 57,
+            "quote": "Conflicting medication facts for lisinopril: hold versus take."
+          }
+        ]
+      }
+    ],
+    "open_questions": [],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

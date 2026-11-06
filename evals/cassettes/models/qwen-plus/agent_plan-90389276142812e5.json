@@ -1,0 +1,39 @@
+{
+  "fingerprint": "90389276142812e565d7c858cf744f130e9285d8a59927a6a802a512ef389909",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 952,
+    "output_tokens": 255,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was lisinopril first prescribed, and at what dose?",
+        "query": "lisinopril prescribe"
+      },
+      {
+        "question": "When was the dry cough first documented as a side effect of lisinopril?",
+        "query": "dry cough lisinopril"
+      },
+      {
+        "question": "Was losartan previously trialed or contraindicated before this initiation?",
+        "query": "losartan trial contraindicated"
+      },
+      {
+        "question": "What blood pressure readings supported continuing lisinopril in June, and were they repeated after switching to losartan?",
+        "query": "blood pressure lisinopril losartan"
+      },
+      {
+        "question": "Was there documentation of renal function or potassium monitoring before stopping lisinopril and starting losartan?",
+        "query": "creatinine potassium losartan"
+      },
+      {
+        "question": "Was the lisinopril hold or stop action confirmed in a subsequent note or order after August 12?",
+        "query": "lisinopril stop confirmed"
+      }
+    ]
+  }
+}

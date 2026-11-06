@@ -1,0 +1,35 @@
+{
+  "fingerprint": "d4c7b152872d549e41dffd5176a02fede50f6f31bf1ec7eb718aaf2cf7ed7a6b",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 4062,
+    "output_tokens": 152,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was the colonoscopy first requested or recommended, and for what indication?",
+        "query": "colonoscopy referral indication"
+      },
+      {
+        "question": "Was any earlier colonoscopy or bowel screening completed, and what did it show?",
+        "query": "colonoscopy bowel screening result"
+      },
+      {
+        "question": "Has the outstanding colonoscopy referral been acted on or declined since it was recorded?",
+        "query": "colonoscopy booked scheduled"
+      },
+      {
+        "question": "What earlier entries say about symptoms (e.g. bowel change, bleeding) that prompted the colonoscopy referral?",
+        "query": "rectal bleeding bowel habit change"
+      },
+      {
+        "question": "Where in the record did the colonoscopy plan first appear, and was patient consent or preference documented?",
+        "query": "colonoscopy consent discussed"
+      }
+    ]
+  }
+}

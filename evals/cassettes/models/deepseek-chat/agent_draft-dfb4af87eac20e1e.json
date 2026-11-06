@@ -1,0 +1,99 @@
+{
+  "fingerprint": "dfb4af87eac20e1e7f61b1768c1bed3e5e74da4b87d0afc6c1756bb6d9cea286",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2594,
+    "output_tokens": 898,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "On 2026-08-14 the clinician recorded an INR of 3.8 and wrote to reduce warfarin to 2.5 mg nightly and recheck INR on Friday.",
+        "category": "plan",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "8c71a5c0-4cf5-5451-b643-adf7280fe836",
+            "start": 0,
+            "end": 85,
+            "quote": "INR 3.8. Reduce warfarin 2.5 mg nightly and recheck INR on Friday."
+          }
+        ]
+      },
+      {
+        "text": "On 2026-08-16 the patient reports still taking warfarin 5 mg every night, which does not match the 2.5 mg nightly dose written on 2026-08-14.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "30d178a0-f3f0-54af-af4c-e85ff96b79c0",
+            "start": 8,
+            "end": 49,
+            "quote": "still taking warfarin 5 mg every night"
+          }
+        ]
+      },
+      {
+        "text": "A deterministic check flags a conflicting dose for warfarin in the record: 2.5mg versus 5mg.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "30d178a0-f3f0-54af-af4c-e85ff96b79c0",
+            "start": 17,
+            "end": 49,
+            "quote": "warfarin 5 mg every night"
+          },
+          {
+            "entry_id": "8c71a5c0-4cf5-5451-b643-adf7280fe836",
+            "start": 24,
+            "end": 55,
+            "quote": "warfarin 2.5 mg nightly"
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Was the INR recheck planned for Friday after the 2.5 mg reduction actually done, and what was the result?",
+      "Which warfarin dose is the patient actually taking now, given the patient's report of 5 mg nightly versus the recorded 2.5 mg nightly?",
+      "When was warfarin first recorded, at what dose and for what indication? Earlier entries on this are not in the available record.",
+      "Are any earlier INR values or prior warfarin dose adjustments recorded? None appear in the available entries.",
+      "Are any allergies or reactions recorded? None appear in the available entries.",
+      "Have any bleeding symptoms, bruising or adverse effects been recorded with warfarin? None appear in the available entries.",
+      "Are any other interacting medications, recent antibiotics or anticoagulant changes recorded? None appear in the available entries."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "30d178a0-f3f0-54af-af4c-e85ff96b79c0",
+          "start": 8,
+          "end": 49,
+          "quote": "still taking warfarin 5 mg every night"
+        },
+        "risk_reason": "Patient-reported dose of warfarin 5 mg nightly conflicts with the clinician's 2026-08-14 instruction to take 2.5 mg nightly after an INR of 3.8.",
+        "suggested_action": "Clinician to confirm the patient's current warfarin dose and the planned INR recheck.",
+        "clinical_entities": [
+          "warfarin"
+        ]
+      },
+      {
+        "citation": {
+          "entry_id": "8c71a5c0-4cf5-5451-b643-adf7280fe836",
+          "start": 0,
+          "end": 85,
+          "quote": "INR 3.8. Reduce warfarin 2.5 mg nightly and recheck INR on Friday."
+        },
+        "risk_reason": "An elevated INR of 3.8 prompted a dose change and a planned Friday INR recheck; there is no record that the recheck occurred or its result.",
+        "suggested_action": "Clinician to verify whether the Friday INR recheck was completed and review the result.",
+        "clinical_entities": [
+          "warfarin",
+          "INR"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

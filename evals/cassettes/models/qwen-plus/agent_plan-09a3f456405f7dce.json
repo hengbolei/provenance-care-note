@@ -1,0 +1,39 @@
+{
+  "fingerprint": "09a3f456405f7dcea86670dacbafb9cb4cf29b667ad9ab330e2f2219f4f4f13d",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 4721,
+    "output_tokens": 279,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was apixaban first prescribed, and what dose was initially ordered?",
+        "query": "apixaban prescribe dose"
+      },
+      {
+        "question": "What is the documented indication for apixaban in this patient?",
+        "query": "apixaban indication"
+      },
+      {
+        "question": "Has the apixaban dose been formally changed or confirmed by a prescriber since the pharmacy label discrepancy was noted?",
+        "query": "apixaban 2.5 mg 5 mg confirm prescriber"
+      },
+      {
+        "question": "Are there any documented bleeding events, falls risk assessments, or renal function tests relevant to apixaban dosing?",
+        "query": "bleeding fall renal creatinine apixaban"
+      },
+      {
+        "question": "Was apixaban held, paused, or adjusted around any recent procedures, admissions, or acute illnesses?",
+        "query": "apixaban hold procedure admission illness"
+      },
+      {
+        "question": "What do earlier entries say about anticoagulation—was another agent (e.g., warfarin, rivaroxaban) used before apixaban?",
+        "query": "anticoagulant warfarin rivaroxaban"
+      }
+    ]
+  }
+}

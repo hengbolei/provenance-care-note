@@ -1,0 +1,35 @@
+{
+  "fingerprint": "47cc50a1323c6f25fe40c934119306ce3ac28728f87293be11751bfea3ade0e4",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2262,
+    "output_tokens": 186,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "The patient reports that their daughter can be reached on [REDACTED_PHONE] if the patient misses a call.",
+        "category": "other",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "471d4a44-88d8-572e-b549-689aa5bf369c",
+            "start": 0,
+            "end": 84,
+            "quote": "My daughter can be reached on [REDACTED_PHONE] if I miss a call."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "No medication starts, stops, holds or changes are recorded in the available entries.",
+      "No allergies or allergic reactions are recorded in the available entries.",
+      "No follow-ups, referrals or tests are recorded as planned or outstanding in the available entries."
+    ],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

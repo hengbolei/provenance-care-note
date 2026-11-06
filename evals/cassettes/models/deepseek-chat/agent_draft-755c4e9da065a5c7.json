@@ -1,0 +1,50 @@
+{
+  "fingerprint": "755c4e9da065a5c7e256f8f8f80d4e6462b187341595f8706d72a7d806059f97",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2385,
+    "output_tokens": 378,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports thinking they are allergic to ibuprofen, which makes them wheezy.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "b97ba818-6e0d-54c7-a203-65f69534febb",
+            "start": 8,
+            "end": 60,
+            "quote": "I think I am allergic to ibuprofen, it makes me wheezy."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was the ibuprofen allergy and wheeze first recorded, and how was it documented previously? The record contains only the single patient note and no earlier documentation.",
+      "Has the ibuprofen reaction been assessed or confirmed in earlier entries? No assessment or confirmation is recorded.",
+      "Are other NSAIDs or alternative analgesics recorded, and were any stopped or switched because of this reaction? No other medications or changes are recorded.",
+      "Is there any recorded asthma or prior respiratory reaction to medications? Only the wheeze with ibuprofen is recorded; no asthma history is documented.",
+      "Have allergy details been added to the formal allergy list or communicated to other clinicians? The reaction appears only as a patient note.",
+      "Which medications were started, stopped, held or changed? No medication changes are recorded."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "b97ba818-6e0d-54c7-a203-65f69534febb",
+          "start": 8,
+          "end": 60,
+          "quote": "I think I am allergic to ibuprofen, it makes them wheezy."
+        },
+        "risk_reason": "Patient-reported ibuprofen reaction with wheeze is only in a free-text patient note and may not be on the structured allergy list.",
+        "suggested_action": "Clinician to verify the ibuprofen reaction and confirm allergy documentation.",
+        "clinical_entities": []
+      }
+    ],
+    "check_points": []
+  }
+}

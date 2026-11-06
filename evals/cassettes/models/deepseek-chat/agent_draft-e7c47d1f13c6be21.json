@@ -1,0 +1,50 @@
+{
+  "fingerprint": "e7c47d1f13c6be216ffce0fc20a2c2a76a32838cf3b1a79df49cd35642704178",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2327,
+    "output_tokens": 433,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "A staff note records that someone called from a phone number about a patient's record and asked for a callback.",
+        "category": "other",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "153113a4-0102-5752-9a5c-cd51565acb3d",
+            "start": 0,
+            "end": 96,
+            "quote": "[REDACTED_NAME] called from [REDACTED_PHONE] about record [REDACTED_NAME] and asked for a callback."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Which medications were started, stopped, held or changed? The record contains no medication entries, so this cannot be answered.",
+      "Which allergies or reactions are recorded? No allergy entries appear in the record.",
+      "Which follow-ups, referrals or tests are planned or outstanding? No such entries appear in the record.",
+      "What earlier entries explain this callback request, and what was the outcome of prior calls? No earlier entries or prior call outcomes are present in the record.",
+      "When did this patient's most recent documented contact or visit occur, and what was discussed? The only entry is a staff note dated 2026-08-20 about a callback request; no visit or contact with the patient is documented.",
+      "Is the callback request in the staff note outstanding, and who is responsible for returning the call?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "153113a4-0102-5752-9a5c-cd51565acb3d",
+          "start": 0,
+          "end": 96,
+          "quote": "[REDACTED_NAME] called from [REDACTED_PHONE] about record [REDACTED_NAME] and asked for a callback."
+        },
+        "risk_reason": "A callback was requested by phone but the record shows no documentation that it was returned or resolved.",
+        "suggested_action": "Confirm whether the requested callback has been returned and document the outcome.",
+        "clinical_entities": []
+      }
+    ],
+    "check_points": []
+  }
+}

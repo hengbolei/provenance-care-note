@@ -1,0 +1,39 @@
+{
+  "fingerprint": "7aa17525beed8ae4be3f36bea452a17a2c45b856342b93aa55f34ea12944a142",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 867,
+    "output_tokens": 244,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was amlodipine first started, and at what dose?",
+        "query": "amlodipine started dose"
+      },
+      {
+        "question": "Was there any prior documentation of stopping or holding amlodipine before the 2026-08-22 patient note?",
+        "query": "amlodipine stop hold"
+      },
+      {
+        "question": "What is the documented allergy or reaction history for this patient, especially related to calcium channel blockers?",
+        "query": "allergy amlodipine calcium channel blocker"
+      },
+      {
+        "question": "What follow-up or monitoring plan was established before the 2026-08-20 clinician note, and was it completed?",
+        "query": "follow-up review amlodipine"
+      },
+      {
+        "question": "Are there earlier entries documenting symptoms or indications that led to starting amlodipine?",
+        "query": "hypertension high blood pressure started amlodipine"
+      },
+      {
+        "question": "Was the instruction in the 2026-08-22 patient note acted upon or addressed in any subsequent clinical entry?",
+        "query": "stop all medications response"
+      }
+    ]
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "fingerprint": "477b1350f44d30ad375339bf69ed4cb39ec601fa6a886372d3b81c46def580b4",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 776,
+    "output_tokens": 251,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was chest discomfort first recorded, and what was its character, duration and associated features?",
+        "query": "chest discomfort exertion"
+      },
+      {
+        "question": "What medications were prescribed for chest discomfort or cardiovascular risk, and when were they started?",
+        "query": "chest discomfort medication"
+      },
+      {
+        "question": "Was any cardiac investigation (e.g., ECG, troponin, stress test) ordered or performed, and when?",
+        "query": "ECG troponin stress test"
+      },
+      {
+        "question": "Has the patient been referred to cardiology or another specialist for this symptom?",
+        "query": "cardiology referral"
+      },
+      {
+        "question": "What cardiovascular risk factors (e.g., hypertension, diabetes, smoking) are documented, and when were they first noted?",
+        "query": "hypertension diabetes smoking"
+      },
+      {
+        "question": "Was a formal diagnosis (e.g., angina, CAD, GERD) assigned, and when was it first recorded?",
+        "query": "angina CAD GERD diagnosis"
+      }
+    ]
+  }
+}

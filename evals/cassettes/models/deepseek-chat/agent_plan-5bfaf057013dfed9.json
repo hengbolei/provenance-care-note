@@ -1,0 +1,35 @@
+{
+  "fingerprint": "5bfaf057013dfed92f88652caca3a9f7edffd47f06d7174e36251388e9735f42",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 850,
+    "output_tokens": 176,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was the ankle swelling first recorded and how did it evolve before amlodipine was stopped?",
+        "query": "ankle swelling oedema"
+      },
+      {
+        "question": "Was amlodipine the only antihypertensive tried, and what was the blood pressure control history before it was stopped?",
+        "query": "blood pressure amlodipine hypertension"
+      },
+      {
+        "question": "Was a follow-up blood pressure check arranged, and has it been completed or rescheduled?",
+        "query": "blood pressure review two weeks follow-up"
+      },
+      {
+        "question": "What alternative antihypertensive, if any, was started after amlodipine was stopped?",
+        "query": "antihypertensive started stopped"
+      },
+      {
+        "question": "What was the amlodipine dose and start date, and were there earlier dose changes?",
+        "query": "amlodipine 5 mg dose start"
+      }
+    ]
+  }
+}

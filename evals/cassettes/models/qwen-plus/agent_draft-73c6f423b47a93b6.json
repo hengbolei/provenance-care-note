@@ -1,0 +1,105 @@
+{
+  "fingerprint": "73c6f423b47a93b668479dee167613d3884a35e6ec1c87e4f5578c68d78c4c4b",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2637,
+    "output_tokens": 1014,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports new dizziness after taking lisinopril 20 mg in the morning.",
+        "category": "symptom",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "0a48402a-df4f-5797-b6ab-63cfae03a0e2",
+            "start": 0,
+            "end": 51,
+            "quote": "Patient describes new dizziness after lisinopril 20 mg morning dose."
+          }
+        ]
+      },
+      {
+        "text": "Patient's home blood pressure was 98/62 mmHg, recorded during a dizziness episode.",
+        "category": "symptom",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "0a48402a-df4f-5797-b6ab-63cfae03a0e2",
+            "start": 52,
+            "end": 83,
+            "quote": "Home blood pressure was 98/62 mmHg."
+          }
+        ]
+      },
+      {
+        "text": "Lisinopril was started seven days ago at 10 mg.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "316d9e1b-a9bd-55f2-a81b-37da15558ec0",
+            "start": 33,
+            "end": 72,
+            "quote": "Patient started lisinopril 10 mg seven days ago."
+          }
+        ]
+      },
+      {
+        "text": "The record contains conflicting dose information for lisinopril: 10 mg and 20 mg.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "57e4a256-a789-5fc4-8a2d-7ba8bd0d28d3",
+            "start": 0,
+            "end": 65,
+            "quote": "Conflicting dose facts for lisinopril: 10mg versus 20mg."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Was the lisinopril dose increased from 10 mg to 20 mg, and if so, when and why?",
+      "What was the patient's blood pressure before starting lisinopril?",
+      "Has dizziness or hypotension been documented previously on lisinopril or other antihypertensives?",
+      "Are there any documented allergies or adverse reactions to ACE inhibitors?",
+      "What follow-up actions were taken or planned after the dizziness episode (e.g., BP monitoring, dose adjustment, discontinuation)?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "57e4a256-a789-5fc4-8a2d-7ba8bd0d28d3",
+          "start": 0,
+          "end": 65,
+          "quote": "Conflicting dose facts for lisinopril: 10mg versus 20mg."
+        },
+        "risk_reason": "Dose discrepancy may indicate unintentional doubling or prescribing error, increasing risk of hypotension.",
+        "suggested_action": "Clarify current prescribed lisinopril dose and reconcile with pharmacy records and patient instructions.",
+        "clinical_entities": [
+          "lisinopril"
+        ]
+      },
+      {
+        "citation": {
+          "entry_id": "0a48402a-df4f-5797-b6ab-63cfae03a0e2",
+          "start": 0,
+          "end": 83,
+          "quote": "Patient describes new dizziness after lisinopril 20 mg morning dose. Home blood pressure was 98/62 mmHg."
+        },
+        "risk_reason": "Symptomatic hypotension (dizziness + BP 98/62) suggests possible overdose or sensitivity to lisinopril.",
+        "suggested_action": "Hold lisinopril until dose reconciliation and clinical assessment; consider BP recheck and orthostatic evaluation.",
+        "clinical_entities": [
+          "lisinopril",
+          "dizziness",
+          "hypotension"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

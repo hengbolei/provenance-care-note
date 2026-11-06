@@ -1,0 +1,39 @@
+{
+  "fingerprint": "5a31ca7ed967950293203a1cc7acfa6164e30eaee83815f6b189dfce35095c12",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 880,
+    "output_tokens": 231,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was insulin glargine first started, and at what dose?",
+        "query": "insulin glargine started"
+      },
+      {
+        "question": "Was the instruction to double insulin tonight carried out, and if so, when and by whom?",
+        "query": "double insulin tonight"
+      },
+      {
+        "question": "What were the glucose readings prior to this week, and were there any trends or interventions?",
+        "query": "glucose readings"
+      },
+      {
+        "question": "Has there been any documented hypoglycemia or hyperglycemia requiring action?",
+        "query": "hypoglycemia hyperglycemia"
+      },
+      {
+        "question": "Was there any documentation of patient education or shared decision-making about insulin adjustment?",
+        "query": "patient education insulin adjustment"
+      },
+      {
+        "question": "Are there any recent changes in renal or hepatic function that might affect insulin dosing?",
+        "query": "renal function hepatic function"
+      }
+    ]
+  }
+}

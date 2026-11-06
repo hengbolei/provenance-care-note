@@ -1,0 +1,47 @@
+{
+  "fingerprint": "5b3b0c645ed2f3452e92a0cff9f3aff10da5eaa4713bffedd469ad58d1767d46",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2322,
+    "output_tokens": 344,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports being allergic to amoxicillin and developed a rash on day three of a course.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "76296e90-c93b-5a47-b7fd-9ea8358e1ab5",
+            "start": 38,
+            "end": 72,
+            "quote": "Patient developed a rash on day three of the course and is allergic to amoxicillin."
+          }
+        ]
+      },
+      {
+        "text": "Clinician documented 'no known drug allergies' on 2026-05-02.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "31a3b69d-9d48-512b-b44e-1762ebb44672",
+            "start": 26,
+            "end": 52,
+            "quote": "No known drug allergies. Blood pressure and weight recorded."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Was the amoxicillin course prescribed before or after the clinician note dated 2026-05-02?",
+      "Has the patient's allergy status been updated in the record since the clinician note?"
+    ],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "fingerprint": "e1f2acd416a1adbe8926f3ecd7a75f055fcaf72cbf719c38249f7601a07b7eec",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2583,
+    "output_tokens": 660,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports no allergy to codeine, stating they 'just felt sick once'.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "f7c8bcd4-b828-5bcf-a73c-d6fa383670ea",
+            "start": 0,
+            "end": 49,
+            "quote": "I am not allergic to codeine, I just felt sick once."
+          }
+        ]
+      },
+      {
+        "text": "Staff note states patient is 'Allergic to codeine per the pharmacy record.'",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "16749069-ad3c-5cef-b03b-7132d28750d6",
+            "start": 0,
+            "end": 45,
+            "quote": "Allergic to codeine per the pharmacy record."
+          }
+        ]
+      },
+      {
+        "text": "There is a documented conflict regarding codeine allergy: 'Conflicting allergy facts for codeine: absent versus present.'",
+        "category": "allergy",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "e13de048-6507-542c-869b-06e7bedd590c",
+            "start": 0,
+            "end": 65,
+            "quote": "Conflicting allergy facts for codeine: absent versus present."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was codeine first recorded as an allergy in the record?",
+      "What does the pharmacy record say about codeine allergy, and when was it entered?",
+      "Has codeine ever been prescribed, administered, or avoided, and when?",
+      "Are there any earlier notes from staff or patient clarifying the codeine reaction (e.g., nausea vs. anaphylaxis)?",
+      "Was the allergy conflict resolved in any prior entry, and if so, how and when?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "e13de048-6507-542c-869b-06e7bedd590c",
+          "start": 0,
+          "end": 65,
+          "quote": "Conflicting allergy facts for codeine: absent versus present."
+        },
+        "risk_reason": "Direct contradiction between patient-reported absence of allergy and staff-recorded presence creates high risk for inappropriate avoidance or administration.",
+        "suggested_action": "Clarify nature and timing of the reaction with patient and verify pharmacy record source; document resolution explicitly.",
+        "clinical_entities": [
+          "codeine"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

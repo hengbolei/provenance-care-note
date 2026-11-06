@@ -1,0 +1,39 @@
+{
+  "fingerprint": "00a5a611d76d68f63d9a3847a499b5058cf8f15418ee2b0a9d42658595f9992c",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 907,
+    "output_tokens": 164,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was aspirin first started, and at what dose?",
+        "query": "aspirin start dose"
+      },
+      {
+        "question": "When and why was the coronary stent placed, and what was the planned duration of antiplatelet therapy?",
+        "query": "stent antiplatelet duration"
+      },
+      {
+        "question": "Was the dental extraction performed, and was aspirin actually stopped before it?",
+        "query": "dental extraction aspirin"
+      },
+      {
+        "question": "Is there any documented bleeding, gastrointestinal or other adverse event on aspirin?",
+        "query": "aspirin bleeding adverse"
+      },
+      {
+        "question": "Were any other antiplatelet or anticoagulant medications ever prescribed alongside aspirin?",
+        "query": "antiplatelet anticoagulant clopidogrel"
+      },
+      {
+        "question": "Is there a record of aspirin allergy or intolerance?",
+        "query": "aspirin allergy intolerance"
+      }
+    ]
+  }
+}

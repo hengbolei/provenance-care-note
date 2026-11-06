@@ -1,0 +1,39 @@
+{
+  "fingerprint": "c97f600216648af4aa0afee53474aa2f737ab53297571b1fba27855c135e67b7",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 946,
+    "output_tokens": 195,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was lisinopril first prescribed, and at what starting dose?",
+        "query": "lisinopril start dose"
+      },
+      {
+        "question": "When and why was the lisinopril dose increased from 10 mg to 20 mg?",
+        "query": "lisinopril 20 mg increase"
+      },
+      {
+        "question": "Were there earlier reports of dizziness, low blood pressure, or other adverse effects with lisinopril?",
+        "query": "dizziness hypotension lisinopril"
+      },
+      {
+        "question": "What were the home blood pressure readings before starting lisinopril?",
+        "query": "home blood pressure readings"
+      },
+      {
+        "question": "What was the patient's blood pressure and renal function at follow-up after starting lisinopril?",
+        "query": "blood pressure creatinine potassium follow-up"
+      },
+      {
+        "question": "Are other antihypertensives or diuretics also being taken, and were doses adjusted?",
+        "query": "antihypertensive diuretic medication"
+      }
+    ]
+  }
+}

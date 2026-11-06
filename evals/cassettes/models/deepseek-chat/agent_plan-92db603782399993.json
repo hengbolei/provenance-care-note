@@ -1,0 +1,35 @@
+{
+  "fingerprint": "92db6037823999931855a93cca51cce749e212f493c35f6fa7d8cc609457ec53",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 850,
+    "output_tokens": 156,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was the new tablet started, and is it metformin or another medication?",
+        "query": "metformin new tablet start"
+      },
+      {
+        "question": "Are there earlier entries documenting gastrointestinal symptoms or intolerance before metformin was started?",
+        "query": "stomach upset nausea diarrhea"
+      },
+      {
+        "question": "What baseline diabetes tests (HbA1c, renal function) were recorded before metformin initiation?",
+        "query": "HbA1c creatinine eGFR baseline"
+      },
+      {
+        "question": "Is there any earlier record of metformin allergy or intolerance, and what were the details?",
+        "query": "metformin allergy intolerance reaction"
+      },
+      {
+        "question": "Were diabetes education, dietitian referral, or follow-up monitoring planned and completed?",
+        "query": "dietitian referral follow-up diabetes education"
+      }
+    ]
+  }
+}

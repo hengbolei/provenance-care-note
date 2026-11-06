@@ -1,0 +1,23 @@
+{
+  "fingerprint": "9449d7197d30c97cf229736d175fc8ce11bffcdb65c623de0c69af4b46840045",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 784,
+    "output_tokens": 67,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "What earlier entries explain this callback request, and what was the outcome of prior calls?",
+        "query": "callback telephone call record"
+      },
+      {
+        "question": "When did this patient's most recent documented contact or visit occur, and what was discussed?",
+        "query": "visit contact staff note"
+      }
+    ]
+  }
+}
