@@ -1,0 +1,53 @@
+{
+  "fingerprint": "db130c59d2b10e3bc417593b452e3e89e16f3b89e192a8ef8e1beb75442f64af",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 6388,
+    "output_tokens": 495,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports sleeping well and having no new symptoms for the past 60 consecutive days, from 2026-07-11 through 2026-08-18.",
+        "category": "symptom",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "1b7b1bb3-0fe4-546a-b891-7f49b6b8cced",
+            "start": 25,
+            "end": 65,
+            "quote": "I slept well and have nothing new to report today."
+          }
+        ]
+      },
+      {
+        "text": "Clinician documented lip swelling after the first dose of cefalexin and recorded a confirmed allergy to cefalexin, flagged in the record.",
+        "category": "allergy",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "791197d7-0415-5bb5-a182-91fc80caeb81",
+            "start": 0,
+            "end": 69,
+            "quote": "Lip swelling after the first dose of cefalexin. Allergic to cefalexin; documented and flagged."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was cefalexin first prescribed, and what was the indication?",
+      "What other antibiotics were tried before cefalexin, and were there prior allergic reactions?",
+      "Was lip swelling assessed clinically (e.g., airway evaluation, epinephrine administered) and documented at the time of reaction?",
+      "Was an alternative antibiotic initiated after stopping cefalexin, and when?",
+      "Has allergy testing or formal allergy documentation (e.g., severity, mechanism) been performed for cefalexin?",
+      "Were any follow-up actions scheduled after the allergic reaction (e.g., allergist referral, re-education, EpiPen prescription)?",
+      "Which medications were started, stopped, held or changed?",
+      "Which follow-ups, referrals or tests are planned or outstanding?"
+    ],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

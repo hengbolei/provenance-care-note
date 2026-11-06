@@ -1,0 +1,41 @@
+{
+  "fingerprint": "1c5d4464c5079078e2f1486c7b4cce20f45ddb29da78f3d9d2eaf9e5e116f168",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2486,
+    "output_tokens": 300,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports feeling tired lately and not sleeping well.",
+        "category": "symptom",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "bcf545c0-d3f4-5b33-baa7-b7baa249c513",
+            "start": 0,
+            "end": 42,
+            "quote": "Feeling tired lately and not sleeping well."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was the fatigue and sleep disturbance first reported?",
+      "Which medications were started, stopped, held or changed?",
+      "Which allergies or reactions are recorded?",
+      "Which follow-ups, referrals or tests are planned or outstanding?",
+      "What medications were prescribed or adjusted around the time fatigue and sleep issues began?",
+      "Were any investigations ordered for fatigue or insomnia, such as CBC, thyroid function, or sleep study?",
+      "Has the patient reported similar symptoms in the past, and if so, what was the assessment or management?",
+      "Was a mental health screen (e.g., PHQ-9, GAD-7) performed given fatigue and sleep disturbance?",
+      "Are there documented social, occupational, or lifestyle factors contributing to fatigue or poor sleep?"
+    ],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

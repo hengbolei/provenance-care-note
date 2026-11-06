@@ -1,0 +1,63 @@
+{
+  "fingerprint": "d4dcc6bd4332c5304fc551869367b34c239eb0b246022aa40d83b15eedd64898",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2772,
+    "output_tokens": 556,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Levothyroxine 50 mcg daily was documented as active in the medication list on 2026-07-01.",
+        "category": "medication",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "b638fc79-e60d-5a3f-825d-f70d3b607569",
+            "start": 0,
+            "end": 44,
+            "quote": "Medication list includes levothyroxine 50 mcg each morning."
+          }
+        ]
+      },
+      {
+        "text": "Levothyroxine 75 mcg daily was ordered on 2026-08-05 per clinician note.",
+        "category": "medication",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "8f11dc96-d486-5339-ae3b-ab8a987cd1bc",
+            "start": 23,
+            "end": 47,
+            "quote": "levothyroxine 75 mcg daily"
+          }
+        ]
+      },
+      {
+        "text": "There is a conflict between documented levothyroxine doses: 50 mcg (staff note, 2026-07-01) and 75 mcg (clinician note, 2026-08-05).",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "b638fc79-e60d-5a3f-825d-f70d3b607569",
+            "start": 0,
+            "end": 44,
+            "quote": "Medication list includes levothyroxine 50 mcg each morning."
+          },
+          {
+            "entry_id": "8f11dc96-d486-5339-ae3b-ab8a987cd1bc",
+            "start": 23,
+            "end": 47,
+            "quote": "levothyroxine 75 mcg daily"
+          }
+        ]
+      }
+    ],
+    "open_questions": [],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

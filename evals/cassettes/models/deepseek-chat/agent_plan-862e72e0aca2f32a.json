@@ -1,0 +1,39 @@
+{
+  "fingerprint": "862e72e0aca2f32a5964a712a76131a9c9ddd4b267a99bcaa3a7f4c193345154",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 977,
+    "output_tokens": 168,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was aspirin first recorded, and what was the original indication and dose?",
+        "query": "aspirin start indication dose"
+      },
+      {
+        "question": "Was the stent procedure documented, and was any antiplatelet duration plan recorded?",
+        "query": "stent antiplatelet duration"
+      },
+      {
+        "question": "Was hold of aspirin for the dental extraction documented elsewhere, and was it resumed afterwards?",
+        "query": "aspirin hold dental extraction"
+      },
+      {
+        "question": "What bleeding or cardiovascular risks were recorded that affect stopping aspirin?",
+        "query": "bleeding risk cardiovascular"
+      },
+      {
+        "question": "Were any prior medication holds or interruptions recorded before this one?",
+        "query": "medication hold interrupted"
+      },
+      {
+        "question": "Which recent entries mention the dental procedure and any planned resumption of antiplatelets?",
+        "query": "dental extraction resumption antiplatelet"
+      }
+    ]
+  }
+}

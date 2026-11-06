@@ -1,0 +1,100 @@
+{
+  "fingerprint": "e9ecff9dbcdcd7a7d73f2684fd9136315558e057b7d05bf54c3be6114a112674",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2707,
+    "output_tokens": 851,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "A clinician note dated 2026-08-12 directs to stop lisinopril because of a dry cough and start losartan 50 mg daily.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "4725b068-965c-58cd-9179-b6d59cc88a17",
+            "start": 0,
+            "end": 76,
+            "quote": "Stop lisinopril because of a dry cough. Start losartan 50 mg daily."
+          }
+        ]
+      },
+      {
+        "text": "A clinician note dated 2026-06-02 directed to continue lisinopril 10 mg daily, with blood pressure at target.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "4531a170-1e0d-5351-bc98-b312d0ee171a",
+            "start": 0,
+            "end": 44,
+            "quote": "Continue lisinopril 10 mg daily; blood pressure at target."
+          }
+        ]
+      },
+      {
+        "text": "The record contains a medication conflict for lisinopril (hold versus take), spanning the 2026-06-02 continue entry and the 2026-08-12 stop entry.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "4531a170-1e0d-5351-bc98-b312d0ee171a",
+            "start": 0,
+            "end": 28,
+            "quote": "Continue lisinopril 10 mg daily"
+          },
+          {
+            "entry_id": "4725b068-965c-58cd-9179-b6d59cc88a17",
+            "start": 0,
+            "end": 20,
+            "quote": "Stop lisinopril because"
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Which entry reflects the current lisinopril status: the 2026-06-02 continue entry or the 2026-08-12 stop entry?",
+      "When was lisinopril first started, and at what dose? The record does not show an initial start.",
+      "Was the lisinopril dry cough reported earlier, and when did it first appear? The record only documents it in the 2026-08-12 note.",
+      "Was losartan previously tried or documented? The record shows only the 2026-08-12 start.",
+      "What were blood pressure and renal function at the time of the reported lisinopril-to-losartan switch? The record does not include these values.",
+      "Are there other antihypertensive agents besides lisinopril that were held or changed? The record does not show any.",
+      "Has the losartan start been confirmed as dispensed or followed up? No dispensing or follow-up entry is recorded.",
+      "Which allergies or reactions are recorded? No allergy entry appears in the record beyond the reported dry cough."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "4725b068-965c-58cd-9179-b6d59cc88a17",
+          "start": 0,
+          "end": 76,
+          "quote": "Stop lisinopril because of a dry cough. Start losartan 50 mg daily."
+        },
+        "risk_reason": "The latest note stops lisinopril and starts losartan 50 mg daily, directly contradicting the earlier continue-lisinopril entry, so the active medication list may be wrong.",
+        "suggested_action": "Confirm which lisinopril instruction is current and reconcile the active medication list before the next prescribing decision.",
+        "clinical_entities": [
+          "lisinopril",
+          "losartan"
+        ]
+      },
+      {
+        "citation": {
+          "entry_id": "4531a170-1e0d-5351-bc98-b312d0ee171a",
+          "start": 0,
+          "end": 44,
+          "quote": "Continue lisinopril 10 mg daily; blood pressure at target."
+        },
+        "risk_reason": "This older entry continues lisinopril while a later entry stops it for cough, a documented medication conflict in the record.",
+        "suggested_action": "Check the record timeline to determine whether the lisinopril continue entry has been superseded.",
+        "clinical_entities": [
+          "lisinopril"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

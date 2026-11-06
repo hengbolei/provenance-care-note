@@ -1,0 +1,83 @@
+{
+  "fingerprint": "2e9a32e2eeeb0c873c42198054096bacce5fdc83a7c6691450dadc59d9445b86",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2719,
+    "output_tokens": 665,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "A clinician note records a heart rate of 48 and states to hold metoprolol until the heart rate is reviewed on Thursday.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "e2590edf-79a0-57ac-8c06-7edfe42b66fd",
+            "start": 0,
+            "end": 88,
+            "quote": "Heart rate 48. Hold metoprolol until the heart rate is reviewed on Thursday."
+          }
+        ]
+      },
+      {
+        "text": "Patient reports taking metoprolol every morning as usual and feeling fine.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "0b1783d6-b8a8-547a-a28c-fd92fb8f28b0",
+            "start": 0,
+            "end": 60,
+            "quote": "I take metoprolol every morning as usual and feel fine."
+          }
+        ]
+      },
+      {
+        "text": "The record contains a conflicting medication fact for metoprolol: one entry says to hold it, while the patient-reported entry says it is still being taken.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "e2590edf-79a0-57ac-8c06-7edfe42b66fd",
+            "start": 56,
+            "end": 88,
+            "quote": "Hold metoprolol until the heart rate is reviewed"
+          },
+          {
+            "entry_id": "0b1783d6-b8a8-547a-a28c-fd92fb8f28b0",
+            "start": 0,
+            "end": 60,
+            "quote": "I take metoprolol every morning as usual and feel fine."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was metoprolol first started, and what was the original dose?",
+      "Was the Thursday heart rate review carried out, and what did it show?",
+      "Did the clinician document a hold or restart of metoprolol after the heart rate was reviewed?",
+      "What were earlier recorded heart rates, and were there prior bradycardia episodes?",
+      "Who instructed the patient to continue taking metoprolol, and when was that documented?",
+      "Are there other medications affecting heart rate or blood pressure recorded earlier?",
+      "No allergies or reactions are recorded in the available entries; confirm allergy history with the patient."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "0b1783d6-b8a8-547a-a28c-fd92fb8f28b0",
+          "start": 0,
+          "end": 60,
+          "quote": "I take metoprolol every morning as usual and feel fine."
+        },
+        "risk_reason": "Patient reports continuing metoprolol despite a clinician note holding it for a heart rate of 48.",
+        "suggested_action": "Confirm with the patient and clinician whether metoprolol is currently being taken and reconcile the conflicting entries.",
+        "clinical_entities": []
+      }
+    ],
+    "check_points": []
+  }
+}

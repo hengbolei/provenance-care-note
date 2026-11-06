@@ -1,0 +1,65 @@
+{
+  "fingerprint": "4fd10c4d6863252fbefed74e42a57095857d3654019251546f48142154de0339",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2590,
+    "output_tokens": 555,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Amlodipine was stopped on or before 2026-08-18 due to ankle swelling.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "7109649a-a49b-5a60-908a-b93b4c9589ef",
+            "start": 0,
+            "end": 48,
+            "quote": "Amlodipine was stopped because of ankle swelling;"
+          }
+        ]
+      },
+      {
+        "text": "Patient was taking amlodipine 5 mg daily as of 2026-07-28.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "4389a3ac-5129-56df-8fbf-61fed1f7cac4",
+            "start": 16,
+            "end": 41,
+            "quote": "Patient takes amlodipine 5 mg daily."
+          }
+        ]
+      },
+      {
+        "text": "A blood pressure review was planned for two weeks after 2026-08-18.",
+        "category": "follow_up",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "7109649a-a49b-5a60-908a-b93b4c9589ef",
+            "start": 49,
+            "end": 79,
+            "quote": "review blood pressure in two weeks."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was amlodipine first started, and at what dose?",
+      "What was the blood pressure reading that led to amlodipine being stopped?",
+      "Was the two-week blood pressure review completed, and what were the results?",
+      "What alternative antihypertensive was prescribed after stopping amlodipine?",
+      "When was ankle swelling first documented, and was it attributed to amlodipine earlier?",
+      "Were there any prior notes about amlodipine dose adjustments or tolerability concerns before July 2026?",
+      "Which allergies or reactions are recorded?"
+    ],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

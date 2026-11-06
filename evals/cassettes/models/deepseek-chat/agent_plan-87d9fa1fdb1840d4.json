@@ -1,0 +1,35 @@
+{
+  "fingerprint": "87d9fa1fdb1840d43ce1ac2cf2ebcf2f2c29e4795fc8aa3446420afe698821d3",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 974,
+    "output_tokens": 162,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was codeine allergy or intolerance first recorded, and what reaction was documented at that time?",
+        "query": "codeine allergy reaction intolerance"
+      },
+      {
+        "question": "Who documented the codeine allergy and on what basis (patient report versus pharmacy record)?",
+        "query": "codeine pharmacy allergy history"
+      },
+      {
+        "question": "What was the nature and timing of the reported sickness after codeine, and was it ever assessed as a true allergic reaction?",
+        "query": "codeine nausea vomiting adverse reaction"
+      },
+      {
+        "question": "Has codeine been prescribed or administered since the allergy was recorded, and was it tolerated?",
+        "query": "codeine prescribed administered tolerated"
+      },
+      {
+        "question": "Was any allergy clarification or allergy testing for codeine ever planned or carried out?",
+        "query": "codeine allergy testing referral clarification"
+      }
+    ]
+  }
+}

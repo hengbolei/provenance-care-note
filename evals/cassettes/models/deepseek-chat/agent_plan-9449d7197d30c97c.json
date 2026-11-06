@@ -5,19 +5,10 @@
   "model": "deepseek-chat",
   "usage": {
     "input_tokens": 784,
-    "output_tokens": 67,
+    "output_tokens": 5,
     "cost_usd": null
   },
   "output": {
-    "questions": [
-      {
-        "question": "What earlier entries explain this callback request, and what was the outcome of prior calls?",
-        "query": "callback telephone call record"
-      },
-      {
-        "question": "When did this patient's most recent documented contact or visit occur, and what was discussed?",
-        "query": "visit contact staff note"
-      }
-    ]
+    "questions": []
   }
 }

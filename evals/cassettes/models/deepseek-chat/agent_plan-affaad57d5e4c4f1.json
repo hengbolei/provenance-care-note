@@ -5,34 +5,34 @@
   "model": "deepseek-chat",
   "usage": {
     "input_tokens": 763,
-    "output_tokens": 181,
+    "output_tokens": 170,
     "cost_usd": null
   },
   "output": {
     "questions": [
       {
-        "question": "When was the patient's fatigue and poor sleep first recorded, and has it been documented before?",
-        "query": "fatigue sleep insomnia tired"
+        "question": "When was the patient's fatigue first recorded, and what was noted about its onset and course?",
+        "query": "fatigue tired onset"
       },
       {
-        "question": "What recent or past entries mention sleep problems, and were any treatments tried?",
-        "query": "sleep insomnia sleep hygiene"
+        "question": "When was insomnia or poor sleep first documented, and what was the prior assessment?",
+        "query": "insomnia sleep"
       },
       {
-        "question": "Were any tests or assessments done for fatigue, such as thyroid function, anemia or sleep studies?",
-        "query": "thyroid anemia fatigue blood test"
+        "question": "What previous entries say about prior sleep problems and any treatment tried?",
+        "query": "sleep hygiene insomnia treatment"
       },
       {
-        "question": "Which medications or substances could explain fatigue or poor sleep, and when were they started or changed?",
-        "query": "medication fatigue medication change"
+        "question": "Which medications or changes were recorded around the time fatigue and poor sleep appeared?",
+        "query": "medication change start stop"
       },
       {
-        "question": "Are there prior entries about mood, depression or anxiety that may relate to fatigue and sleep?",
-        "query": "mood depression anxiety"
+        "question": "Are there prior notes of anemia, thyroid or other conditions that could explain fatigue?",
+        "query": "anemia thyroid fatigue workup"
       },
       {
-        "question": "Was any follow-up or referral planned for the sleep or fatigue complaints?",
-        "query": "referral sleep clinic follow-up"
+        "question": "Were any tests or referrals for fatigue or sleep previously planned, and were they completed?",
+        "query": "fatigue tests referral completed"
       }
     ]
   }

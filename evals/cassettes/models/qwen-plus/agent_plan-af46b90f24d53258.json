@@ -1,0 +1,39 @@
+{
+  "fingerprint": "af46b90f24d53258d521613038ffde039d7988f0b5fefd8288240a6757b20173",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 1135,
+    "output_tokens": 270,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was warfarin first prescribed and at what dose?",
+        "query": "warfarin prescribed dose"
+      },
+      {
+        "question": "When was the warfarin dose changed from 5 mg to 3 mg, and what was the clinical rationale?",
+        "query": "warfarin dose change 5 mg 3 mg"
+      },
+      {
+        "question": "What INR values were recorded before and after the warfarin dose change?",
+        "query": "INR"
+      },
+      {
+        "question": "Was the warfarin 5 mg dose ever dispensed or administered, or was it only prescribed?",
+        "query": "warfarin 5 mg dispense administer"
+      },
+      {
+        "question": "Are there any documented reasons for reducing the warfarin dose, such as bleeding, INR elevation, or drug interaction?",
+        "query": "warfarin reduce reason bleed INR interaction"
+      },
+      {
+        "question": "Has any patient education or monitoring plan for warfarin been documented (e.g., INR schedule, dietary advice, signs of bleeding)?",
+        "query": "warfarin education INR schedule bleeding"
+      }
+    ]
+  }
+}

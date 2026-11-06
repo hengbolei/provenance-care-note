@@ -5,15 +5,10 @@
   "model": "deepseek-chat",
   "usage": {
     "input_tokens": 788,
-    "output_tokens": 38,
+    "output_tokens": 5,
     "cost_usd": null
   },
   "output": {
-    "questions": [
-      {
-        "question": "Does an earlier entry document the source or verification of the patient's identity used in this record?",
-        "query": "identity verification NRIC"
-      }
-    ]
+    "questions": []
   }
 }

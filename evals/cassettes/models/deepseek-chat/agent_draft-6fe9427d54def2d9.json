@@ -1,0 +1,110 @@
+{
+  "fingerprint": "6fe9427d54def2d9b925685e92ef16fe7132fe1ee29b909e5137a9e176b432f7",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 5822,
+    "output_tokens": 882,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "The record shows conflicting apixaban dose facts: an earlier clinician note documents apixaban 5 mg twice daily, while a later staff note states the pharmacy label reads apixaban 2.5 mg twice daily.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "c4b4cd3b-b499-5398-96b0-e52f5e24f111",
+            "start": 24,
+            "end": 55,
+            "quote": "apixaban 5 mg twice daily"
+          },
+          {
+            "entry_id": "1000bb7a-b576-5ce8-8763-51fb4dcd136a",
+            "start": 33,
+            "end": 64,
+            "quote": "apixaban 2.5 mg twice daily"
+          }
+        ]
+      },
+      {
+        "text": "A clinician note dated 2026-06-01 documents new atrial fibrillation and that apixaban 5 mg twice daily was started.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "c4b4cd3b-b499-5398-96b0-e52f5e24f111",
+            "start": 0,
+            "end": 55,
+            "quote": "New atrial fibrillation. Started apixaban 5 mg twice daily"
+          }
+        ]
+      },
+      {
+        "text": "A staff note dated 2026-08-25 states the pharmacy label reads apixaban 2.5 mg twice daily and that the prescriber is to confirm.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "1000bb7a-b576-5ce8-8763-51fb4dcd136a",
+            "start": 33,
+            "end": 89,
+            "quote": "apixaban 2.5 mg twice daily; prescriber to confirm"
+          }
+        ]
+      },
+      {
+        "text": "Serial routine staff observations from 2026-06-19 through 2026-07-26 are recorded as within the usual range with no new concerns raised.",
+        "category": "other",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "9a671c31-0af5-56c0-9dd3-89e685df6ae7",
+            "start": 16,
+            "end": 105,
+            "quote": "Observations within the usual range and no new concerns raised"
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Which apixaban dose and frequency is currently active: the 5 mg twice daily recorded by the clinician on 2026-06-01, or the 2.5 mg twice daily on the pharmacy label noted 2026-08-25?",
+      "Is there documentation of the prescriber's confirmation of the apixaban dose (2.5 mg versus 5 mg)?",
+      "The record does not contain renal function, creatinine, eGFR, weight or age data relevant to apixaban dosing.",
+      "The record does not document any allergies or reactions.",
+      "The record does not document any follow-ups, referrals, tests, bleeding events, falls or anticoagulation monitoring.",
+      "The record does not document a medication review or monitoring plan for apixaban."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "1000bb7a-b576-5ce8-8763-51fb4dcd136a",
+          "start": 33,
+          "end": 89,
+          "quote": "apixaban 2.5 mg twice daily; prescriber to confirm"
+        },
+        "risk_reason": "Pharmacy label dose (2.5 mg twice daily) conflicts with the clinician-documented starting dose (5 mg twice daily); prescriber confirmation is noted as pending.",
+        "suggested_action": "Clinician to confirm the active apixaban dose and frequency against the prescriber record.",
+        "clinical_entities": [
+          "apixaban"
+        ]
+      },
+      {
+        "citation": {
+          "entry_id": "c4b4cd3b-b499-5398-96b0-e52f5e24f111",
+          "start": 24,
+          "end": 55,
+          "quote": "apixaban 5 mg twice daily"
+        },
+        "risk_reason": "Original documentation records apixaban 5 mg twice daily, which differs from the later pharmacy label dose.",
+        "suggested_action": "Compare this clinician entry with the pharmacy label entry before finalizing the medication list.",
+        "clinical_entities": [
+          "apixaban"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "fingerprint": "6c2155e4c74488bb00258d1e15c292e401a97d5d79181b4903676ff11fe60e2c",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 1003,
+    "output_tokens": 179,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was metoprolol first started, and what was the original dose?",
+        "query": "metoprolol start dose"
+      },
+      {
+        "question": "Was the Thursday heart rate review carried out, and what did it show?",
+        "query": "heart rate review bradycardia"
+      },
+      {
+        "question": "Did the clinician document a hold or restart of metoprolol after the heart rate was reviewed?",
+        "query": "metoprolol hold restart"
+      },
+      {
+        "question": "What were earlier recorded heart rates, and were there prior bradycardia episodes?",
+        "query": "heart rate bradycardia"
+      },
+      {
+        "question": "Who instructed the patient to continue taking metoprolol, and when was that documented?",
+        "query": "metoprolol continue instructions"
+      },
+      {
+        "question": "Are there other medications affecting heart rate or blood pressure recorded earlier?",
+        "query": "beta blocker antihypertensive"
+      }
+    ]
+  }
+}

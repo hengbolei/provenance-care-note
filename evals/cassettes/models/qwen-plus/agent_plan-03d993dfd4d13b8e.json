@@ -5,26 +5,34 @@
   "model": "qwen-plus",
   "usage": {
     "input_tokens": 771,
-    "output_tokens": 147,
+    "output_tokens": 207,
     "cost_usd": null
   },
   "output": {
     "questions": [
       {
-        "question": "When was lisinopril first started or its dose last changed?",
-        "query": "lisinopril started dose change"
+        "question": "When was lisinopril first started, and at what dose?",
+        "query": "lisinopril started"
       },
       {
-        "question": "What were the home blood pressure readings before 2026-08-15, and how have they trended?",
-        "query": "blood pressure home reading"
+        "question": "What was the initial blood pressure reading that led to lisinopril initiation or dose adjustment?",
+        "query": "blood pressure baseline"
       },
       {
-        "question": "Was any action planned or taken in response to BP readings around 150/90?",
-        "query": "150/90 action plan"
+        "question": "Has lisinopril been held, reduced, or increased before, and if so, when and why?",
+        "query": "lisinopril held reduced increased"
       },
       {
-        "question": "Has lisinopril been held, stopped, or adjusted previously, and if so, why?",
-        "query": "lisinopril held stopped adjusted"
+        "question": "Are there any recorded home blood pressure readings prior to 2026-08-15, and what were the trends?",
+        "query": "home BP reading"
+      },
+      {
+        "question": "Was any other antihypertensive medication tried before or alongside lisinopril?",
+        "query": "antihypertensive trial"
+      },
+      {
+        "question": "Is there documentation of renal function or potassium monitoring since starting lisinopril?",
+        "query": "creatinine potassium lisinopril"
       }
     ]
   }

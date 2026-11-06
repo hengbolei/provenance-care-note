@@ -1,0 +1,39 @@
+{
+  "fingerprint": "6c2155e4c74488bb00258d1e15c292e401a97d5d79181b4903676ff11fe60e2c",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 1034,
+    "output_tokens": 316,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was metoprolol first started, and at what dose?",
+        "query": "metoprolol start dose"
+      },
+      {
+        "question": "Was the hold order for metoprolol carried out after 2026-08-15, and if so, when was it resumed or revised?",
+        "query": "metoprolol hold resume restarted"
+      },
+      {
+        "question": "What was the heart rate trend leading up to 2026-08-15, and were prior bradycardia concerns documented?",
+        "query": "heart rate bradycardia"
+      },
+      {
+        "question": "Was there a formal review of heart rate on 2026-08-17 (Thursday), as planned, and what was decided about metoprolol?",
+        "query": "2026-08-17 heart rate metoprolol review"
+      },
+      {
+        "question": "Are there any documented adverse reactions or allergies to metoprolol or beta-blockers?",
+        "query": "metoprolol allergy reaction beta-blocker"
+      },
+      {
+        "question": "What other cardiovascular medications or conditions (e.g., hypertension, arrhythmia) are documented that may influence metoprolol use?",
+        "query": "hypertension arrhythmia beta-blocker"
+      }
+    ]
+  }
+}

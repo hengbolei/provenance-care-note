@@ -1,0 +1,111 @@
+{
+  "fingerprint": "382d297e907d13baa7305a8c0d5848f89aa9d83f4a6c740038c1954eaa41bf5c",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2725,
+    "output_tokens": 1034,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Lisinopril 10 mg is prescribed daily in the morning.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "af98e831-de2b-57d2-a67f-c5480d2871c3",
+            "start": 0,
+            "end": 33,
+            "quote": "Lisinopril 10 mg each morning continues."
+          }
+        ]
+      },
+      {
+        "text": "Home blood pressure readings are around 150/90 mmHg.",
+        "category": "symptom",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "af98e831-de2b-57d2-a67f-c5480d2871c3",
+            "start": 34,
+            "end": 64,
+            "quote": "Home readings around 150/90."
+          }
+        ]
+      },
+      {
+        "text": "The note states lisinopril 'continues', implying it was started prior to 2026-08-15.",
+        "category": "medication",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "af98e831-de2b-57d2-a67f-c5480d2871c3",
+            "start": 0,
+            "end": 33,
+            "quote": "Lisinopril 10 mg each morning continues."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was lisinopril first started, and at what dose?",
+      "What was the initial blood pressure reading that led to lisinopril initiation or dose adjustment?",
+      "Has lisinopril been held, reduced, or increased before, and if so, when and why?",
+      "Are there any recorded home blood pressure readings prior to 2026-08-15, and what were the trends?",
+      "Was any other antihypertensive medication tried before or alongside lisinopril?",
+      "Is there documentation of renal function or potassium monitoring since starting lisinopril?",
+      "Which allergies or reactions are recorded?",
+      "Which follow-ups, referrals or tests are planned or outstanding?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "af98e831-de2b-57d2-a67f-c5480d2871c3",
+          "start": 34,
+          "end": 64,
+          "quote": "Home readings around 150/90."
+        },
+        "risk_reason": "Home BP remains elevated above target (≥140/90 mmHg), suggesting suboptimal control on current lisinopril dose.",
+        "suggested_action": "Review home BP log for pattern and consider titration or add-on therapy per guideline.",
+        "clinical_entities": [
+          "lisinopril",
+          "blood pressure"
+        ]
+      }
+    ],
+    "check_points": [
+      {
+        "text": "Check whether kidney function and potassium have been monitored after starting or changing lisinopril dose.",
+        "reference": {
+          "document_id": "7a98c82c-c42a-53d7-bd25-859316014fb1",
+          "version": 1,
+          "start": 51,
+          "end": 112,
+          "quote": "Check kidney function and potassium after starting or changing an ACE inhibitor dose."
+        },
+        "citations": []
+      },
+      {
+        "text": "Review home blood pressure readings at each visit.",
+        "reference": {
+          "document_id": "7a98c82c-c42a-53d7-bd25-859316014fb1",
+          "version": 1,
+          "start": 0,
+          "end": 43,
+          "quote": "Review home blood pressure readings at each visit."
+        },
+        "citations": [
+          {
+            "entry_id": "af98e831-de2b-57d2-a67f-c5480d2871c3",
+            "start": 34,
+            "end": 64,
+            "quote": "Home readings around 150/90."
+          }
+        ]
+      }
+    ]
+  }
+}

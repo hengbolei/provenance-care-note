@@ -1,0 +1,53 @@
+{
+  "fingerprint": "fdadcfe2f626c263b0f81f336d158518df8358b789022da1a43f2334fea6f180",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2449,
+    "output_tokens": 387,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports thinking they are allergic to ibuprofen, which makes them wheezy.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "b97ba818-6e0d-54c7-a203-65f69534febb",
+            "start": 6,
+            "end": 68,
+            "quote": "I think I am allergic to ibuprofen, it makes me wheezy."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Which medications were started, stopped, held or changed? The record contains no medication change entries.",
+      "Is the reported ibuprofen allergy recorded in a structured allergy list? Only a patient note reports it.",
+      "When was the ibuprofen-related wheeze first recorded, and are there earlier entries of wheeze or asthma symptoms after NSAIDs? No earlier entries are present.",
+      "Was any prior ibuprofen or NSAID prescription recorded, and was it stopped? No such prescription appears in the record.",
+      "Which follow-ups, referrals or tests are planned or outstanding? No such entries are present."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "b97ba818-6e0d-54c7-a203-65f69534febb",
+          "start": 6,
+          "end": 68,
+          "quote": "I think I am allergic to ibuprofen, it makes me wheezy."
+        },
+        "risk_reason": "Patient-reported wheeze after ibuprofen may indicate NSAID hypersensitivity, and it is not documented in a structured allergy list.",
+        "suggested_action": "Confirm the reported ibuprofen reaction and whether it is recorded in the structured allergy list.",
+        "clinical_entities": [
+          "ibuprofen",
+          "wheeze",
+          "allergy"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

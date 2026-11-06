@@ -1,0 +1,39 @@
+{
+  "fingerprint": "afa1494fee143439c6b34e7bce21e4d931806dde00333e108c362cbbe700950c",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 1050,
+    "output_tokens": 258,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was metformin first prescribed, and at what dose?",
+        "query": "metformin prescribed dose"
+      },
+      {
+        "question": "Was the dose change from 500 mg twice daily to 2000 mg once daily documented as intentional and when?",
+        "query": "metformin dose change"
+      },
+      {
+        "question": "What clinical rationale or indication was given for increasing metformin to 2000 mg?",
+        "query": "metformin 2000 mg rationale"
+      },
+      {
+        "question": "Was the patient's renal function assessed before escalating metformin dose?",
+        "query": "eGFR creatinine metformin"
+      },
+      {
+        "question": "Has the patient reported any gastrointestinal side effects since starting or escalating metformin?",
+        "query": "metformin side effect diarrhea nausea"
+      },
+      {
+        "question": "Was the metformin 2000 mg prescription confirmed in a signed clinician note or prescription record?",
+        "query": "metformin 2000 mg prescription signed"
+      }
+    ]
+  }
+}

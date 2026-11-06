@@ -1,0 +1,101 @@
+{
+  "fingerprint": "10c28f9ac39cefcf13404606126054111a9f8c74101da863c1e216173f71099c",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 6501,
+    "output_tokens": 1067,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Colonoscopy referral has not been booked as of 2026-08-26.",
+        "category": "follow_up",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "4c968285-a416-5a68-bc6f-e4f144f049db",
+            "start": 0,
+            "end": 46,
+            "quote": "Colonoscopy referral has not been booked."
+          }
+        ]
+      },
+      {
+        "text": "Low haemoglobin was identified on 2026-07-01, prompting a colonoscopy referral and repeat blood count in four weeks.",
+        "category": "plan",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "a3590d83-0db4-5e46-ae05-fc20fcc20ddc",
+            "start": 0,
+            "end": 76,
+            "quote": "Low haemoglobin. Arrange a colonoscopy referral and repeat blood count in four weeks."
+          }
+        ]
+      },
+      {
+        "text": "Patient reported being comfortable and raised no concerns across 52 consecutive nurse checks from 2026-07-01 to 2026-08-26.",
+        "category": "symptom",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "aa1f02eb-e0ad-5e25-a9f9-4ec3a3c6018d",
+            "start": 29,
+            "end": 66,
+            "quote": "Patient comfortable and no concerns raised during the call."
+          },
+          {
+            "entry_id": "a3590d83-0db4-5e46-ae05-fc20fcc20ddc",
+            "start": 0,
+            "end": 15,
+            "quote": "Low haemoglobin."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was the colonoscopy referral first made, and what was the clinical indication?",
+      "Has the patient had any gastrointestinal symptoms such as bleeding, change in bowel habit or abdominal pain that led to the colonoscopy referral?",
+      "Was a bowel preparation plan or instructions provided for the colonoscopy, and when?",
+      "Have any diagnostic test results (e.g., FIT, colonoscopy report, imaging) been recorded that relate to the referral?",
+      "Has the patient been assessed for colonoscopy contraindications or risks (e.g., anticoagulants, comorbidities)?",
+      "Was the colonoscopy referral discussed with or approved by a consultant or specialist, and when?",
+      "Which medications were started, stopped, held or changed?",
+      "Which allergies or reactions are recorded?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "4c968285-a416-5a68-bc6f-e4f144f049db",
+          "start": 0,
+          "end": 46,
+          "quote": "Colonoscopy referral has not been booked."
+        },
+        "risk_reason": "Colonoscopy remains unbooked despite documented clinical indication (low haemoglobin) and a planned timeline (referral arranged on 2026-07-01 with repeat blood count due in four weeks). Delay may impede timely diagnosis of potential colorectal pathology.",
+        "suggested_action": "Confirm whether colonoscopy referral has now been actioned; if not, urgently book or reassign responsibility.",
+        "clinical_entities": [
+          "colonoscopy",
+          "low haemoglobin"
+        ]
+      },
+      {
+        "citation": {
+          "entry_id": "a3590d83-0db4-5e46-ae05-fc20fcc20ddc",
+          "start": 0,
+          "end": 76,
+          "quote": "Low haemoglobin. Arrange a colonoscopy referral and repeat blood count in four weeks."
+        },
+        "risk_reason": "Repeat blood count was due approximately four weeks after 2026-07-01 (i.e., by ~2026-08-01), but no record of its completion or result exists in the provided entries.",
+        "suggested_action": "Locate and review the result of the repeat full blood count ordered on 2026-07-01.",
+        "clinical_entities": [
+          "haemoglobin",
+          "blood count"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

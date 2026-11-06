@@ -73,22 +73,30 @@ flowchart LR
   payload leaks, verifier accuracy, retrieval recall, key entries reaching the model, injection
   detection and framing, reference retrieval (current versions only) and check-point verdicts.
 - The **agent** suite scores real model drafts replayed from cassettes, one directory per model,
-  so CI reproduces the numbers with no API key. Two models are recorded so far (38 of 39 cases
-  each; each model returned one draft that did not match the schema):
+  so CI reproduces the numbers with no API key. Two models are recorded so far (DeepSeek 39 of
+  39 cases; Qwen 37 of 39, where two drafts did not match the schema):
 
   | Metric | Gate | DeepSeek (`deepseek-chat`) | Qwen (`qwen-plus`) |
   | --- | --- | ---: | ---: |
-  | Citation validity | ≥ 95% | **100%** | 92.6% |
-  | Unsupported-claim rate | ≤ 5% | **3.5%** | 10.7% |
-  | Unsupported-claim rate before automatic revision | — | 14.1% | 22.6% |
-  | Critical-finding recall | ≥ 90% | **96.6%** | 82.1% |
+  | Citation validity | ≥ 95% | **100%** | **100%** |
+  | Unsupported-claim rate | ≤ 5% | **3.6%** | 11.2% |
+  | Unsupported-claim rate before automatic revision | — | 16.7% | 18.9% |
+  | Critical-finding recall | ≥ 90% | **96.7%** | 89.3% |
   | Conflict coverage | 100% | 100% | 100% |
   | Injection cases that obeyed the injection | 0 | 0 | 0 |
 
-  Verify-and-revise cuts unsupported claims by about three quarters for DeepSeek and half for
-  Qwen, but it cannot supply what the model gets wrong: 7 of Qwen's 9 failed claims cite a
-  record entry that does not exist. Missed checks, per-family results and known gaps are in the
-  [evaluation report](evals/REPORT.md), which CI regenerates and checks.
+  The evaluation drove one fix. In the first recording Qwen's citation validity was 92.6%: 7 of
+  its 9 failed claims cited a conflict's ID as if it were an entry, because both tags used an
+  `id` attribute and conflicts never said which entries they involved. Conflicts now carry
+  `conflict_id` and list their entries, and the verifier tells the model which entries to cite
+  instead. Qwen still cited a conflict twice in first drafts, but revision fixed both, and its
+  citation validity is now 100%. Its remaining failures are all medications or doses that the
+  cited text does not contain, so it still misses the gate.
+
+  Verify-and-revise cuts unsupported claims by about four fifths for DeepSeek and two fifths for
+  Qwen. Each model was recorded once, so differences of a few points in metrics the fix did not
+  target are within run-to-run variation. Missed checks, per-family results and known gaps are
+  in the [evaluation report](evals/REPORT.md), which CI regenerates and checks.
 
 **Care record**
 

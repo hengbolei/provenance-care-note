@@ -5,18 +5,22 @@
   "model": "deepseek-chat",
   "usage": {
     "input_tokens": 774,
-    "output_tokens": 66,
+    "output_tokens": 96,
     "cost_usd": null
   },
   "output": {
     "questions": [
       {
-        "question": "When was lisinopril first started and at what dose, and has the dose changed since?",
+        "question": "When was lisinopril first started, and have the dose or timing changed since then?",
         "query": "lisinopril dose start"
       },
       {
-        "question": "How long have home blood pressure readings been elevated, and what are the earlier readings?",
-        "query": "blood pressure home readings"
+        "question": "Have earlier blood pressure readings been higher or lower than the recent 150/90 home readings?",
+        "query": "blood pressure readings home"
+      },
+      {
+        "question": "Has any antihypertensive besides lisinopril been tried or considered previously?",
+        "query": "antihypertensive hypertension medication"
       }
     ]
   }

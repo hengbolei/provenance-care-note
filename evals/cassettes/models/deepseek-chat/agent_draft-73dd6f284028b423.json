@@ -1,0 +1,22 @@
+{
+  "fingerprint": "73dd6f284028b423040f28ccf52f5907433bccb6e7a4742411c2164339a08376",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2329,
+    "output_tokens": 117,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [],
+    "open_questions": [
+      "Which medications were started, stopped, held or changed? The record contains only a staff note about an appointment reschedule and does not document any medication changes.",
+      "Which allergies or reactions are recorded? No allergy or reaction information appears in the record.",
+      "Which follow-ups, referrals or tests are planned or outstanding? The record mentions an appointment rescheduled to next Tuesday but no referrals or tests.",
+      "What is the clinical reason for the rescheduled appointment next Tuesday?"
+    ],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "fingerprint": "19a37dc1874e4398cc98beb16ae6a418ada4d4ee578658114f2daa04c43190ab",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2816,
+    "output_tokens": 1148,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports new dizziness after taking lisinopril 20 mg in the morning.",
+        "category": "symptom",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "0a48402a-df4f-5797-b6ab-63cfae03a0e2",
+            "start": 32,
+            "end": 67,
+            "quote": "Patient describes new dizziness after lisinopril 20 mg morning dose."
+          }
+        ]
+      },
+      {
+        "text": "Patient's home blood pressure was 98/62 mmHg, recorded concurrently with reported dizziness after lisinopril 20 mg.",
+        "category": "other",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "0a48402a-df4f-5797-b6ab-63cfae03a0e2",
+            "start": 69,
+            "end": 96,
+            "quote": "Home blood pressure was 98/62 mmHg."
+          }
+        ]
+      },
+      {
+        "text": "Lisinopril was started at 10 mg seven days before 2026-08-22, per staff reconciliation note.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "316d9e1b-a9bd-55f2-a81b-37da15558ec0",
+            "start": 37,
+            "end": 78,
+            "quote": "Patient started lisinopril 10 mg seven days ago."
+          }
+        ]
+      },
+      {
+        "text": "The record contains conflicting dose information for lisinopril: 10 mg (staff note) and 20 mg (AI nurse summary).",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "316d9e1b-a9bd-55f2-a81b-37da15558ec0",
+            "start": 37,
+            "end": 78,
+            "quote": "Patient started lisinopril 10 mg seven days ago."
+          },
+          {
+            "entry_id": "0a48402a-df4f-5797-b6ab-63cfae03a0e2",
+            "start": 32,
+            "end": 67,
+            "quote": "Patient describes new dizziness after lisinopril 20 mg morning dose."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Was the lisinopril dose increased from 10 mg to 20 mg, and if so, when and by whom?",
+      "What was the patient's blood pressure before starting lisinopril, and how has it trended since initiation?",
+      "Has dizziness been documented before starting lisinopril, or is it new onset?",
+      "Were any actions taken in response to the low BP (98/62) or dizziness—e.g., dose reduction, hold, or monitoring plan?",
+      "Is there documentation of renal function or potassium levels around lisinopril initiation or dose change?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "0a48402a-df4f-5797-b6ab-63cfae03a0e2",
+          "start": 32,
+          "end": 67,
+          "quote": "Patient describes new dizziness after lisinopril 20 mg morning dose."
+        },
+        "risk_reason": "Dizziness and hypotension (98/62 mmHg) are potential adverse effects of ACE inhibitor overdose or rapid up-titration.",
+        "suggested_action": "Confirm current lisinopril dose and assess for orthostatic hypotension; consider holding dose pending clarification.",
+        "clinical_entities": [
+          "lisinopril",
+          "dizziness",
+          "hypotension"
+        ]
+      },
+      {
+        "citation": {
+          "entry_id": "0a48402a-df4f-5797-b6ab-63cfae03a0e2",
+          "start": 69,
+          "end": 96,
+          "quote": "Home blood pressure was 98/62 mmHg."
+        },
+        "risk_reason": "Systolic BP <100 mmHg with symptoms suggests symptomatic hypotension requiring urgent dose review.",
+        "suggested_action": "Verify accuracy of home BP measurement and assess for orthostatic drop; evaluate need for lisinopril dose adjustment or discontinuation.",
+        "clinical_entities": [
+          "blood pressure",
+          "hypotension",
+          "lisinopril"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

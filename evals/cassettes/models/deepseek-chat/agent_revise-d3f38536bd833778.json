@@ -1,0 +1,123 @@
+{
+  "fingerprint": "d3f38536bd8337784d7329740d7efc69df58d786b0f313b78b68626902a67e28",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 3173,
+    "output_tokens": 943,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient is 84 years old and weighs 58 kg at the time apixaban 5 mg twice daily was started.",
+        "category": "medication",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "458cc1de-e388-5852-8772-96a5cbcd7fde",
+            "start": 0,
+            "end": 65,
+            "quote": "Started apixaban 5 mg twice daily. Age 84; weight 58 kg."
+          }
+        ]
+      },
+      {
+        "text": "Apixaban 5 mg twice daily was started on 2026-08-01.",
+        "category": "medication",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "458cc1de-e388-5852-8772-96a5cbcd7fde",
+            "start": 0,
+            "end": 29,
+            "quote": "Started apixaban 5 mg twice daily"
+          }
+        ]
+      },
+      {
+        "text": "Creatinine was 140 umol/L on today's sample (2026-08-20). Age 84, weight 58 kg and creatinine 140 umol/L mean three of the label's listed criteria are present, alongside the apixaban 5 mg twice daily record; this is a labeled dose-criteria conflict for the clinician to resolve.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "2029d558-21c1-5cbb-9957-deeb8159949a",
+            "start": 0,
+            "end": 38,
+            "quote": "Creatinine 140 umol/L on today's sample."
+          },
+          {
+            "entry_id": "458cc1de-e388-5852-8772-96a5cbcd7fde",
+            "start": 0,
+            "end": 65,
+            "quote": "Started apixaban 5 mg twice daily. Age 84; weight 58 kg."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Does the apixaban dose need review given recorded age 84, weight 58 kg and creatinine 140 umol/L?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "2029d558-21c1-5cbb-9957-deeb8159949a",
+          "start": 0,
+          "end": 38,
+          "quote": "Creatinine 140 umol/L on today's sample."
+        },
+        "risk_reason": "Creatinine 140 umol/L with apixaban 5 mg twice daily and recorded age 84 and weight 58 kg meets the label's dose-reduction criteria.",
+        "suggested_action": "Verify apixaban dosing criteria against recorded age, weight and creatinine.",
+        "clinical_entities": [
+          "apixaban",
+          "creatinine"
+        ]
+      }
+    ],
+    "check_points": [
+      {
+        "text": "Confirm whether two or more of age 80 or over, weight 60 kg or less, and creatinine 133 umol/L or more apply, given the recorded age 84, weight 58 kg and creatinine 140 umol/L with apixaban 5 mg twice daily.",
+        "reference": {
+          "document_id": "6b5338ea-9d16-5086-b73f-b42d98951cb6",
+          "version": 2,
+          "start": 51,
+          "end": 191,
+          "quote": "Reduce the dose to 2.5 mg twice daily when two of the following apply: age 80 or over, weight 60 kg or less, creatinine 133 umol/L or more."
+        },
+        "citations": [
+          {
+            "entry_id": "458cc1de-e388-5852-8772-96a5cbcd7fde",
+            "start": 0,
+            "end": 65,
+            "quote": "Started apixaban 5 mg twice daily. Age 84; weight 58 kg."
+          },
+          {
+            "entry_id": "2029d558-21c1-5cbb-9957-deeb8159949a",
+            "start": 0,
+            "end": 38,
+            "quote": "Creatinine 140 umol/L on today's sample."
+          }
+        ]
+      },
+      {
+        "text": "Check whether renal function has been assessed within the past year; the record contains only the 2026-08-20 creatinine of 140 umol/L.",
+        "reference": {
+          "document_id": "6b5338ea-9d16-5086-b73f-b42d98951cb6",
+          "version": 2,
+          "start": 191,
+          "end": 230,
+          "quote": "Check renal function at least once a year."
+        },
+        "citations": [
+          {
+            "entry_id": "2029d558-21c1-5cbb-9957-deeb8159949a",
+            "start": 0,
+            "end": 38,
+            "quote": "Creatinine 140 umol/L on today's sample."
+          }
+        ]
+      }
+    ]
+  }
+}

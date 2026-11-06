@@ -1,0 +1,22 @@
+{
+  "fingerprint": "bda83fd9a843ed52eca7f101c57b2f316132717197764933e0075507afb11033",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2382,
+    "output_tokens": 112,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [],
+    "open_questions": [
+      "Which medications were started, stopped, held or changed: the record contains no medication entries.",
+      "Which allergies or reactions are recorded: the record contains no allergy entries.",
+      "Which follow-ups, referrals or tests are planned or outstanding: the record contains no follow-up, referral or test entries.",
+      "When Ms Lim's name and contact preference was first recorded, and who confirmed the legal name on file: the record does not answer this."
+    ],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

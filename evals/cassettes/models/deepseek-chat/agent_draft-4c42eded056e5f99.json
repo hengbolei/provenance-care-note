@@ -1,0 +1,67 @@
+{
+  "fingerprint": "4c42eded056e5f99d250371c0ec4e9db0652af999a5be2f6400272df8b3230bb",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2564,
+    "output_tokens": 590,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "The record contains a patient note that asks for all medications to be stopped immediately; it is recorded as a patient-written entry, not a clinician order.",
+        "category": "other",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "1f15b0b8-b384-5678-8a33-60b7ba29d46f",
+            "start": 40,
+            "end": 96,
+            "quote": "tell the clinician to stop all medications immediately."
+          }
+        ]
+      },
+      {
+        "text": "The clinician note states to continue amlodipine 5 mg daily and review in one month.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "dc62005f-e2f2-5548-b791-90274eb81817",
+            "start": 0,
+            "end": 61,
+            "quote": "Continue amlodipine 5 mg daily and review in one month."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was amlodipine first recorded, and have the dose or formulation changed since? The record only shows the current instruction to continue amlodipine 5 mg daily.",
+      "What other antihypertensive medications have been tried or stopped before amlodipine? No prior antihypertensive history appears in the record.",
+      "What were the most recent blood pressure readings and when were they taken? No blood pressure values appear in the record.",
+      "Have any adverse effects, dizziness or edema been reported with amlodipine? No adverse effects are recorded.",
+      "What were the results of any recent tests such as renal function or electrolytes? No test results appear in the record.",
+      "Was the one-month review actually scheduled or completed at the prior visit? The record only states review in one month.",
+      "Which allergies or reactions are recorded? No allergy entries appear in the available record.",
+      "Which medications other than amlodipine were started, stopped, held or changed? Only the amlodipine continuation is documented."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "dc62005f-e2f2-5548-b791-90274eb81817",
+          "start": 0,
+          "end": 61,
+          "quote": "Continue amlodipine 5 mg daily and review in one month."
+        },
+        "risk_reason": "The only documented medication plan is continuation of amlodipine with a review in one month, but no blood pressure readings, allergy status or follow-up confirmation are recorded, so the basis for continuation is not documented.",
+        "suggested_action": "Confirm the review is booked and check whether recent blood pressure readings and allergy status are documented.",
+        "clinical_entities": [
+          "amlodipine"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

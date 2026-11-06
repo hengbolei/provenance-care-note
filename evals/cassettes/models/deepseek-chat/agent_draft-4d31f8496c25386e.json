@@ -1,0 +1,85 @@
+{
+  "fingerprint": "4d31f8496c25386e3451580cebaf89ad1b1b51affc9d154f6c1e89d2b2e43be3",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2678,
+    "output_tokens": 722,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "The record contains conflicting allergy facts for codeine: a staff note states the patient is allergic to codeine per the pharmacy record, while a patient note denies allergy, describing only feeling sick once.",
+        "category": "allergy",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "16749069-ad3c-5cef-b03b-7132d28750d6",
+            "start": 0,
+            "end": 46,
+            "quote": "Allergic to codeine per the pharmacy record."
+          },
+          {
+            "entry_id": "f7c8bcd4-b828-5bcf-a73c-d6fa383670ea",
+            "start": 0,
+            "end": 53,
+            "quote": "I am not allergic to codeine, I just felt sick once."
+          }
+        ]
+      },
+      {
+        "text": "Patient reports not being allergic to codeine, stating they just felt sick once.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "f7c8bcd4-b828-5bcf-a73c-d6fa383670ea",
+            "start": 0,
+            "end": 53,
+            "quote": "I am not allergic to codeine, I just felt sick once."
+          }
+        ]
+      },
+      {
+        "text": "A staff note records codeine allergy per the pharmacy record.",
+        "category": "allergy",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "16749069-ad3c-5cef-b03b-7132d28750d6",
+            "start": 0,
+            "end": 46,
+            "quote": "Allergic to codeine per the pharmacy record."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Which medications were started, stopped, held or changed? The record provided contains no medication change entries.",
+      "Which follow-ups, referrals or tests are planned or outstanding? The record contains no follow-up, referral or test entries.",
+      "When was the codeine allergy or intolerance first recorded, and what reaction was documented at that time? The record does not give a date or prior reaction details.",
+      "Who documented the codeine allergy and on what basis? The staff note attributes it to the pharmacy record; the original documenting clinician is not identified.",
+      "What was the nature and timing of the sickness after codeine, and was it ever assessed as a true allergic reaction? The patient notes only 'felt sick once' with no timing or assessment documented.",
+      "Has codeine been prescribed or administered since the allergy was recorded, and was it tolerated? No such entries appear in the record.",
+      "Was any allergy clarification or allergy testing for codeine ever planned or carried out? No such plan or testing is documented."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "16749069-ad3c-5cef-b03b-7132d28750d6",
+          "start": 0,
+          "end": 46,
+          "quote": "Allergic to codeine per the pharmacy record."
+        },
+        "risk_reason": "Conflicting codeine allergy information exists: staff note records allergy per pharmacy record while patient note denies allergy. This affects safe prescribing decisions.",
+        "suggested_action": "Clinician to reconcile the codeine allergy discrepancy with the patient and confirm the allergy status in the record.",
+        "clinical_entities": [
+          "codeine"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

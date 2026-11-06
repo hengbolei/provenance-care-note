@@ -1,0 +1,63 @@
+{
+  "fingerprint": "1d13bdb8f0d32c35c208921f10462b79ea822adf7fcadceab4266c033052559b",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2648,
+    "output_tokens": 453,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "The record contains conflicting allergy facts for codeine: a staff note states the patient is allergic to codeine per the pharmacy record, while a patient note denies allergy, describing only feeling sick once.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "16749069-ad3c-5cef-b03b-7132d28750d6",
+            "start": 0,
+            "end": 46,
+            "quote": "Allergic to codeine per the pharmacy record."
+          },
+          {
+            "entry_id": "f7c8bcd4-b828-5bcf-a73c-d6fa383670ea",
+            "start": 0,
+            "end": 53,
+            "quote": "I am not allergic to codeine, I just felt sick once."
+          }
+        ]
+      },
+      {
+        "text": "Patient reports not being allergic to codeine, stating they just felt sick once.",
+        "category": "allergy",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "f7c8bcd4-b828-5bcf-a73c-d6fa383670ea",
+            "start": 0,
+            "end": 53,
+            "quote": "I am not allergic to codeine, I just felt sick once."
+          }
+        ]
+      },
+      {
+        "text": "A staff note records codeine allergy per the pharmacy record.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "16749069-ad3c-5cef-b03b-7132d28750d6",
+            "start": 0,
+            "end": 46,
+            "quote": "Allergic to codeine per the pharmacy record."
+          }
+        ]
+      }
+    ],
+    "open_questions": [],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "fingerprint": "e621c930f481c1b869eb0e3af0fab16bfcad9337a962b742288559bb9649387f",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2761,
+    "output_tokens": 946,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Clinician instructed to stop aspirin before the dental extraction on Monday.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "e873f474-48c5-5d62-97a7-a18c5056ef6d",
+            "start": 0,
+            "end": 47,
+            "quote": "Stop aspirin before the dental extraction on Monday."
+          }
+        ]
+      },
+      {
+        "text": "Clinician instructed to continue aspirin 75 mg daily after the stent.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "6d20b538-52b8-50ea-88aa-c9472209699d",
+            "start": 0,
+            "end": 45,
+            "quote": "Continue aspirin 75 mg daily after the stent."
+          }
+        ]
+      },
+      {
+        "text": "There is a documented conflict regarding aspirin: one entry directs continuation (75 mg daily post-stent), another directs stopping before dental extraction.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "6d20b538-52b8-50ea-88aa-c9472209699d",
+            "start": 0,
+            "end": 45,
+            "quote": "Continue aspirin 75 mg daily after the stent."
+          },
+          {
+            "entry_id": "e873f474-48c5-5d62-97a7-a18c5056ef6d",
+            "start": 0,
+            "end": 47,
+            "quote": "Stop aspirin before the dental extraction on Monday."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was aspirin first started, and what was the original indication?",
+      "When was the coronary stent placed, and was aspirin initiated or adjusted at that time?",
+      "Was the dental extraction carried out, and if so, was aspirin resumed afterward?",
+      "Are there documented bleeding risks, contraindications, or clinical rationale for holding aspirin before dental extraction?",
+      "What other antiplatelet or anticoagulant medications are recorded, and when were they started or changed?",
+      "Is there documentation of patient discussion or shared decision-making about stopping aspirin pre-procedure?",
+      "Which allergies or reactions are recorded?",
+      "Which follow-ups, referrals or tests are planned or outstanding?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "6d20b538-52b8-50ea-88aa-c9472209699d",
+          "start": 0,
+          "end": 45,
+          "quote": "Continue aspirin 75 mg daily after the stent."
+        },
+        "risk_reason": "Aspirin is indicated for secondary prevention post-coronary stent; premature discontinuation increases thrombotic risk.",
+        "suggested_action": "Confirm whether aspirin was held per the dental instruction and verify resumption timing and clinical rationale.",
+        "clinical_entities": [
+          "aspirin",
+          "coronary stent"
+        ]
+      },
+      {
+        "citation": {
+          "entry_id": "e873f474-48c5-5d62-97a7-a18c5056ef6d",
+          "start": 0,
+          "end": 47,
+          "quote": "Stop aspirin before the dental extraction on Monday."
+        },
+        "risk_reason": "No documented bleeding risk assessment, contraindication, or shared decision-making supports this directive.",
+        "suggested_action": "Document bleeding risk evaluation, procedural details, and discussion with patient regarding aspirin hold.",
+        "clinical_entities": [
+          "aspirin",
+          "dental extraction"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

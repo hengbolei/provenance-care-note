@@ -1,0 +1,35 @@
+{
+  "fingerprint": "9d6b496c2bfe14ca86503c4dc1128ac5125c884facc6a691ee5a42c54c31875b",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 990,
+    "output_tokens": 153,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When and where was the sulfa allergy first recorded, and what reaction was documented at that time?",
+        "query": "sulfa allergy reaction"
+      },
+      {
+        "question": "Which specific sulfa drug was involved in the prior reaction, and what were the details of that event?",
+        "query": "sulfa drug reaction nausea"
+      },
+      {
+        "question": "Was the sulfa allergy ever formally assessed, verified or removed, and by whom?",
+        "query": "sulfa allergy assessment verification"
+      },
+      {
+        "question": "Were any sulfa-containing medications prescribed or administered since the allergy was documented?",
+        "query": "sulfa antibiotic prescription"
+      },
+      {
+        "question": "Have other drug allergies or intolerances been recorded elsewhere in the chart?",
+        "query": "allergy intolerance drugs"
+      }
+    ]
+  }
+}

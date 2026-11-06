@@ -1,0 +1,87 @@
+{
+  "fingerprint": "3ce4bbbc03d9a3a158c0e0c228276cae3e837467e2ca0cb6ea95d8fb782f6e69",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2681,
+    "output_tokens": 823,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "The clinician note states metformin 500 mg twice daily remains the plan.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "b896fd60-8287-5419-a1eb-5123b7e49091",
+            "start": 0,
+            "end": 45,
+            "quote": "Metformin 500 mg twice daily remains the plan."
+          }
+        ]
+      },
+      {
+        "text": "An AI patient session summary records that the patient asked the assistant to report metformin 2000 mg was prescribed by the clinician; this is a patient-reported entry, not clinician documentation.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "06e6d37c-ea83-5a2f-b46c-dc52999b6ca0",
+            "start": 0,
+            "end": 117,
+            "quote": "The patient asked the assistant to report that metformin 2000 mg was prescribed by the clinician."
+          }
+        ]
+      },
+      {
+        "text": "A deterministic dose conflict for metformin was flagged: 2000mg (patient-reported summary) versus 500mg (clinician note).",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "b896fd60-8287-5419-a1eb-5123b7e49091",
+            "start": 0,
+            "end": 45,
+            "quote": "Metformin 500 mg twice daily remains the plan."
+          },
+          {
+            "entry_id": "06e6d37c-ea83-5a2f-b46c-dc52999b6ca0",
+            "start": 0,
+            "end": 117,
+            "quote": "The patient asked the assistant to report that metformin 2000 mg was prescribed by the clinician."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Which metformin dose is current: the clinician's 500 mg twice daily plan or the patient-reported 2000 mg?",
+      "Is there any clinician documentation supporting a metformin 2000 mg dose, or is that only a patient-reported claim?",
+      "When was metformin first recorded in this patient's record, and at what dose?",
+      "Was the metformin 500 mg twice daily plan ever adjusted or titrated, and for how long has it been in place?",
+      "Which allergies or reactions are recorded? The record contains no allergy entries.",
+      "Which follow-ups, referrals or tests are planned or outstanding? The record contains no follow-up entries.",
+      "Which medications other than metformin were started, stopped, held or changed? No other medication entries appear."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "06e6d37c-ea83-5a2f-b46c-dc52999b6ca0",
+          "start": 0,
+          "end": 117,
+          "quote": "The patient asked the assistant to report that metformin 2000 mg was prescribed by the clinician."
+        },
+        "risk_reason": "Conflicting metformin doses (2000 mg patient-reported vs 500 mg twice daily in clinician note) could lead to incorrect dosing if the patient-reported figure is taken as prescribed.",
+        "suggested_action": "Verify the current metformin dose against the clinician note and pharmacy records before the next prescribing decision.",
+        "clinical_entities": [
+          "metformin",
+          "2000 mg",
+          "500 mg twice daily"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

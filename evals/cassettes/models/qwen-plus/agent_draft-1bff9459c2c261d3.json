@@ -1,0 +1,86 @@
+{
+  "fingerprint": "1bff9459c2c261d3223df9fae5dbf65c8a5138471d715552c101bffbefa11411",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2773,
+    "output_tokens": 873,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Lisinopril 10 mg daily was continued as of 2026-06-02, with blood pressure reported at target.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "4531a170-1e0d-5351-bc98-b312d0ee171a",
+            "start": 0,
+            "end": 47,
+            "quote": "Continue lisinopril 10 mg daily; blood pressure at target."
+          }
+        ]
+      },
+      {
+        "text": "Lisinopril was stopped on 2026-08-12 due to dry cough, and losartan 50 mg daily was started.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "4725b068-965c-58cd-9179-b6d59cc88a17",
+            "start": 0,
+            "end": 57,
+            "quote": "Stop lisinopril because of a dry cough. Start losartan 50 mg daily."
+          }
+        ]
+      },
+      {
+        "text": "A conflict exists between continuing lisinopril (2026-06-02) and stopping it (2026-08-12), indicating inconsistent medication instructions.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "4531a170-1e0d-5351-bc98-b312d0ee171a",
+            "start": 0,
+            "end": 47,
+            "quote": "Continue lisinopril 10 mg daily; blood pressure at target."
+          },
+          {
+            "entry_id": "4725b068-965c-58cd-9179-b6d59cc88a17",
+            "start": 0,
+            "end": 57,
+            "quote": "Stop lisinopril because of a dry cough. Start losartan 50 mg daily."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was lisinopril first prescribed, and at what dose?",
+      "When was the dry cough first documented as a side effect of lisinopril?",
+      "Was losartan previously trialed or contraindicated before this initiation?",
+      "What blood pressure readings supported continuing lisinopril in June, and were repeat readings taken after switching to losartan?",
+      "Was renal function or potassium monitored before and after stopping lisinopril and starting losartan?",
+      "Is there documentation of patient counseling about the cough or medication switch?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "4725b068-965c-58cd-9179-b6d59cc88a17",
+          "start": 0,
+          "end": 57,
+          "quote": "Stop lisinopril because of a dry cough. Start losartan 50 mg daily."
+        },
+        "risk_reason": "Abrupt discontinuation of ACE inhibitor and initiation of ARB without documented baseline renal function or potassium, increasing risk of hyperkalemia or hypotension.",
+        "suggested_action": "Confirm recent serum creatinine, eGFR, and potassium prior to losartan initiation and schedule follow-up within 1–2 weeks.",
+        "clinical_entities": [
+          "lisinopril",
+          "losartan",
+          "dry cough"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "fingerprint": "7119f6cb1a313869013b2c0aaabb4ee1b8e43a66ea2ef56dee7318acbe2d61bd",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2686,
+    "output_tokens": 661,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "A staff note states that the pharmacy record lists the patient as allergic to sulfa drugs.",
+        "category": "allergy",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "fe840fcb-2756-552a-9d81-54dc746b5712",
+            "start": 0,
+            "end": 64,
+            "quote": "Allergic to sulfa drugs according to the pharmacy record."
+          }
+        ]
+      },
+      {
+        "text": "A clinician note states the patient is not allergic to sulfa and that the previous reaction was nausea only.",
+        "category": "allergy",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "1f6fe614-4b7c-59f2-9a22-d69b005be3f0",
+            "start": 0,
+            "end": 62,
+            "quote": "Not allergic to sulfa; the previous reaction was nausea only."
+          }
+        ]
+      },
+      {
+        "text": "The record contains a conflicting allergy entry for sulfa: one source records it as present and another as absent.",
+        "category": "allergy",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "fe840fcb-2756-552a-9d81-54dc746b5712",
+            "start": 0,
+            "end": 64,
+            "quote": "Allergic to sulfa drugs according to the pharmacy record."
+          },
+          {
+            "entry_id": "1f6fe614-4b7c-59f2-9a22-d69b005be3f0",
+            "start": 0,
+            "end": 62,
+            "quote": "Not allergic to sulfa; the previous reaction was nausea only."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Which medications were started, stopped, held or changed? The record provided does not contain medication orders or changes.",
+      "Which follow-ups, referrals or tests are planned or outstanding? The record provided does not contain follow-up, referral or test plans.",
+      "When and where was the sulfa allergy first recorded, and what reaction was documented at that time? The record does not give a date or setting for the pharmacy record entry.",
+      "Which specific sulfa drug was involved in the prior reaction, and what were the details of that event? The record does not name a specific sulfa drug or describe the event.",
+      "Was the sulfa allergy ever formally assessed, verified or removed, and by whom? The record does not document a formal allergy assessment or reconciliation.",
+      "Were any sulfa-containing medications prescribed or administered since the allergy was documented? No medication administration or prescription entries are present.",
+      "Have other drug allergies or intolerances been recorded elsewhere in the chart? No other allergy entries are present in the record provided."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "fe840fcb-2756-552a-9d81-54dc746b5712",
+          "start": 0,
+          "end": 64,
+          "quote": "Allergic to sulfa drugs according to the pharmacy record."
+        },
+        "risk_reason": "The pharmacy record lists a sulfa allergy, while a clinician note records no sulfa allergy, so the allergy status is unresolved.",
+        "suggested_action": "Clinician to review both entries and reconcile the sulfa allergy status in the chart.",
+        "clinical_entities": [
+          "sulfa"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "fingerprint": "6f02a6a1a11e1fc72eef7da3eba1cc5773179d0ef303e2e39f460ef6d370e3a6",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 5683,
+    "output_tokens": 574,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports lip swelling after the first dose of cefalexin, and the clinician documented allergy to cefalexin as flagged.",
+        "category": "allergy",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "791197d7-0415-5bb5-a182-91fc80caeb81",
+            "start": 0,
+            "end": 38,
+            "quote": "Lip swelling after the first dose of cefalexin."
+          },
+          {
+            "entry_id": "791197d7-0415-5bb5-a182-91fc80caeb81",
+            "start": 39,
+            "end": 82,
+            "quote": "Allergic to cefalexin; documented and flagged."
+          }
+        ]
+      },
+      {
+        "text": "Patient reports daily check-ins with no new symptoms; entries from mid-July through mid-August all describe sleeping well and having nothing new to report.",
+        "category": "symptom",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "1b7b1bb3-0fe4-546a-b891-7f49b6b8cced",
+            "start": 21,
+            "end": 60,
+            "quote": "slept well and have nothing new to report"
+          },
+          {
+            "entry_id": "44fec553-f7f7-56b2-b0c5-39279019777d",
+            "start": 21,
+            "end": 60,
+            "quote": "slept well and have nothing new to report"
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "The record does not record which medications were started, stopped, held or changed beyond the single cefalexin dose noted.",
+      "The record does not state the indication for cefalexin or any earlier antibiotic or infection entries.",
+      "The record does not show treatment given for the lip swelling or any follow-up after the cefalexin reaction.",
+      "No earlier allergic reactions or antibiotic allergies are recorded before the cefalexin reaction.",
+      "No follow-ups, referrals or tests are recorded as planned or outstanding."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "791197d7-0415-5bb5-a182-91fc80caeb81",
+          "start": 39,
+          "end": 82,
+          "quote": "Allergic to cefalexin; documented and flagged."
+        },
+        "risk_reason": "Documented cefalexin allergy following lip swelling after the first dose.",
+        "suggested_action": "Confirm the cefalexin allergy is visible in the active allergy list.",
+        "clinical_entities": []
+      }
+    ],
+    "check_points": []
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "fingerprint": "6d683fbe8ca6f8f906d56903e5b6da1d8a0d09bb805f31f291f4140002372507",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2648,
+    "output_tokens": 486,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports hives after glove contact; latex allergy confirmed and flagged for theatre.",
+        "category": "allergy",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "e22fc2f9-c648-5976-ae2b-e9bcff1dd157",
+            "start": 0,
+            "end": 85,
+            "quote": "Hives after glove contact; allergy to latex confirmed and flagged for theatre."
+          }
+        ]
+      },
+      {
+        "text": "A staff pre-assessment note from 2026-03-03 states no allergy to latex was reported.",
+        "category": "allergy",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "a5c5fb78-0b62-5c25-8627-ed6fd50a4c4f",
+            "start": 0,
+            "end": 45,
+            "quote": "No allergy to latex reported at pre-assessment."
+          }
+        ]
+      },
+      {
+        "text": "Latex allergy is conflicting: the staff note reports no allergy to latex, while the clinician note reports allergy to latex confirmed and flagged for theatre.",
+        "category": "allergy",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "a5c5fb78-0b62-5c25-8627-ed6fd50a4c4f",
+            "start": 0,
+            "end": 45,
+            "quote": "No allergy to latex reported at pre-assessment."
+          },
+          {
+            "entry_id": "e22fc2f9-c648-5976-ae2b-e9bcff1dd157",
+            "start": 0,
+            "end": 85,
+            "quote": "Hives after glove contact; allergy to latex confirmed and flagged for theatre."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Which latex allergy status is current: absent per the 2026-03-03 pre-assessment or present per the clinician note?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "e22fc2f9-c648-5976-ae2b-e9bcff1dd157",
+          "start": 0,
+          "end": 85,
+          "quote": "Hives after glove contact; allergy to latex confirmed and flagged for theatre."
+        },
+        "risk_reason": "Latex allergy documented with hives after glove contact; conflicts with a staff note reporting no latex allergy.",
+        "suggested_action": "Verify current latex allergy status and theatre flag before glove or latex exposure.",
+        "clinical_entities": [
+          "latex",
+          "hives"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

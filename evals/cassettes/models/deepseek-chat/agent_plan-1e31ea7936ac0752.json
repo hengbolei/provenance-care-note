@@ -1,0 +1,39 @@
+{
+  "fingerprint": "1e31ea7936ac075207d84672fe30c0465d4d17bf909234342d5dfc8f9ae4f099",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 995,
+    "output_tokens": 191,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was warfarin first recorded, at what dose, and with what INR monitoring plan?",
+        "query": "warfarin dose INR"
+      },
+      {
+        "question": "When was the colonoscopy first recorded, was it scheduled, and was the warfarin-hold instruction carried out?",
+        "query": "colonoscopy warfarin hold"
+      },
+      {
+        "question": "Which INR values are recorded and what were the most recent results before holding warfarin?",
+        "query": "INR result"
+      },
+      {
+        "question": "What bleeding, bruising, or thrombotic events are recorded that bear on holding warfarin?",
+        "query": "bleeding bruising thrombosis"
+      },
+      {
+        "question": "Are any other anticoagulant or interacting medication changes recorded around the colonoscopy?",
+        "query": "anticoagulant medication change"
+      },
+      {
+        "question": "What prior procedures or periprocedural anticoagulation plans are recorded in earlier entries?",
+        "query": "procedure periprocedural anticoagulation"
+      }
+    ]
+  }
+}

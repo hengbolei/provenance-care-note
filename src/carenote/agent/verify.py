@@ -91,8 +91,14 @@ def verify_draft(
     """
     redactions = redactions or {}
     known_medications = _known_medications(entries.values())
+    conflict_entries = {
+        conflict.id: [entry_id for entry_id in conflict.entry_ids if entry_id in entries]
+        for conflict in conflicts
+    }
     checks = [
-        _check_claim(index, claim, entries, redactions, known_medications, reference_ids)
+        _check_claim(
+            index, claim, entries, redactions, known_medications, reference_ids, conflict_entries
+        )
         for index, claim in enumerate(draft.claims)
     ]
     verified_texts = [draft.claims[check.claim_index].text for check in checks if check.verified]
@@ -128,7 +134,9 @@ def _check_claim(
     redactions: Mapping[UUID, RedactionResult],
     known_medications: set[str],
     reference_ids: Collection[UUID] = (),
+    conflict_entries: Mapping[UUID, list[UUID]] | None = None,
 ) -> ClaimCheck:
+    conflict_entries = conflict_entries or {}
     failures: list[CheckFailure] = []
     detail: list[str] = []
     resolved: list[Citation] = []
@@ -146,6 +154,15 @@ def _check_claim(
                 CheckFailure.REFERENCE_AS_FACT,
                 f"{label}: cites a reference document; claims about the patient must cite the "
                 "record (use a check point for reference material)",
+            )
+            continue
+        if entry is None and citation.entry_id in conflict_entries:
+            # A conflict ID looks like an entry ID; say which entries to cite instead.
+            involved = ", ".join(str(entry_id) for entry_id in conflict_entries[citation.entry_id])
+            fail(
+                CheckFailure.UNKNOWN_ENTRY,
+                f"{label}: cites a conflict_id, not an entry; cite the entries the conflict "
+                f"involves instead: {involved or 'none are in this review'}",
             )
             continue
         if entry is None:

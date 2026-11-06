@@ -5,30 +5,26 @@
   "model": "deepseek-chat",
   "usage": {
     "input_tokens": 944,
-    "output_tokens": 143,
+    "output_tokens": 119,
     "cost_usd": null
   },
   "output": {
     "questions": [
       {
-        "question": "When was the rash first recorded, and what was its course and treatment?",
-        "query": "rash onset"
+        "question": "When did the rash first appear, and has it been documented or treated before?",
+        "query": "rash onset treatment"
       },
       {
-        "question": "When was postural hypotension (BP <90 systolic on standing) first documented?",
-        "query": "systolic standing hypotension"
+        "question": "What were the patient's previously recorded blood pressure readings, especially any postural or systolic readings below 90?",
+        "query": "blood pressure hypotension standing"
       },
       {
-        "question": "Was a follow-up or referral arranged after the standing hypotension was noted, and was it carried out?",
-        "query": "follow-up referral standing"
+        "question": "What dietary advice was given previously, and why was the old leaflet superseded?",
+        "query": "diet sheet leaflet advice"
       },
       {
-        "question": "What earlier entries say about the diet sheet and old leaflet advice?",
-        "query": "diet sheet leaflet"
-      },
-      {
-        "question": "Was any antihypertensive medication started or changed before the standing hypotension was recorded?",
-        "query": "antihypertensive medication change"
+        "question": "Was any follow-up or referral for the rash actually arranged and completed?",
+        "query": "rash follow-up referral"
       }
     ]
   }

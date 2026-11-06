@@ -1,0 +1,89 @@
+{
+  "fingerprint": "fd69e4e4b3588032afae36a15b52310fb3ed562428c791a0ea13dd2b79aed282",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2728,
+    "output_tokens": 695,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "A clinician note states atorvastatin 20 mg nightly was confirmed with the pharmacy.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "d9b399ed-c958-5803-b199-2bbf5ef71937",
+            "start": 0,
+            "end": 46,
+            "quote": "Atorvastatin 20 mg nightly confirmed with the pharmacy."
+          }
+        ]
+      },
+      {
+        "text": "An AI-generated consult summary records a discussion of atorvastatin 40 mg nightly for cholesterol and notes clinician confirmation is required.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "6310eed0-57e8-5088-ade1-4ab30c7db69c",
+            "start": 0,
+            "end": 61,
+            "quote": "Discussed atorvastatin 40 mg nightly for cholesterol. AI-generated summary; clinician confirmation required."
+          }
+        ]
+      },
+      {
+        "text": "The record contains a documented dose conflict for atorvastatin: 20 mg versus 40 mg, spanning both the clinician note and the AI-generated consult summary.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "d9b399ed-c958-5803-b199-2bbf5ef71937",
+            "start": 0,
+            "end": 46,
+            "quote": "Atorvastatin 20 mg nightly confirmed with the pharmacy."
+          },
+          {
+            "entry_id": "6310eed0-57e8-5088-ade1-4ab30c7db69c",
+            "start": 0,
+            "end": 61,
+            "quote": "Discussed atorvastatin 40 mg nightly for cholesterol. AI-generated summary; clinician confirmation required."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Which atorvastatin dose is current — 20 mg nightly (clinician note) or 40 mg nightly (AI-generated consult summary)?",
+      "When was atorvastatin first recorded in this patient's record, and at what dose?",
+      "How many atorvastatin dose changes have been documented, and what prompted them?",
+      "Were lipid panel or other cholesterol test results recorded before atorvastatin was started or adjusted?",
+      "Is there any earlier documentation of statin intolerance, adverse reactions, or muscle symptoms?",
+      "Was any follow-up lipid monitoring or clinician review of atorvastatin planned after the dose discussion?",
+      "What medication history precedes the atorvastatin record, including other lipid-lowering agents?",
+      "Which medications other than atorvastatin were started, stopped, held or changed?",
+      "Which allergies or reactions are recorded?",
+      "Which follow-ups, referrals or tests are planned or outstanding?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "6310eed0-57e8-5088-ade1-4ab30c7db69c",
+          "start": 0,
+          "end": 61,
+          "quote": "Discussed atorvastatin 40 mg nightly for cholesterol. AI-generated summary; clinician confirmation required."
+        },
+        "risk_reason": "Atorvastatin dose is recorded as 40 mg nightly in the AI-generated summary but 20 mg nightly in the clinician note, a documented dose conflict.",
+        "suggested_action": "Verify the current atorvastatin dose against the pharmacy record and original prescribing documentation before finalizing the medication list.",
+        "clinical_entities": [
+          "atorvastatin",
+          "dose conflict"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "fingerprint": "ffa10db460818b2dfd260a6ffcf7ff541ea19bc1ee1e8e9079aa614f09630133",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2731,
+    "output_tokens": 875,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient has a confirmed latex allergy, with hives after glove contact reported.",
+        "category": "allergy",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "e22fc2f9-c648-5976-ae2b-e9bcff1dd157",
+            "start": 0,
+            "end": 48,
+            "quote": "Hives after glove contact; allergy to latex confirmed and flagged for theatre."
+          }
+        ]
+      },
+      {
+        "text": "Latex allergy status is conflicting: pre-assessment staff note states no latex allergy reported, while later clinician note confirms it.",
+        "category": "allergy",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "a5c5fb78-0b62-5c25-8627-ed6fd50a4c4f",
+            "start": 0,
+            "end": 45,
+            "quote": "No allergy to latex reported at pre-assessment."
+          },
+          {
+            "entry_id": "e22fc2f9-c648-5976-ae2b-e9bcff1dd157",
+            "start": 0,
+            "end": 48,
+            "quote": "Hives after glove contact; allergy to latex confirmed and flagged for theatre."
+          }
+        ]
+      },
+      {
+        "text": "Latex allergy was flagged for theatre.",
+        "category": "plan",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "e22fc2f9-c648-5976-ae2b-e9bcff1dd157",
+            "start": 30,
+            "end": 48,
+            "quote": "allergy to latex confirmed and flagged for theatre."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was the latex allergy first documented?",
+      "What evidence supports the diagnosis of latex allergy, such as testing or clinical reaction details?",
+      "Was the latex allergy confirmed by allergy testing or specialist review, and when?",
+      "What actions were taken after the latex allergy was flagged for theatre, such as documentation in surgical checklist or alternative equipment ordered?",
+      "Was the discrepancy in latex allergy status (absent vs present) investigated or resolved in a later entry?",
+      "What other allergies or sensitivities are recorded besides latex?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "e22fc2f9-c648-5976-ae2b-e9bcff1dd157",
+          "start": 0,
+          "end": 48,
+          "quote": "Hives after glove contact; allergy to latex confirmed and flagged for theatre."
+        },
+        "risk_reason": "Latex allergy confirmed with acute reaction (hives), high risk for anaphylaxis during procedures involving latex products.",
+        "suggested_action": "Verify latex-free protocol is active in theatre scheduling and equipment lists; confirm surgical team notified.",
+        "clinical_entities": [
+          "latex allergy",
+          "hives",
+          "theatre"
+        ]
+      },
+      {
+        "citation": {
+          "entry_id": "a5c5fb78-0b62-5c25-8627-ed6fd50a4c4f",
+          "start": 0,
+          "end": 45,
+          "quote": "No allergy to latex reported at pre-assessment."
+        },
+        "risk_reason": "Direct conflict with later confirmed latex allergy creates risk of unsafe exposure if unresolved.",
+        "suggested_action": "Resolve discrepancy by reviewing assessment timing, source of information, and documenting resolution in next note.",
+        "clinical_entities": [
+          "latex allergy",
+          "conflict"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

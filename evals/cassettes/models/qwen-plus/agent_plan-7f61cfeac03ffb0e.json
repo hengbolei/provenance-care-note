@@ -1,0 +1,39 @@
+{
+  "fingerprint": "7f61cfeac03ffb0ece0f9f1d782aa2250ef7ecf12b8b17464bc473914747a383",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 4725,
+    "output_tokens": 261,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was furosemide first prescribed, and what was the initial dose and indication?",
+        "query": "furosemide prescribe dose"
+      },
+      {
+        "question": "What were the creatinine and kidney function values before the recent rise, and when were they last normal?",
+        "query": "creatinine kidney function"
+      },
+      {
+        "question": "Was dehydration diagnosed earlier, and what evidence (e.g., clinical signs, labs, weight loss) supported that diagnosis?",
+        "query": "dehydration weight loss"
+      },
+      {
+        "question": "Has furosemide been held or adjusted previously, and if so, when and why?",
+        "query": "furosemide hold adjust"
+      },
+      {
+        "question": "Were any other diuretics or nephrotoxic medications active around the time of rising creatinine?",
+        "query": "diuretic nephrotoxic"
+      },
+      {
+        "question": "What follow-up occurred after the 48-hour kidney function repeat was ordered — was it done, and what were the results?",
+        "query": "kidney function repeat result"
+      }
+    ]
+  }
+}

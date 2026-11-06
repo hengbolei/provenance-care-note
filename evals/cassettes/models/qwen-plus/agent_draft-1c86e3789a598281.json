@@ -1,0 +1,40 @@
+{
+  "fingerprint": "1c86e3789a598281d8325efdc69e2c296a858c89aaa9e589f761acfb99564191",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2515,
+    "output_tokens": 305,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports allergy to penicillin.",
+        "category": "allergy",
+        "risk_level": "critical",
+        "citations": [
+          {
+            "entry_id": "4ec4f841-5385-5192-ab98-a696ce5943f9",
+            "start": 20,
+            "end": 45,
+            "quote": "the patient is allergic to penicillin"
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was the penicillin allergy first recorded, and what evidence or reaction details were documented at that time?",
+      "What medications were started, stopped, held or changed around the time of the penicillin allergy documentation?",
+      "Were any antibiotics prescribed before or after the penicillin allergy claim, and which ones?",
+      "Has any follow-up or verification been done for the reported penicillin allergy (e.g., testing, clarification, or de-labeling)?",
+      "What other allergies or reactions are documented in the record besides penicillin?",
+      "Are there any outstanding referrals, tests or follow-ups related to allergy assessment or medication safety?",
+      "Which medications were started, stopped, held or changed?",
+      "Which follow-ups, referrals or tests are planned or outstanding?"
+    ],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "fingerprint": "ec8667b27426b72d31d2eef6bf2f2e7639cef14c8602b6526396ee8816a9c9a3",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2694,
+    "output_tokens": 495,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient is reported as not allergic to sulfa; the prior reaction was nausea only.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "1f6fe614-4b7c-59f2-9a22-d69b005be3f0",
+            "start": 0,
+            "end": 52,
+            "quote": "Not allergic to sulfa; the previous reaction was nausea only."
+          }
+        ]
+      },
+      {
+        "text": "Pharmacy record states patient is allergic to sulfa drugs.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "fe840fcb-2756-552a-9d81-54dc746b5712",
+            "start": 0,
+            "end": 47,
+            "quote": "Allergic to sulfa drugs according to the pharmacy record."
+          }
+        ]
+      },
+      {
+        "text": "Conflict exists regarding sulfa allergy: one entry states patient is not allergic (with prior nausea-only reaction), another states patient is allergic per pharmacy record.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "1f6fe614-4b7c-59f2-9a22-d69b005be3f0",
+            "start": 0,
+            "end": 52,
+            "quote": "Not allergic to sulfa; the previous reaction was nausea only."
+          },
+          {
+            "entry_id": "fe840fcb-2756-552a-9d81-54dc746b5712",
+            "start": 0,
+            "end": 47,
+            "quote": "Allergic to sulfa drugs according to the pharmacy record."
+          }
+        ]
+      }
+    ],
+    "open_questions": [],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

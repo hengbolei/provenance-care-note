@@ -1,0 +1,39 @@
+{
+  "fingerprint": "5f7ba12bcab5d1004389382af0f67071988217bc4e9d25ceca5d99b70c291812",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 1000,
+    "output_tokens": 197,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was atorvastatin first recorded in this patient's record, and at what dose?",
+        "query": "atorvastatin first recorded dose"
+      },
+      {
+        "question": "How many atorvastatin dose changes have been documented, and what prompted them?",
+        "query": "atorvastatin dose change titration"
+      },
+      {
+        "question": "Were lipid panel or other cholesterol test results recorded before atorvastatin was started or adjusted?",
+        "query": "lipid panel cholesterol LDL results"
+      },
+      {
+        "question": "Is there any earlier documentation of statin intolerance, adverse reactions, or muscle symptoms?",
+        "query": "statin intolerance myalgia muscle symptoms"
+      },
+      {
+        "question": "Was any follow-up lipid monitoring or clinician review of atorvastatin planned after the dose discussion?",
+        "query": "lipid monitoring follow-up atorvastatin"
+      },
+      {
+        "question": "What medication history precedes the atorvastatin record, including other lipid-lowering agents?",
+        "query": "medication history lipid-lowering therapy"
+      }
+    ]
+  }
+}

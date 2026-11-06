@@ -1,0 +1,21 @@
+{
+  "fingerprint": "0831ee165bd4ffd8d7f3a7b57e2d5ff06dac5d26cecff59c0970d57fb419ac79",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2336,
+    "output_tokens": 69,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [],
+    "open_questions": [
+      "No medication start, stop, hold or change is recorded in the available entries.",
+      "No allergies or allergic reactions are recorded in the available entries.",
+      "No follow-ups, referrals or tests are recorded in the available entries."
+    ],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

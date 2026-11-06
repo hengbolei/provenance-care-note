@@ -1,0 +1,63 @@
+{
+  "fingerprint": "4c0a39cf778e562f3955f5145db0d23500a96f3c9fc0c812b82dbc2c7d8d561c",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2745,
+    "output_tokens": 536,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Atorvastatin 20 mg nightly is confirmed with the pharmacy per clinician note.",
+        "category": "medication",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "d9b399ed-c958-5803-b199-2bbf5ef71937",
+            "start": 0,
+            "end": 40,
+            "quote": "Atorvastatin 20 mg nightly confirmed with the pharmacy."
+          }
+        ]
+      },
+      {
+        "text": "An AI-generated summary states atorvastatin 40 mg nightly was discussed for cholesterol, and notes clinician confirmation is required.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "6310eed0-57e8-5088-ade1-4ab30c7db69c",
+            "start": 0,
+            "end": 55,
+            "quote": "Discussed atorvastatin 40 mg nightly for cholesterol. AI-generated summary; clinician confirmation required."
+          }
+        ]
+      },
+      {
+        "text": "There is a conflict between documented atorvastatin doses: 20 mg (per clinician note) and 40 mg (per AI-generated summary).",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "d9b399ed-c958-5803-b199-2bbf5ef71937",
+            "start": 0,
+            "end": 40,
+            "quote": "Atorvastatin 20 mg nightly confirmed with the pharmacy."
+          },
+          {
+            "entry_id": "6310eed0-57e8-5088-ade1-4ab30c7db69c",
+            "start": 0,
+            "end": 55,
+            "quote": "Discussed atorvastatin 40 mg nightly for cholesterol. AI-generated summary; clinician confirmation required."
+          }
+        ]
+      }
+    ],
+    "open_questions": [],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "fingerprint": "ffe6da9f0beeb131b5af6b867cac2ef26337cf1224d8759f4adbdb2e3e0540ab",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2823,
+    "output_tokens": 513,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Warfarin 5 mg each evening was prescribed on 2026-08-01.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "f2d044c1-f89a-5d04-b1b3-737ff68dd764",
+            "start": 0,
+            "end": 32,
+            "quote": "Warfarin 5 mg each evening; INR target 2 to 3."
+          }
+        ]
+      },
+      {
+        "text": "Pharmacy dispensed warfarin 3 mg tablets, one each evening.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "0dedd3b8-932b-5d83-a202-804b9104bdd9",
+            "start": 0,
+            "end": 52,
+            "quote": "Pharmacy dispensed warfarin 3 mg tablets, one each evening."
+          }
+        ]
+      },
+      {
+        "text": "There is a dose conflict for warfarin: 3 mg (dispensed) versus 5 mg (prescribed).",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "f2d044c1-f89a-5d04-b1b3-737ff68dd764",
+            "start": 0,
+            "end": 32,
+            "quote": "Warfarin 5 mg each evening; INR target 2 to 3."
+          },
+          {
+            "entry_id": "0dedd3b8-932b-5d83-a202-804b9104bdd9",
+            "start": 0,
+            "end": 52,
+            "quote": "Pharmacy dispensed warfarin 3 mg tablets, one each evening."
+          }
+        ]
+      }
+    ],
+    "open_questions": [],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

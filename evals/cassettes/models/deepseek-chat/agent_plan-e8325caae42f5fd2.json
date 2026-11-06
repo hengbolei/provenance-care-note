@@ -5,30 +5,30 @@
   "model": "deepseek-chat",
   "usage": {
     "input_tokens": 774,
-    "output_tokens": 140,
+    "output_tokens": 141,
     "cost_usd": null
   },
   "output": {
     "questions": [
       {
-        "question": "When was warfarin first started and at what doses has it been titrated over time?",
-        "query": "warfarin dose change"
+        "question": "When was warfarin first started and what was its initial dose and indication?",
+        "query": "warfarin start dose indication"
       },
       {
-        "question": "What is the recent INR trend and what prior INR values prompted this dose change?",
-        "query": "INR warfarin"
+        "question": "What were the recent INR values and dose adjustments before this change to 4 mg?",
+        "query": "INR warfarin dose adjustment"
       },
       {
-        "question": "What was the indication for anticoagulation with warfarin?",
-        "query": "warfarin indication anticoagulation"
+        "question": "Was there any bleeding or adverse event associated with the raised INR?",
+        "query": "bleeding INR adverse event"
       },
       {
-        "question": "Have there been prior bleeding events or adverse reactions on warfarin?",
-        "query": "warfarin bleeding adverse reaction"
+        "question": "What other medications could interact with warfarin or affect INR?",
+        "query": "warfarin interaction medications"
       },
       {
-        "question": "Were there previous dose adjustments for warfarin and what was the response?",
-        "query": "warfarin adjustment INR response"
+        "question": "Are there earlier records of over-anticoagulation or prior INR monitoring plans?",
+        "query": "INR monitoring anticoagulation"
       }
     ]
   }

@@ -1,0 +1,22 @@
+{
+  "fingerprint": "6d1e31f3d9a8c18abf1ed9b760fcef7dfe842f3409760d81e85d263a8a9e419e",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2348,
+    "output_tokens": 97,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [],
+    "open_questions": [
+      "No medication start, stop, hold or change is documented in the available record.",
+      "No allergies or allergic reactions are documented in the available record.",
+      "No follow-up, referral or test is documented in the available record.",
+      "The staff note records a call from an unidentified caller about a record and a callback request; the purpose and callback details are not documented."
+    ],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

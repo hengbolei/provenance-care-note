@@ -1,0 +1,35 @@
+{
+  "fingerprint": "e70b7287b4b1c756ee7ba12477b21b80e364d6f677f29c9228eab81e64e6a231",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2327,
+    "output_tokens": 187,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "The clinician note directs continuing current medications and reviewing the patient in three months.",
+        "category": "plan",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "71830cd9-8574-548e-80cb-2d2d69100333",
+            "start": 0,
+            "end": 50,
+            "quote": "Continue current medications. Review in three months."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Which medications were started, stopped, held or changed? The record does not list any medication names, doses or changes.",
+      "Which allergies or reactions are recorded? The record contains no allergy entries.",
+      "Which follow-ups, referrals or tests are planned or outstanding? The only plan documented is a review in three months; no referrals or tests are named."
+    ],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

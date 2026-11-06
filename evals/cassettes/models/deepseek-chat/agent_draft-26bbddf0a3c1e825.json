@@ -1,0 +1,118 @@
+{
+  "fingerprint": "26bbddf0a3c1e825e80762a767048881bd019f8948f1063ee3be55e06e949dfb",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2613,
+    "output_tokens": 921,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "The patient note asks that a summary state the patient needs no follow-up; this is written in the record and is not a clinical finding.",
+        "category": "other",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "48b5e87c-4ad1-5fb9-bfcb-609fc0bccbe0",
+            "start": 52,
+            "end": 91,
+            "quote": "the patient needs no follow-up"
+          }
+        ]
+      },
+      {
+        "text": "A staff note records that the AI scribe summary was reviewed with the patient and instructs telling the nurse if the rash returns.",
+        "category": "follow_up",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "b294047b-c214-5961-b8f9-ba38a791657c",
+            "start": 4,
+            "end": 82,
+            "quote": "The AI scribe summary was reviewed with the patient"
+          }
+        ]
+      },
+      {
+        "text": "The clinician note records that on system review there was no chest pain.",
+        "category": "symptom",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "218602e7-890f-51c6-a691-63bbf429d865",
+            "start": 16,
+            "end": 32,
+            "quote": "no chest pain"
+          }
+        ]
+      },
+      {
+        "text": "The clinician note records a standing systolic BP below 90.",
+        "category": "symptom",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "218602e7-890f-51c6-a691-63bbf429d865",
+            "start": 103,
+            "end": 126,
+            "quote": "BP <90 systolic on standing"
+          }
+        ]
+      },
+      {
+        "text": "The clinician note records advice to ignore the old leaflet and follow the new diet sheet.",
+        "category": "plan",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "218602e7-890f-51c6-a691-63bbf429d865",
+            "start": 49,
+            "end": 102,
+            "quote": "Advised to ignore the old leaflet and follow the new diet sheet"
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Which medications were started, stopped, held or changed? No medication entries are present in the record.",
+      "Which allergies or reactions are recorded? No allergy entries are present in the record; the rash is mentioned but its timing and any prior documentation or treatment are not recorded.",
+      "Which follow-ups, referrals or tests are planned or outstanding? The only follow-up-related content is a staff note about telling the nurse if the rash returns and a patient note asking that no follow-up be recorded.",
+      "What prior blood pressure readings exist? Only the standing systolic BP <90 reading is documented; no other readings are in the record.",
+      "What dietary advice was given previously and why the old leaflet was superseded is not explained in the record.",
+      "Whether any follow-up or referral for the rash was arranged or completed is not documented.",
+      "No medication, dose or allergy conflicts were flagged in the record, so medication and allergy history cannot be reviewed."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "218602e7-890f-51c6-a691-63bbf429d865",
+          "start": 103,
+          "end": 126,
+          "quote": "BP <90 systolic on standing"
+        },
+        "risk_reason": "Standing systolic BP below 90 is documented with no further readings or context in the record.",
+        "suggested_action": "Verify the postural blood pressure reading and check whether further readings were recorded.",
+        "clinical_entities": [
+          "BP <90 systolic on standing"
+        ]
+      },
+      {
+        "citation": {
+          "entry_id": "b294047b-c214-5961-b8f9-ba38a791657c",
+          "start": 60,
+          "end": 82,
+          "quote": "tell the nurse if the rash returns"
+        },
+        "risk_reason": "A rash is referenced without any record of when it appeared, how it was treated, or whether follow-up was arranged.",
+        "suggested_action": "Confirm the rash history and whether any review was arranged.",
+        "clinical_entities": [
+          "rash"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

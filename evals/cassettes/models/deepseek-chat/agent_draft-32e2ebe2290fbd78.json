@@ -1,0 +1,84 @@
+{
+  "fingerprint": "32e2ebe2290fbd783e490a4eacb05897e3fc274f20555f9c4285adccf35b6582",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2685,
+    "output_tokens": 639,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports hives after glove contact; latex allergy confirmed and flagged for theatre.",
+        "category": "allergy",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "e22fc2f9-c648-5976-ae2b-e9bcff1dd157",
+            "start": 0,
+            "end": 85,
+            "quote": "Hives after glove contact; allergy to latex confirmed and flagged for theatre."
+          }
+        ]
+      },
+      {
+        "text": "A staff pre-assessment note from 2026-03-03 states no allergy to latex was reported.",
+        "category": "allergy",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "a5c5fb78-0b62-5c25-8627-ed6fd50a4c4f",
+            "start": 0,
+            "end": 45,
+            "quote": "No allergy to latex reported at pre-assessment."
+          }
+        ]
+      },
+      {
+        "text": "Record contains a conflicting allergy fact for latex: absent (staff note) versus present (clinician note).",
+        "category": "allergy",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "e22fc2f9-c648-5976-ae2b-e9bcff1dd157",
+            "start": 14,
+            "end": 59,
+            "quote": "allergy to latex confirmed and flagged for theatre"
+          },
+          {
+            "entry_id": "a5c5fb78-0b62-5c25-8627-ed6fd50a4c4f",
+            "start": 0,
+            "end": 45,
+            "quote": "No allergy to latex reported at pre-assessment."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Which medications were started, stopped, held or changed? The record does not document any medication changes.",
+      "Which follow-ups, referrals or tests are planned or outstanding? The record does not document any follow-up, referral or test.",
+      "When was a latex allergy or reaction first recorded in this record? The record does not give a date for the first latex allergy record.",
+      "What details document the hives after glove contact (date, exposure, treatment, severity)? Only hives after glove contact is noted; no date, exposure, treatment or severity is documented.",
+      "Was any prior latex exposure, sensitivity or reaction noted before the pre-assessment saying none? The record does not show whether any earlier latex exposure was documented.",
+      "Was the latex allergy theatre flag communicated and acted on (alert placed, precautions ordered)? The record only states it was flagged; action taken is not documented."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "e22fc2f9-c648-5976-ae2b-e9bcff1dd157",
+          "start": 14,
+          "end": 59,
+          "quote": "allergy to latex confirmed and flagged for theatre"
+        },
+        "risk_reason": "Latex allergy is recorded as confirmed in a 2026-08-19 note, but a 2026-03-03 staff note says no latex allergy was reported, creating a conflicting allergy record.",
+        "suggested_action": "Confirm the current latex allergy status and reconcile the conflicting allergy entries with the patient before theatre.",
+        "clinical_entities": [
+          "latex"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

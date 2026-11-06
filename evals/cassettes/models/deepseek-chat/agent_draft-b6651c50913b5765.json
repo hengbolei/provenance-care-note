@@ -1,0 +1,93 @@
+{
+  "fingerprint": "b6651c50913b5765f53c3c4d17d0798be1a165fb5e942a8631c0c6f26897a9f5",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 5750,
+    "output_tokens": 696,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Clinician note documents rising creatinine with dehydration and states a plan to hold furosemide and repeat kidney function in 48 hours.",
+        "category": "plan",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "f1f7e95a-2380-5db0-8745-3476cf0bcc1b",
+            "start": 0,
+            "end": 34,
+            "quote": "Creatinine rising with dehydration."
+          },
+          {
+            "entry_id": "f1f7e95a-2380-5db0-8745-3476cf0bcc1b",
+            "start": 35,
+            "end": 100,
+            "quote": "Hold furosemide and repeat kidney function in 48 hours."
+          }
+        ]
+      },
+      {
+        "text": "A May entry records continuing furosemide 40 mg each morning.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "975b430f-7b85-5132-9c1e-6f1803a2e6fd",
+            "start": 0,
+            "end": 38,
+            "quote": "Continue furosemide 40 mg each morning."
+          }
+        ]
+      },
+      {
+        "text": "The record contains a medication conflict for furosemide: one entry says continue it and a later clinician note says hold it.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "975b430f-7b85-5132-9c1e-6f1803a2e6fd",
+            "start": 9,
+            "end": 38,
+            "quote": "furosemide 40 mg each morning."
+          },
+          {
+            "entry_id": "f1f7e95a-2380-5db0-8745-3476cf0bcc1b",
+            "start": 35,
+            "end": 48,
+            "quote": "Hold furosemide"
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "No allergy or reaction is documented in the available entries; confirm allergy status.",
+      "When was furosemide first started, and what was the original indication and dose?",
+      "Was furosemide previously held or stopped before the 2026-08-20 note, and was it restarted?",
+      "No creatinine or kidney function values are recorded in the entries before the recent rise; obtain prior results.",
+      "No weight values are recorded; the vitals entries state only that weight and pulse were unchanged. How long has dehydration been documented?",
+      "Whether the plan to hold furosemide and repeat kidney function in 48 hours was carried out is not documented.",
+      "Which follow-ups, referrals or tests are planned or outstanding beyond the repeat kidney function?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "f1f7e95a-2380-5db0-8745-3476cf0bcc1b",
+          "start": 35,
+          "end": 100,
+          "quote": "Hold furosemide and repeat kidney function in 48 hours."
+        },
+        "risk_reason": "Rising creatinine with dehydration and a hold order for furosemide conflict with an earlier record to continue furosemide 40 mg each morning; kidney function follow-up is pending.",
+        "suggested_action": "Review the furosemide conflict and confirm whether the hold order and repeat kidney function were carried out.",
+        "clinical_entities": [
+          "furosemide",
+          "creatinine",
+          "dehydration"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "fingerprint": "f9520b15e506f1f5da41f9870e5d384e858e3700421f18c5edffdeb632c6bd82",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2527,
+    "output_tokens": 267,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports feeling fine today.",
+        "category": "symptom",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "cd27778d-23dd-5d33-a12a-979371740f61",
+            "start": 0,
+            "end": 22,
+            "quote": "Feeling fine today."
+          }
+        ]
+      },
+      {
+        "text": "Clinician documented penicillin allergy with widespread rash in 2019.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "e8a3991d-cde3-5a61-8f00-b572a213e617",
+            "start": 0,
+            "end": 49,
+            "quote": "Allergic to penicillin; widespread rash in 2019."
+          }
+        ]
+      }
+    ],
+    "open_questions": [],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

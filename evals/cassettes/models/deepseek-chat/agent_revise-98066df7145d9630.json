@@ -1,0 +1,46 @@
+{
+  "fingerprint": "98066df7145d9630c039eda00a52ad3949cc86f88e9198d2ab4486c36e25b0a8",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2397,
+    "output_tokens": 219,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Clinician note documents Glucophage 850 mg twice daily as continuing, with HbA1c described as improving.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "f2b703b7-d3e3-53d3-abee-5d903b6a619d",
+            "start": 0,
+            "end": 47,
+            "quote": "Glucophage 850 mg twice daily continues"
+          }
+        ]
+      },
+      {
+        "text": "A staff note records that the pharmacy list shows metformin 500 mg twice daily.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "a2dbd20d-3025-5770-9932-a42fc69eb4cf",
+            "start": 0,
+            "end": 48,
+            "quote": "Pharmacy list shows metformin 500 mg twice daily."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "The clinician note lists Glucophage 850 mg twice daily while the pharmacy list shows metformin 500 mg twice daily; which regimen is current?"
+    ],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

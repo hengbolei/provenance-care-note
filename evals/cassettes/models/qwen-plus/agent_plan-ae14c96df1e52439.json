@@ -5,13 +5,13 @@
   "model": "qwen-plus",
   "usage": {
     "input_tokens": 863,
-    "output_tokens": 279,
+    "output_tokens": 175,
     "cost_usd": null
   },
   "output": {
     "questions": [
       {
-        "question": "When was apixaban first started, and was the dose adjusted based on renal function or weight?",
+        "question": "When was apixaban first started, and was the dose adjusted since then?",
         "query": "apixaban 5 mg"
       },
       {
@@ -19,20 +19,12 @@
         "query": "creatinine"
       },
       {
-        "question": "Was renal function assessed prior to initiating apixaban, and what was the estimated CrCl or eGFR at that time?",
-        "query": "CrCl eGFR renal"
+        "question": "Was renal function assessed before starting apixaban, given the patient's age and current elevated creatinine?",
+        "query": "renal function apixaban"
       },
       {
-        "question": "Has apixaban been held, reduced, or discontinued in response to elevated creatinine or other concerns?",
-        "query": "apixaban hold reduce stop"
-      },
-      {
-        "question": "Are there any documented bleeding risks, falls history, or other contraindications relevant to apixaban use in this 84-year-old patient?",
+        "question": "Are there any documented contraindications or cautions for apixaban use, such as prior bleeding or fall risk?",
         "query": "bleeding fall risk"
-      },
-      {
-        "question": "What follow-up actions were planned after the creatinine result — e.g., repeat test, nephrology referral, dose review?",
-        "query": "follow up creatinine referral"
       }
     ]
   }

@@ -1,0 +1,125 @@
+{
+  "fingerprint": "0e7ac2e2700c40e04ac4193834770447e7448f471eaa01e3a1108fb396e301e8",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 6526,
+    "output_tokens": 1273,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Furosemide was prescribed at 40 mg each morning, as of 2026-05-01.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "975b430f-7b85-5132-9c1e-6f1803a2e6fd",
+            "start": 0,
+            "end": 34,
+            "quote": "Continue furosemide 40 mg each morning."
+          }
+        ]
+      },
+      {
+        "text": "Furosemide was held on 2026-08-20 due to rising creatinine and dehydration.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "f1f7e95a-2380-5db0-8745-3476cf0bcc1b",
+            "start": 0,
+            "end": 56,
+            "quote": "Creatinine rising with dehydration. Hold furosemide and repeat kidney function in 48 hours."
+          }
+        ]
+      },
+      {
+        "text": "There is a conflict between continuing furosemide (2026-05-01) and holding it (2026-08-20).",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "975b430f-7b85-5132-9c1e-6f1803a2e6fd",
+            "start": 0,
+            "end": 34,
+            "quote": "Continue furosemide 40 mg each morning."
+          },
+          {
+            "entry_id": "f1f7e95a-2380-5db0-8745-3476cf0bcc1b",
+            "start": 0,
+            "end": 56,
+            "quote": "Creatinine rising with dehydration. Hold furosemide and repeat kidney function in 48 hours."
+          }
+        ]
+      },
+      {
+        "text": "Kidney function testing was ordered to be repeated in 48 hours after 2026-08-20.",
+        "category": "follow_up",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "f1f7e95a-2380-5db0-8745-3476cf0bcc1b",
+            "start": 36,
+            "end": 56,
+            "quote": "repeat kidney function in 48 hours."
+          }
+        ]
+      },
+      {
+        "text": "Dehydration was documented as a clinical concern on 2026-08-20.",
+        "category": "symptom",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "f1f7e95a-2380-5db0-8745-3476cf0bcc1b",
+            "start": 18,
+            "end": 31,
+            "quote": "with dehydration"
+          }
+        ]
+      },
+      {
+        "text": "Creatinine was noted as rising on 2026-08-20.",
+        "category": "symptom",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "f1f7e95a-2380-5db0-8745-3476cf0bcc1b",
+            "start": 0,
+            "end": 17,
+            "quote": "Creatinine rising"
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was furosemide first prescribed, and what was the initial dose and indication?",
+      "What were the creatinine and kidney function values before the recent rise, and when were they last normal?",
+      "Was dehydration diagnosed earlier, and what evidence (e.g., clinical signs, labs, weight loss) supported that diagnosis?",
+      "Has furosemide been held or adjusted previously, and if so, when and why?",
+      "Were any other diuretics or nephrotoxic medications active around the time of rising creatinine?",
+      "What follow-up occurred after the 48-hour kidney function repeat was ordered — was it done, and what were the results?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "f1f7e95a-2380-5db0-8745-3476cf0bcc1b",
+          "start": 0,
+          "end": 56,
+          "quote": "Creatinine rising with dehydration. Hold furosemide and repeat kidney function in 48 hours."
+        },
+        "risk_reason": "Furosemide hold is clinically appropriate given rising creatinine and dehydration, but no documentation of renal lab values or volume status assessment is present to confirm severity or guide timing of re-initiation.",
+        "suggested_action": "Review recent serum creatinine, eGFR, electrolytes, and volume status markers (e.g., orthostatics, BUN/Cr ratio) to assess acute kidney injury stage and readiness for diuretic resumption.",
+        "clinical_entities": [
+          "furosemide",
+          "creatinine",
+          "dehydration"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

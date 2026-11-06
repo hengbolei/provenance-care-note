@@ -1,0 +1,39 @@
+{
+  "fingerprint": "3c9411adf0561e695fa6bfce4255e951d0fe25813efa67df640935257685af3b",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 1042,
+    "output_tokens": 271,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was levothyroxine first started, and at what dose?",
+        "query": "levothyroxine start dose"
+      },
+      {
+        "question": "When was the levothyroxine dose last changed before the 75 mcg increase on 2026-08-05?",
+        "query": "levothyroxine change dose"
+      },
+      {
+        "question": "What was the TSH value that prompted the dose increase to 75 mcg?",
+        "query": "TSH value"
+      },
+      {
+        "question": "Was the levothyroxine 50 mcg dose confirmed as active and ongoing before the 2026-08-05 note?",
+        "query": "levothyroxine 50 mcg active"
+      },
+      {
+        "question": "Are there any documented reasons for non-adherence or missed doses prior to the TSH elevation?",
+        "query": "levothyroxine adherence missed dose"
+      },
+      {
+        "question": "Has a repeat TSH test been ordered or performed since the dose increase?",
+        "query": "TSH repeat test"
+      }
+    ]
+  }
+}

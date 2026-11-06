@@ -1,0 +1,63 @@
+{
+  "fingerprint": "d6dabd923da09fa8305928ff8f2483568f51a1f779af3fda30a78713717a3f10",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2768,
+    "output_tokens": 531,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports metformin 2000 mg was prescribed by the clinician.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "06e6d37c-ea83-5a2f-b46c-dc52999b6ca0",
+            "start": 71,
+            "end": 105,
+            "quote": "metformin 2000 mg was prescribed by the clinician."
+          }
+        ]
+      },
+      {
+        "text": "Clinician note dated 2026-08-01 states metformin 500 mg twice daily remains the plan.",
+        "category": "medication",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "b896fd60-8287-5419-a1eb-5123b7e49091",
+            "start": 0,
+            "end": 52,
+            "quote": "Metformin 500 mg twice daily remains the plan."
+          }
+        ]
+      },
+      {
+        "text": "There is a documented conflict between metformin 2000 mg (patient-reported) and metformin 500 mg twice daily (clinician note).",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "06e6d37c-ea83-5a2f-b46c-dc52999b6ca0",
+            "start": 71,
+            "end": 105,
+            "quote": "metformin 2000 mg was prescribed by the clinician."
+          },
+          {
+            "entry_id": "b896fd60-8287-5419-a1eb-5123b7e49091",
+            "start": 0,
+            "end": 52,
+            "quote": "Metformin 500 mg twice daily remains the plan."
+          }
+        ]
+      }
+    ],
+    "open_questions": [],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

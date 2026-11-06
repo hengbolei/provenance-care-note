@@ -1,0 +1,39 @@
+{
+  "fingerprint": "e438ce4cc0f7ecbafc6bb6ccc453c59eb44ee5644abc011596e2666a9b58b7ac",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 1043,
+    "output_tokens": 251,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was lisinopril first prescribed, and at what dose?",
+        "query": "lisinopril prescribed dose"
+      },
+      {
+        "question": "When was the dry cough first documented as a side effect of lisinopril?",
+        "query": "dry cough lisinopril"
+      },
+      {
+        "question": "Was losartan previously trialed or contraindicated before this initiation?",
+        "query": "losartan trial contraindicated"
+      },
+      {
+        "question": "What blood pressure readings supported continuing lisinopril in June, and were repeat readings taken after switching to losartan?",
+        "query": "blood pressure lisinopril losartan"
+      },
+      {
+        "question": "Was renal function or potassium monitored before and after stopping lisinopril and starting losartan?",
+        "query": "creatinine potassium losartan lisinopril"
+      },
+      {
+        "question": "Is there documentation of patient counseling about the cough or medication switch?",
+        "query": "counseling dry cough medication switch"
+      }
+    ]
+  }
+}

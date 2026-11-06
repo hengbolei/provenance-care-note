@@ -5,26 +5,34 @@
   "model": "deepseek-chat",
   "usage": {
     "input_tokens": 3952,
-    "output_tokens": 120,
+    "output_tokens": 183,
     "cost_usd": null
   },
   "output": {
     "questions": [
       {
-        "question": "When was the cefalexin allergy first recorded, and what was the initial reaction?",
-        "query": "cefalexin allergy lip swelling"
+        "question": "When was cefalexin first recorded in this patient's record, and for what indication?",
+        "query": "cefalexin"
       },
       {
-        "question": "Was cefalexin started before the reaction, and what was the indication and dose?",
-        "query": "cefalexin dose start indication"
+        "question": "Were there any earlier allergic reactions or antibiotic allergies before the cefalexin reaction?",
+        "query": "allergy reaction swelling"
       },
       {
-        "question": "What earlier entries document prior antibiotic use or antibiotic reactions?",
-        "query": "antibiotic reaction allergy"
+        "question": "Was the cefalexin reaction reported, flagged, or followed up, and did the patient receive any treatment for the lip swelling?",
+        "query": "cefalexin lip swelling treatment"
       },
       {
-        "question": "What did earlier entries say before the daily check-ins became unremarkable?",
-        "query": "symptom medication change"
+        "question": "What earlier entries mention antibiotics or infections that led to the cefalexin course?",
+        "query": "antibiotic infection"
+      },
+      {
+        "question": "Were other medications recorded before the recent check-ins, and are any still active?",
+        "query": "medication dose"
+      },
+      {
+        "question": "Were any tests or referrals ordered earlier and are they still outstanding?",
+        "query": "test referral"
       }
     ]
   }

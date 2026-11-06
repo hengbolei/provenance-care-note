@@ -1,0 +1,78 @@
+{
+  "fingerprint": "29ea1d39cf15a2f0b2499e25ba944ecdbb8b248b81a28819b6fed4f8893f963a",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2788,
+    "output_tokens": 751,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports metformin 2000 mg was prescribed by the clinician.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "06e6d37c-ea83-5a2f-b46c-dc52999b6ca0",
+            "start": 71,
+            "end": 105,
+            "quote": "metformin 2000 mg was prescribed by the clinician."
+          }
+        ]
+      },
+      {
+        "text": "Clinician note dated 2026-08-01 states metformin 500 mg twice daily remains the plan.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "b896fd60-8287-5419-a1eb-5123b7e49091",
+            "start": 0,
+            "end": 52,
+            "quote": "Metformin 500 mg twice daily remains the plan."
+          }
+        ]
+      },
+      {
+        "text": "There is a documented conflict between metformin 2000 mg (patient-reported) and metformin 500 mg twice daily (clinician note).",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "d49c61be-f65e-567c-9dff-0638c2ffaaaf",
+            "start": 0,
+            "end": 58,
+            "quote": "Conflicting dose facts for metformin: 2000mg versus 500mg."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was metformin first prescribed, and at what dose?",
+      "Was the dose change from 500 mg twice daily to 2000 mg once daily documented as intentional and when?",
+      "What clinical rationale or indication was given for increasing metformin to 2000 mg?",
+      "Was the patient's renal function assessed before escalating metformin dose?",
+      "Has the patient reported any gastrointestinal side effects since starting or escalating metformin?",
+      "Was the metformin 2000 mg prescription confirmed in a signed clinician note or prescription record?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "d49c61be-f65e-567c-9dff-0638c2ffaaaf",
+          "start": 0,
+          "end": 58,
+          "quote": "Conflicting dose facts for metformin: 2000mg versus 500mg."
+        },
+        "risk_reason": "Dose discrepancy between patient report (2000 mg) and clinician note (500 mg BID) creates risk of duplication, underdosing, or adverse effects.",
+        "suggested_action": "Clarify intended metformin dose and regimen; reconcile and document resolution in next note.",
+        "clinical_entities": [
+          "metformin"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

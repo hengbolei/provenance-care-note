@@ -1,0 +1,39 @@
+{
+  "fingerprint": "1e31ea7936ac075207d84672fe30c0465d4d17bf909234342d5dfc8f9ae4f099",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 1036,
+    "output_tokens": 236,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was warfarin first started, and at what dose?",
+        "query": "warfarin start dose"
+      },
+      {
+        "question": "What was the most recent INR value before the planned hold, and when was it measured?",
+        "query": "INR value"
+      },
+      {
+        "question": "Was the warfarin hold actually carried out, and if so, when was it resumed?",
+        "query": "warfarin resume"
+      },
+      {
+        "question": "Was the colonoscopy performed, and if so, on what date?",
+        "query": "colonoscopy done"
+      },
+      {
+        "question": "Are there any documented bleeding risks, contraindications, or other clinical factors that prompted the warfarin hold?",
+        "query": "bleeding risk contraindication"
+      },
+      {
+        "question": "Has the INR been rechecked the day before the colonoscopy as instructed?",
+        "query": "INR recheck colonoscopy"
+      }
+    ]
+  }
+}

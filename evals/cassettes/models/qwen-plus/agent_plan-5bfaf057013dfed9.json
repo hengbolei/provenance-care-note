@@ -5,7 +5,7 @@
   "model": "qwen-plus",
   "usage": {
     "input_tokens": 859,
-    "output_tokens": 249,
+    "output_tokens": 251,
     "cost_usd": null
   },
   "output": {
@@ -15,24 +15,24 @@
         "query": "amlodipine started"
       },
       {
-        "question": "What was the blood pressure reading that led to stopping amlodipine?",
+        "question": "What was the blood pressure reading that led to amlodipine being stopped?",
         "query": "blood pressure amlodipine stopped"
       },
       {
         "question": "Was the two-week blood pressure review completed, and what were the results?",
-        "query": "blood pressure review 2026-08-30"
+        "query": "blood pressure review two weeks"
       },
       {
-        "question": "Is there documentation of ankle swelling severity, onset timing, or assessment for alternative causes?",
-        "query": "ankle swelling onset cause"
+        "question": "What alternative antihypertensive was prescribed after stopping amlodipine?",
+        "query": "antihypertensive alternative amlodipine"
       },
       {
-        "question": "What antihypertensive, if any, replaced amlodipine after discontinuation?",
-        "query": "amlodipine replaced"
+        "question": "When was ankle swelling first documented, and was it attributed to amlodipine earlier?",
+        "query": "ankle swelling amlodipine"
       },
       {
-        "question": "Are there prior notes documenting tolerance or adverse effects of amlodipine before July 2026?",
-        "query": "amlodipine tolerance side effect"
+        "question": "Were there any prior notes about amlodipine dose adjustments or tolerability concerns before July 2026?",
+        "query": "amlodipine tolerability dose"
       }
     ]
   }

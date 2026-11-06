@@ -1,0 +1,82 @@
+{
+  "fingerprint": "58b168143ecc455dfad8f217e425977f2592db7f1c857ef83910c4e7ae1afe19",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2724,
+    "output_tokens": 713,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Metformin 500 mg was started with the evening meal on 2026-08-10 for newly diagnosed type 2 diabetes.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "48e355e5-a5e8-5650-b63b-3aa2d1da0107",
+            "start": 0,
+            "end": 79,
+            "quote": "Started metformin 500 mg with the evening meal for newly diagnosed type 2 diabetes."
+          }
+        ]
+      },
+      {
+        "text": "Patient reports mild stomach upset since starting the new tablet (metformin).",
+        "category": "symptom",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "bfc48721-2693-5a76-9636-01fbc9ffcb3f",
+            "start": 0,
+            "end": 52,
+            "quote": "I have had mild stomach upset since the new tablet."
+          }
+        ]
+      },
+      {
+        "text": "The record does not document any allergies or allergic reactions.",
+        "category": "allergy",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "48e355e5-a5e8-5650-b63b-3aa2d1da0107",
+            "start": 0,
+            "end": 79,
+            "quote": "Started metformin 500 mg with the evening meal for newly diagnosed type 2 diabetes."
+          },
+          {
+            "entry_id": "bfc48721-2693-5a76-9636-01fbc9ffcb3f",
+            "start": 0,
+            "end": 52,
+            "quote": "I have had mild stomach upset since the new tablet."
+          }
+        ]
+      },
+      {
+        "text": "No follow-up appointments, referrals, or diagnostic tests are documented as planned or outstanding.",
+        "category": "follow_up",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "48e355e5-a5e8-5650-b63b-3aa2d1da0107",
+            "start": 0,
+            "end": 79,
+            "quote": "Started metformin 500 mg with the evening meal for newly diagnosed type 2 diabetes."
+          },
+          {
+            "entry_id": "bfc48721-2693-5a76-9636-01fbc9ffcb3f",
+            "start": 0,
+            "end": 52,
+            "quote": "I have had mild stomach upset since the new tablet."
+          }
+        ]
+      }
+    ],
+    "open_questions": [],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

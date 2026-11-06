@@ -1,0 +1,56 @@
+{
+  "fingerprint": "fbcdd4a22068262c9c942c382ada010e29b2580fc36dd2dab79b5f477b886999",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2477,
+    "output_tokens": 471,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports feeling tired lately and not sleeping well.",
+        "category": "symptom",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "bcf545c0-d3f4-5b33-baa7-b7baa249c513",
+            "start": 0,
+            "end": 48,
+            "quote": "Feeling tired lately and not sleeping well."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Which medications were started, stopped, held or changed? No medication entries appear in the record.",
+      "Which allergies or reactions are recorded? No allergy entries appear in the record.",
+      "Which follow-ups, referrals or tests are planned or outstanding? No follow-up, referral or test entries appear in the record.",
+      "When was the patient's fatigue first recorded, and what was noted about its onset and course? Only one entry dates the fatigue; no earlier record of onset or course is present.",
+      "When was insomnia or poor sleep first documented, and what was the prior assessment? Only one entry documents poor sleep; no prior assessment is recorded.",
+      "What previous entries say about prior sleep problems and any treatment tried? No previous sleep-related entries or treatments are recorded.",
+      "Which medications or changes were recorded around the time fatigue and poor sleep appeared? No medication entries are present in the record.",
+      "Are there prior notes of anemia, thyroid or other conditions that could explain fatigue? No such conditions are documented in the record.",
+      "Were any tests or referrals for fatigue or sleep previously planned, and were they completed? No tests or referrals are recorded."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "bcf545c0-d3f4-5b33-baa7-b7baa249c513",
+          "start": 0,
+          "end": 48,
+          "quote": "Feeling tired lately and not sleeping well."
+        },
+        "risk_reason": "Patient-reported fatigue and poor sleep with no documented workup, medication or allergy history in the record.",
+        "suggested_action": "Review the fatigue and sleep complaint at the next contact and confirm whether any medication, allergy, test or referral history exists outside this record.",
+        "clinical_entities": [
+          "fatigue",
+          "poor sleep"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

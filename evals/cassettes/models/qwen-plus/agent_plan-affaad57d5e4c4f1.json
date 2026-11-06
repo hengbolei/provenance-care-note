@@ -5,10 +5,35 @@
   "model": "qwen-plus",
   "usage": {
     "input_tokens": 754,
-    "output_tokens": 5,
+    "output_tokens": 201,
     "cost_usd": null
   },
   "output": {
-    "questions": []
+    "questions": [
+      {
+        "question": "When was the fatigue and sleep disturbance first reported?",
+        "query": "tired sleeping well"
+      },
+      {
+        "question": "What medications were prescribed or adjusted around the time fatigue and sleep issues began?",
+        "query": "tired sleeping well medication"
+      },
+      {
+        "question": "Were any investigations ordered for fatigue or insomnia, such as CBC, thyroid function, or sleep study?",
+        "query": "tired sleeping well test"
+      },
+      {
+        "question": "Has the patient reported similar symptoms in the past, and if so, what was the assessment or management?",
+        "query": "tired sleeping well past"
+      },
+      {
+        "question": "Was a mental health screen (e.g., PHQ-9, GAD-7) performed given fatigue and sleep disturbance?",
+        "query": "tired sleeping well PHQ GAD"
+      },
+      {
+        "question": "Are there documented social, occupational, or lifestyle factors contributing to fatigue or poor sleep?",
+        "query": "tired sleeping well stress work lifestyle"
+      }
+    ]
   }
 }

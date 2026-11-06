@@ -1,0 +1,39 @@
+{
+  "fingerprint": "7f61cfeac03ffb0ece0f9f1d782aa2250ef7ecf12b8b17464bc473914747a383",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 3993,
+    "output_tokens": 184,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was furosemide first recorded, and what was the original indication and dose?",
+        "query": "furosemide dose indication"
+      },
+      {
+        "question": "Was furosemide previously held or stopped, and was it restarted?",
+        "query": "furosemide hold stop restart"
+      },
+      {
+        "question": "What creatinine and kidney function values were recorded before the recent rise?",
+        "query": "creatinine kidney function trend"
+      },
+      {
+        "question": "How long has dehydration or weight change been documented, and what were earlier weights?",
+        "query": "dehydration weight loss"
+      },
+      {
+        "question": "Was the prior plan to hold furosemide and repeat kidney function carried out?",
+        "query": "repeat kidney function furosemide hold"
+      },
+      {
+        "question": "Is there a documented furosemide-related conflict (hold versus take) in earlier entries?",
+        "query": "furosemide take hold conflict"
+      }
+    ]
+  }
+}

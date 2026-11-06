@@ -27,7 +27,7 @@ from carenote.retrieval.text import passages
 # Tag names the model inputs use; a forged one in record text is an injection attempt even after
 # its "<" has been neutralised.
 _TAGS = (
-    "entry|conflict|question|standing_question|clinician_instruction|previous_claim|citation|"
+    "entry|conflict_entry|conflict|question|standing_question|clinician_instruction|previous_claim|citation|"
     "failure|uncovered_conflict|system|instructions?"
 )
 PATTERNS: dict[str, re.Pattern[str]] = {

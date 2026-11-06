@@ -5,34 +5,34 @@
   "model": "deepseek-chat",
   "usage": {
     "input_tokens": 847,
-    "output_tokens": 205,
+    "output_tokens": 206,
     "cost_usd": null
   },
   "output": {
     "questions": [
       {
-        "question": "Was renal function (creatinine/eGFR) documented before apixaban was started, and what were the prior values?",
-        "query": "creatinine eGFR renal function"
+        "question": "What were the patient's earlier creatinine values and renal function, to judge whether 140 umol/L represents an acute rise?",
+        "query": "creatinine renal function eGFR"
       },
       {
-        "question": "For how long has apixaban been prescribed, and was the dose ever adjusted for age, weight or renal function?",
-        "query": "apixaban dose"
+        "question": "Is the apixaban dose of 5 mg twice daily appropriate given age, weight, renal function and any prior bleeding history?",
+        "query": "apixaban anticoagulant bleeding"
       },
       {
-        "question": "Is there a documented indication for apixaban (e.g. atrial fibrillation, VTE), and has bleeding risk been assessed?",
-        "query": "apixaban indication bleeding risk"
+        "question": "What has been recorded about this patient's weight and any recent weight change?",
+        "query": "weight kg"
       },
       {
-        "question": "Has the rising creatinine (140 umol/L) been reviewed, and were earlier creatinine values lower?",
-        "query": "creatinine trend"
+        "question": "Have other anticoagulants or antiplatelets been used previously, and why were they stopped or changed?",
+        "query": "warfarin antiplatelet aspirin clopidogrel"
       },
       {
-        "question": "Are there earlier entries recording falls, bleeding or anaemia that would affect anticoagulation safety?",
-        "query": "falls bleeding anaemia"
+        "question": "Is there a documented history of atrial fibrillation or other indication for apixaban?",
+        "query": "atrial fibrillation anticoagulation indication"
       },
       {
-        "question": "Were any other anticoagulants or interacting medications discontinued before apixaban started?",
-        "query": "warfarin anticoagulant stopped"
+        "question": "What follow-up or monitoring was arranged after starting apixaban, and has it been done?",
+        "query": "follow-up monitoring INR bloods"
       }
     ]
   }

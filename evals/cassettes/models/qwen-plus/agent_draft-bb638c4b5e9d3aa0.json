@@ -1,0 +1,72 @@
+{
+  "fingerprint": "bb638c4b5e9d3aa06e2ccc0e1c62f387cf7961d21ff6513c3c35035e9d51a871",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2553,
+    "output_tokens": 625,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Warfarin dose was changed to 4 mg each evening on or before 2026-08-10.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "87500383-9a47-5a94-af58-5a77fd348186",
+            "start": 0,
+            "end": 37,
+            "quote": "Warfarin dose changed to 4 mg each evening."
+          }
+        ]
+      },
+      {
+        "text": "INR was 3.4 measured last week relative to 2026-08-10.",
+        "category": "follow_up",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "87500383-9a47-5a94-af58-5a77fd348186",
+            "start": 38,
+            "end": 56,
+            "quote": "INR 3.4 last week."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was warfarin first started?",
+      "What was the INR value before the most recent one, and when was it measured?",
+      "Has there been any documented bleeding or bruising since warfarin initiation or dose change?",
+      "Was a fall risk assessment or mobility evaluation performed given anticoagulation?",
+      "Are there any documented drug interactions with warfarin (e.g., antibiotics, NSAIDs, amiodarone)?",
+      "Was patient education on warfarin provided, and when?",
+      "Which allergies or reactions are recorded?",
+      "Which follow-ups, referrals or tests are planned or outstanding?"
+    ],
+    "candidate_highlights": [],
+    "check_points": [
+      {
+        "text": "Check the INR within one week of any warfarin dose change.",
+        "reference": {
+          "document_id": "f9fef278-52c5-57a3-afe8-68ee9ced2bcc",
+          "version": 1,
+          "start": 0,
+          "end": 52,
+          "quote": "Check the INR within one week of any warfarin dose change."
+        },
+        "citations": [
+          {
+            "entry_id": "87500383-9a47-5a94-af58-5a77fd348186",
+            "start": 0,
+            "end": 37,
+            "quote": "Warfarin dose changed to 4 mg each evening."
+          }
+        ]
+      }
+    ]
+  }
+}

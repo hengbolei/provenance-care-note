@@ -5,7 +5,7 @@
   "model": "qwen-plus",
   "usage": {
     "input_tokens": 862,
-    "output_tokens": 251,
+    "output_tokens": 268,
     "cost_usd": null
   },
   "output": {
@@ -15,24 +15,24 @@
         "query": "metformin 500 mg"
       },
       {
-        "question": "What other medications were the patient taking before starting metformin, and were any adjusted or discontinued?",
-        "query": "medication change"
+        "question": "What other medications were the patient taking before starting metformin that might interact or contribute to stomach upset?",
+        "query": "medication stomach upset"
       },
       {
-        "question": "Has the patient reported stomach upset or gastrointestinal side effects with metformin previously, and how was it managed?",
+        "question": "Has the patient reported stomach upset or gastrointestinal side effects with metformin in prior encounters?",
         "query": "stomach upset metformin"
       },
       {
-        "question": "Was any baseline renal function testing performed before initiating metformin?",
-        "query": "eGFR creatinine metformin"
+        "question": "Was any plan made to adjust, reduce, or discontinue metformin due to stomach upset, or to trial extended-release formulation?",
+        "query": "metformin adjust stomach"
       },
       {
-        "question": "Was diabetes education or dietary counseling provided at the time of metformin initiation?",
-        "query": "diabetes education diet"
+        "question": "Were any diagnostic tests (e.g., renal function, HbA1c) ordered or performed around the time metformin was started?",
+        "query": "HbA1c renal metformin"
       },
       {
-        "question": "Are there documented instructions for managing mild GI side effects (e.g., dose titration, food timing) with this metformin start?",
-        "query": "metformin titration stomach"
+        "question": "Was type 2 diabetes diagnosis confirmed with supporting lab results or criteria before metformin initiation?",
+        "query": "type 2 diabetes diagnosis"
       }
     ]
   }

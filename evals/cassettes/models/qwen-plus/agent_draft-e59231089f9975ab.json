@@ -1,0 +1,98 @@
+{
+  "fingerprint": "e59231089f9975ab88478cc91ab2a675b4577512aee4513e17a08936f6affb52",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2800,
+    "output_tokens": 993,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports continuing warfarin 5 mg nightly as before.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "30d178a0-f3f0-54af-af4c-e85ff96b79c0",
+            "start": 23,
+            "end": 57,
+            "quote": "I am still taking warfarin 5 mg every night like before."
+          }
+        ]
+      },
+      {
+        "text": "Clinician ordered warfarin reduced to 2.5 mg nightly on 2026-08-14 after INR 3.8.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "8c71a5c0-4cf5-5451-b643-adf7280fe836",
+            "start": 0,
+            "end": 57,
+            "quote": "INR 3.8. Reduce warfarin 2.5 mg nightly and recheck INR on Friday."
+          }
+        ]
+      },
+      {
+        "text": "Conflict exists between documented warfarin doses: 5 mg (patient-reported) and 2.5 mg (clinician-ordered).",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "8c71a5c0-4cf5-5451-b643-adf7280fe836",
+            "start": 19,
+            "end": 39,
+            "quote": "Reduce warfarin 2.5 mg nightly"
+          },
+          {
+            "entry_id": "30d178a0-f3f0-54af-af4c-e85ff96b79c0",
+            "start": 23,
+            "end": 45,
+            "quote": "warfarin 5 mg every night"
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was warfarin first started, and at what dose?",
+      "When was the last INR test before 2026-08-14, and what was the result?",
+      "Was the warfarin dose change to 2.5 mg implemented after 2026-08-14?",
+      "What was the reason for initiating warfarin, and is there documentation of indication or risk assessment?",
+      "Has the Friday INR recheck (ordered on 2026-08-14) been performed or documented?",
+      "Are there any documented bleeding events, symptoms, or concerns related to anticoagulation since warfarin initiation?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "8c71a5c0-4cf5-5451-b643-adf7280fe836",
+          "start": 0,
+          "end": 57,
+          "quote": "INR 3.8. Reduce warfarin 2.5 mg nightly and recheck INR on Friday."
+        },
+        "risk_reason": "INR 3.8 exceeds therapeutic range for most indications (typically 2.0–3.0), increasing bleeding risk; dose reduction was ordered but adherence is unconfirmed.",
+        "suggested_action": "Confirm current warfarin dose taken and verify INR result from Friday recheck.",
+        "clinical_entities": [
+          "warfarin",
+          "INR"
+        ]
+      },
+      {
+        "citation": {
+          "entry_id": "30d178a0-f3f0-54af-af4c-e85ff96b79c0",
+          "start": 23,
+          "end": 57,
+          "quote": "I am still taking warfarin 5 mg every night like before."
+        },
+        "risk_reason": "Patient continues 5 mg warfarin despite clinician order to reduce to 2.5 mg, risking supratherapeutic anticoagulation.",
+        "suggested_action": "Clarify patient understanding of dose change and assess barriers to adherence.",
+        "clinical_entities": [
+          "warfarin"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

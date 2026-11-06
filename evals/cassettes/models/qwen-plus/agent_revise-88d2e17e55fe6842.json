@@ -1,0 +1,63 @@
+{
+  "fingerprint": "88d2e17e55fe6842d7d63ca77aa9f84c27fac86fc1a9ea9be91ad8533f352005",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2730,
+    "output_tokens": 516,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports continuing warfarin 5 mg nightly as before.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "30d178a0-f3f0-54af-af4c-e85ff96b79c0",
+            "start": 23,
+            "end": 57,
+            "quote": "I am still taking warfarin 5 mg every night like before."
+          }
+        ]
+      },
+      {
+        "text": "Clinician ordered warfarin reduced to 2.5 mg nightly on 2026-08-14 after INR 3.8.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "8c71a5c0-4cf5-5451-b643-adf7280fe836",
+            "start": 0,
+            "end": 57,
+            "quote": "INR 3.8. Reduce warfarin 2.5 mg nightly and recheck INR on Friday."
+          }
+        ]
+      },
+      {
+        "text": "Conflict exists between warfarin doses: 5 mg (patient-reported) and 2.5 mg (clinician-ordered).",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "8c71a5c0-4cf5-5451-b643-adf7280fe836",
+            "start": 19,
+            "end": 39,
+            "quote": "Reduce warfarin 2.5 mg nightly"
+          },
+          {
+            "entry_id": "30d178a0-f3f0-54af-af4c-e85ff96b79c0",
+            "start": 23,
+            "end": 45,
+            "quote": "warfarin 5 mg every night"
+          }
+        ]
+      }
+    ],
+    "open_questions": [],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

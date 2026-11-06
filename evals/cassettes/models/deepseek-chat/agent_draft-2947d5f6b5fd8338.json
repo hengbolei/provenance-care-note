@@ -1,0 +1,80 @@
+{
+  "fingerprint": "2947d5f6b5fd83383fe894af2960f810650ea5a4770313fd6f65502b634897c8",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2584,
+    "output_tokens": 534,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "An earlier clinician note records no known drug allergies.",
+        "category": "allergy",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "31a3b69d-9d48-512b-b44e-1762ebb44672",
+            "start": 0,
+            "end": 25,
+            "quote": "No known drug allergies."
+          }
+        ]
+      },
+      {
+        "text": "A later AI nurse consult summary states the patient developed a rash on day three of the course and is allergic to amoxicillin.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "76296e90-c93b-5a47-b7fd-9ea8358e1ab5",
+            "start": 0,
+            "end": 105,
+            "quote": "Patient developed a rash on day three of the course and is allergic to amoxicillin."
+          }
+        ]
+      },
+      {
+        "text": "The earlier clinician note records that blood pressure and weight were recorded, but gives no values.",
+        "category": "other",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "31a3b69d-9d48-512b-b44e-1762ebb44672",
+            "start": 26,
+            "end": 59,
+            "quote": "Blood pressure and weight recorded."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "The record contains conflicting allergy information: an earlier clinician note (2026-05-02) states no known drug allergies, while a later AI nurse consult summary (2026-08-21) reports amoxicillin allergy with a rash on day three of the course. Which is current?",
+      "When was the amoxicillin allergy or rash first recorded, and what was the reaction and timing relative to the course?",
+      "What was amoxicillin prescribed for, and what course dates and dose were recorded?",
+      "Was any alternative antibiotic or allergy management plan documented after the rash?",
+      "What were the actual weight, blood pressure and other vitals, and were they repeated?",
+      "Were any follow-up appointments, referrals or tests planned, and were they completed?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "76296e90-c93b-5a47-b7fd-9ea8358e1ab5",
+          "start": 95,
+          "end": 105,
+          "quote": "amoxicillin"
+        },
+        "risk_reason": "A later note reports amoxicillin allergy with a rash, which conflicts with an earlier note documenting no known drug allergies.",
+        "suggested_action": "Review the conflicting allergy entries and confirm the documented allergy status with the patient.",
+        "clinical_entities": [
+          "amoxicillin",
+          "allergy",
+          "rash"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

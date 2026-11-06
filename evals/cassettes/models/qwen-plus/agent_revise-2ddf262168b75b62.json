@@ -1,0 +1,59 @@
+{
+  "fingerprint": "2ddf262168b75b62e3d4cd7ee486a03e0ed4466f9658d7c6890ed8f84349cc5a",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2681,
+    "output_tokens": 421,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient has a confirmed latex allergy, with hives after glove contact reported.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "e22fc2f9-c648-5976-ae2b-e9bcff1dd157",
+            "start": 0,
+            "end": 48,
+            "quote": "Hives after glove contact; allergy to latex confirmed and flagged for theatre."
+          }
+        ]
+      },
+      {
+        "text": "Staff note states no latex allergy was reported at pre-assessment.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "a5c5fb78-0b62-5c25-8627-ed6fd50a4c4f",
+            "start": 0,
+            "end": 45,
+            "quote": "No allergy to latex reported at pre-assessment."
+          }
+        ]
+      },
+      {
+        "text": "Clinician note confirms allergy to latex and states it is flagged for theatre.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "e22fc2f9-c648-5976-ae2b-e9bcff1dd157",
+            "start": 0,
+            "end": 48,
+            "quote": "Hives after glove contact; allergy to latex confirmed and flagged for theatre."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Was the latex allergy formally tested or diagnosed after pre-assessment, and if so, when and how?"
+    ],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "fingerprint": "de947cf8c73ddb432a409a60e66d7a9e990c6db834e4c1297a73136292f41713",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2519,
+    "output_tokens": 590,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Warfarin dose was changed to 4 mg each evening.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "87500383-9a47-5a94-af58-5a77fd348186",
+            "start": 0,
+            "end": 36,
+            "quote": "Warfarin dose changed to 4 mg each evening."
+          }
+        ]
+      },
+      {
+        "text": "INR was 3.4 last week.",
+        "category": "other",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "87500383-9a47-5a94-af58-5a77fd348186",
+            "start": 38,
+            "end": 53,
+            "quote": "INR 3.4 last week."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was warfarin first started, and what was its initial dose and indication?",
+      "What were the recent INR values and dose adjustments before this change to 4 mg?",
+      "Was there any bleeding or adverse event associated with the raised INR?",
+      "What other medications could interact with warfarin or affect INR?",
+      "Are there earlier records of over-anticoagulation or prior INR monitoring plans?",
+      "When is the next INR check scheduled after this dose change?",
+      "Which allergies or reactions are recorded for this patient?",
+      "Which follow-ups, referrals or tests are planned or outstanding?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "87500383-9a47-5a94-af58-5a77fd348186",
+          "start": 38,
+          "end": 53,
+          "quote": "INR 3.4 last week."
+        },
+        "risk_reason": "INR of 3.4 alongside a warfarin dose change; no bleeding assessment or follow-up INR is documented.",
+        "suggested_action": "Clinician to review INR and confirm timing of follow-up INR test.",
+        "clinical_entities": [
+          "warfarin",
+          "INR 3.4"
+        ]
+      }
+    ],
+    "check_points": [
+      {
+        "text": "Confirm an INR has been checked within one week of the warfarin dose change to 4 mg each evening.",
+        "reference": {
+          "document_id": "f9fef278-52c5-57a3-afe8-68ee9ced2bcc",
+          "version": 1,
+          "start": 0,
+          "end": 57,
+          "quote": "Check the INR within one week of any warfarin dose change."
+        },
+        "citations": [
+          {
+            "entry_id": "87500383-9a47-5a94-af58-5a77fd348186",
+            "start": 0,
+            "end": 36,
+            "quote": "Warfarin dose changed to 4 mg each evening."
+          },
+          {
+            "entry_id": "87500383-9a47-5a94-af58-5a77fd348186",
+            "start": 38,
+            "end": 53,
+            "quote": "INR 3.4 last week."
+          }
+        ]
+      }
+    ]
+  }
+}
