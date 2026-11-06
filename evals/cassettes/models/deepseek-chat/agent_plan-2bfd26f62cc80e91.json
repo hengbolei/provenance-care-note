@@ -1,0 +1,35 @@
+{
+  "fingerprint": "2bfd26f62cc80e911090cb35da1e741da6eabcb256e4fe315997feb43f39f947",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 906,
+    "output_tokens": 147,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was the codeine allergy first recorded, and what reaction was documented at that time?",
+        "query": "codeine allergy reaction"
+      },
+      {
+        "question": "What did earlier entries record about the nature and severity of the reaction to codeine (e.g., nausea vs. true allergy)?",
+        "query": "codeine nausea reaction"
+      },
+      {
+        "question": "Has codeine ever been administered or prescribed, and was it tolerated?",
+        "query": "codeine administered prescribed tolerated"
+      },
+      {
+        "question": "Are there other documented allergies or medication intolerances besides codeine?",
+        "query": "allergy intolerance medication"
+      },
+      {
+        "question": "Have any medications been started, stopped, held or changed recently?",
+        "query": "medication start stop hold change"
+      }
+    ]
+  }
+}

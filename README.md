@@ -72,8 +72,22 @@ flowchart LR
 - The **pipeline** suite needs no model and gates CI. It covers conflict recall, redaction and
   payload leaks, verifier accuracy, retrieval recall, key entries reaching the model, injection
   detection and framing, reference retrieval (current versions only) and check-point verdicts.
-- The **agent** suite scores real model drafts from cassettes and reports "not recorded" instead
-  of inventing scores. Current results and known gaps are in the
+- The **agent** suite scores real model drafts replayed from cassettes, one directory per model,
+  so CI reproduces the numbers with no API key. Two models are recorded so far (38 of 39 cases
+  each; each model returned one draft that did not match the schema):
+
+  | Metric | Gate | DeepSeek (`deepseek-chat`) | Qwen (`qwen-plus`) |
+  | --- | --- | ---: | ---: |
+  | Citation validity | ≥ 95% | **100%** | 92.6% |
+  | Unsupported-claim rate | ≤ 5% | **3.5%** | 10.7% |
+  | Unsupported-claim rate before automatic revision | — | 14.1% | 22.6% |
+  | Critical-finding recall | ≥ 90% | **96.6%** | 82.1% |
+  | Conflict coverage | 100% | 100% | 100% |
+  | Injection cases that obeyed the injection | 0 | 0 | 0 |
+
+  Verify-and-revise cuts unsupported claims by about three quarters for DeepSeek and half for
+  Qwen, but it cannot supply what the model gets wrong: 7 of Qwen's 9 failed claims cite a
+  record entry that does not exist. Missed checks, per-family results and known gaps are in the
   [evaluation report](evals/REPORT.md), which CI regenerates and checks.
 
 **Care record**
@@ -141,7 +155,8 @@ PostgreSQL. The demo accounts are `patient`, `staff`, `clinician` and `admin`, w
 
 `CARENOTE_AGENT_FALLBACK` names a second provider to try when the first one fails. Models,
 fallback rules and recording are covered in [Development](docs/DEVELOPMENT.md#clinical-review-agent).
-Run `python evals/run_evals.py --record` to record live drafts and score the agent suite.
+Run `python evals/run_evals.py --record <label>` (for example `--record deepseek-v3`) to record one
+model's drafts into `evals/cassettes/models/<label>/`; the report then compares every recorded model.
 
 ## Verification
 
@@ -179,9 +194,10 @@ docs/              Design, roadmap, architecture and operations
 
 ## Status and limitations
 
-- **No live model has been evaluated yet.** The OpenAI, Anthropic and compatible adapters are
-  tested with mocked HTTP only, so model metrics such as critical-finding recall and injection
-  resistance appear once live cassettes are recorded.
+- **Small evaluation.** Two models have been evaluated on 39 synthetic cases through the
+  OpenAI-compatible adapter; the OpenAI and Anthropic adapters are still tested with mocked HTTP
+  only. The cases are synthetic and written by the author, so the results show how the pipeline
+  behaves, not clinical accuracy.
 - **Scale.** Each clinic's data is one encrypted snapshot loaded into memory, which suits a small
   deployment. Per-row storage is a planned separate refactor.
 - **Known gaps** are listed in the [evaluation report](evals/REPORT.md) instead of being worded

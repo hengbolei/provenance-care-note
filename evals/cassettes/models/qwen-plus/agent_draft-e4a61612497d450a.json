@@ -1,0 +1,92 @@
+{
+  "fingerprint": "e4a61612497d450ab3c601e8c1e389ac4eb77f04858a8d8931ef3d7a4b2a6a93",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2510,
+    "output_tokens": 863,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Glucophage 850 mg twice daily is currently prescribed and continuing.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "f2b703b7-d3e3-53d3-abee-5d903b6a619d",
+            "start": 0,
+            "end": 36,
+            "quote": "Glucophage 850 mg twice daily continues; HbA1c improving."
+          }
+        ]
+      },
+      {
+        "text": "The pharmacy list shows metformin 500 mg twice daily.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "a2dbd20d-3025-5770-9932-a42fc69eb4cf",
+            "start": 0,
+            "end": 42,
+            "quote": "Pharmacy list shows metformin 500 mg twice daily."
+          }
+        ]
+      },
+      {
+        "text": "HbA1c is improving, per clinician note.",
+        "category": "follow_up",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "f2b703b7-d3e3-53d3-abee-5d903b6a619d",
+            "start": 37,
+            "end": 61,
+            "quote": "Glucophage 850 mg twice daily continues; HbA1c improving."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was metformin first started, and at what dose?",
+      "When was the dose changed from 500 mg twice daily to 850 mg twice daily?",
+      "What was the most recent HbA1c value and when was it measured?",
+      "Is there documentation of patient education or adherence discussion regarding metformin?",
+      "Are there any documented gastrointestinal side effects or other adverse reactions to metformin?",
+      "Was the pharmacy list reconciled with the current prescribing plan, and when?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "f2b703b7-d3e3-53d3-abee-5d903b6a619d",
+          "start": 0,
+          "end": 36,
+          "quote": "Glucophage 850 mg twice daily continues; HbA1c improving."
+        },
+        "risk_reason": "Dose discrepancy between current prescription (850 mg BID) and pharmacy list (500 mg BID) suggests possible reconciliation gap or dosing error.",
+        "suggested_action": "Reconcile current metformin prescription with pharmacy list and confirm correct dose and timing with patient and pharmacy.",
+        "clinical_entities": [
+          "metformin",
+          "Glucophage"
+        ]
+      },
+      {
+        "citation": {
+          "entry_id": "a2dbd20d-3025-5770-9932-a42fc69eb4cf",
+          "start": 0,
+          "end": 42,
+          "quote": "Pharmacy list shows metformin 500 mg twice daily."
+        },
+        "risk_reason": "Pharmacy list contradicts clinician's documented current dose, raising risk of medication administration error or non-adherence.",
+        "suggested_action": "Verify whether metformin 500 mg BID or 850 mg BID is active, document reconciliation, and update all systems accordingly.",
+        "clinical_entities": [
+          "metformin"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

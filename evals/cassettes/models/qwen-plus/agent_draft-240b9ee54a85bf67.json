@@ -1,0 +1,154 @@
+{
+  "fingerprint": "240b9ee54a85bf67f6545fe63ae610a25105742bbb24fcd55b7c63d1be048f7e",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2790,
+    "output_tokens": 1737,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Apixaban 5 mg twice daily was started on 2026-08-01.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "458cc1de-e388-5852-8772-96a5cbcd7fde",
+            "start": 0,
+            "end": 34,
+            "quote": "Started apixaban 5 mg twice daily."
+          }
+        ]
+      },
+      {
+        "text": "Patient is 84 years old and weighs 58 kg, per clinician note dated 2026-08-01.",
+        "category": "other",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "458cc1de-e388-5852-8772-96a5cbcd7fde",
+            "start": 35,
+            "end": 65,
+            "quote": "Age 84; weight 58 kg."
+          }
+        ]
+      },
+      {
+        "text": "Creatinine was 140 umol/L on 2026-08-20.",
+        "category": "other",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "2029d558-21c1-5cbb-9957-deeb8159949a",
+            "start": 0,
+            "end": 34,
+            "quote": "Creatinine 140 umol/L on today's sample."
+          }
+        ]
+      },
+      {
+        "text": "The apixaban dose of 5 mg twice daily does not meet the label-specified reduction criteria: two of age ≥80, weight ≤60 kg, and creatinine ≥133 umol/L are present (age 84, weight 58 kg, creatinine 140 umol/L).",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "458cc1de-e388-5852-8772-96a5cbcd7fde",
+            "start": 0,
+            "end": 34,
+            "quote": "Started apixaban 5 mg twice daily."
+          },
+          {
+            "entry_id": "458cc1de-e388-5852-8772-96a5cbcd7fde",
+            "start": 35,
+            "end": 65,
+            "quote": "Age 84; weight 58 kg."
+          },
+          {
+            "entry_id": "2029d558-21c1-5cbb-9957-deeb8159949a",
+            "start": 0,
+            "end": 34,
+            "quote": "Creatinine 140 umol/L on today's sample."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "What was the creatinine level before today's result of 140 umol/L, and when was it last measured?",
+      "Was renal function assessed prior to initiating apixaban, and what was the estimated CrCl or eGFR at that time?",
+      "Has apixaban been held, reduced, or discontinued in response to elevated creatinine or other concerns?",
+      "Are there any documented bleeding risks, falls history, or other contraindications relevant to apixaban use in this 84-year-old patient?",
+      "What follow-up actions were planned after the creatinine result — e.g., repeat test, nephrology referral, dose review?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "458cc1de-e388-5852-8772-96a5cbcd7fde",
+          "start": 0,
+          "end": 34,
+          "quote": "Started apixaban 5 mg twice daily."
+        },
+        "risk_reason": "Apixaban dose remains 5 mg BID despite meeting two of three criteria (age ≥80, weight ≤60 kg, creatinine ≥133 umol/L) requiring reduction to 2.5 mg BID per drug label.",
+        "suggested_action": "Review and reduce apixaban to 2.5 mg twice daily unless contraindicated.",
+        "clinical_entities": [
+          "apixaban",
+          "creatinine",
+          "age",
+          "weight"
+        ]
+      }
+    ],
+    "check_points": [
+      {
+        "text": "Check whether apixaban dose was reduced to 2.5 mg twice daily given that two of the following apply: age 80 or over, weight 60 kg or less, creatinine 133 umol/L or more.",
+        "reference": {
+          "document_id": "6b5338ea-9d16-5086-b73f-b42d98951cb6",
+          "version": 2,
+          "start": 51,
+          "end": 159,
+          "quote": "Reduce the dose to 2.5 mg twice daily when two of the following apply: age 80 or over, weight 60 kg or less, creatinine 133 umol/L or more."
+        },
+        "citations": [
+          {
+            "entry_id": "458cc1de-e388-5852-8772-96a5cbcd7fde",
+            "start": 0,
+            "end": 34,
+            "quote": "Started apixaban 5 mg twice daily."
+          },
+          {
+            "entry_id": "458cc1de-e388-5852-8772-96a5cbcd7fde",
+            "start": 35,
+            "end": 65,
+            "quote": "Age 84; weight 58 kg."
+          },
+          {
+            "entry_id": "2029d558-21c1-5cbb-9957-deeb8159949a",
+            "start": 0,
+            "end": 34,
+            "quote": "Creatinine 140 umol/L on today's sample."
+          }
+        ]
+      },
+      {
+        "text": "Confirm whether renal function was assessed prior to initiating apixaban, as recommended before starting therapy.",
+        "reference": {
+          "document_id": "6b5338ea-9d16-5086-b73f-b42d98951cb6",
+          "version": 2,
+          "start": 0,
+          "end": 191,
+          "quote": "Apixaban tablets (synthetic label for evaluation).\n\nReduce the dose to 2.5 mg twice daily when two of the following apply: age 80 or over, weight 60 kg or less, creatinine 133 umol/L or more.\n\nCheck renal function at least once a year."
+        },
+        "citations": [
+          {
+            "entry_id": "458cc1de-e388-5852-8772-96a5cbcd7fde",
+            "start": 0,
+            "end": 34,
+            "quote": "Started apixaban 5 mg twice daily."
+          }
+        ]
+      }
+    ]
+  }
+}

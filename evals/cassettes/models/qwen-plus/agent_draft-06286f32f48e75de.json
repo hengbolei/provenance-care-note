@@ -1,0 +1,78 @@
+{
+  "fingerprint": "06286f32f48e75de5d19cf606526d99f9dd550e383ae2761e63fd3ef8391955b",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2590,
+    "output_tokens": 672,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient is reported as allergic to sulfa drugs according to the pharmacy record.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "fe840fcb-2756-552a-9d81-54dc746b5712",
+            "start": 0,
+            "end": 43,
+            "quote": "Allergic to sulfa drugs according to the pharmacy record."
+          }
+        ]
+      },
+      {
+        "text": "Clinician states patient is not allergic to sulfa, and that a prior reaction was nausea only.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "1f6fe614-4b7c-59f2-9a22-d69b005be3f0",
+            "start": 0,
+            "end": 54,
+            "quote": "Not allergic to sulfa; the previous reaction was nausea only."
+          }
+        ]
+      },
+      {
+        "text": "There is a documented conflict regarding sulfa allergy: absent versus present.",
+        "category": "allergy",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "b73e1e7b-5a31-535f-bd95-b1a5b310d3bc",
+            "start": 0,
+            "end": 68,
+            "quote": "Conflicting allergy facts for sulfa: absent versus present."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was the sulfa allergy first recorded, and what reaction was described?",
+      "When was the clinician's note stating no sulfa allergy made, and what evidence supports it?",
+      "What does the pharmacy record say about the sulfa allergy, and when was it entered?",
+      "Has the sulfa allergy conflict been resolved in any later entry, and if so, how?",
+      "Were any sulfa-containing medications prescribed, dispensed, or avoided, and when?",
+      "What other allergy-related entries exist for this patient, especially regarding drug reactions?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "b73e1e7b-5a31-535f-bd95-b1a5b310d3bc",
+          "start": 0,
+          "end": 68,
+          "quote": "Conflicting allergy facts for sulfa: absent versus present."
+        },
+        "risk_reason": "Direct conflict between pharmacy record and clinician assessment creates risk of inappropriate sulfa exposure or unnecessary avoidance.",
+        "suggested_action": "Resolve discrepancy by reviewing original allergy documentation, clarifying reaction details, and updating single authoritative source.",
+        "clinical_entities": [
+          "sulfa"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

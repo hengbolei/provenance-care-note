@@ -1,0 +1,21 @@
+{
+  "fingerprint": "532def718b56149d01641ac8518024bff0aa5f59586f881e028c9c209dbd396f",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2275,
+    "output_tokens": 64,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [],
+    "open_questions": [
+      "Which medications were started, stopped, held or changed?",
+      "Which allergies or reactions are recorded?",
+      "Which follow-ups, referrals or tests are planned or outstanding?"
+    ],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

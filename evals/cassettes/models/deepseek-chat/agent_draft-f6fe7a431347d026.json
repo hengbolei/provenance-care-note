@@ -1,0 +1,66 @@
+{
+  "fingerprint": "f6fe7a431347d0268692d258324a7822f02e2566b7385cff6c12d5ff98e6e575",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2466,
+    "output_tokens": 496,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Clinician note records Glucophage 850 mg twice daily continues and that HbA1c is improving.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "f2b703b7-d3e3-53d3-abee-5d903b6a619d",
+            "start": 0,
+            "end": 47,
+            "quote": "Glucophage 850 mg twice daily continues"
+          }
+        ]
+      },
+      {
+        "text": "Staff note records that the pharmacy list shows metformin 500 mg twice daily.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "a2dbd20d-3025-5770-9932-a42fc69eb4cf",
+            "start": 0,
+            "end": 51,
+            "quote": "Pharmacy list shows metformin 500 mg twice daily."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "The record contains conflicting names and doses for the same medication — Glucophage 850 mg twice daily in the clinician note versus metformin 500 mg twice daily on the pharmacy list; which is the current regimen?",
+      "When was metformin first recorded and at what dose, and was it ever changed to or from Glucophage 850 mg twice daily? Earlier entries documenting this are not present.",
+      "What earlier entries document the HbA1c trend and prior values? No prior HbA1c values are available in the record.",
+      "Was the pharmacy list metformin 500 mg discrepancy previously noted or reconciled? No earlier record addresses this.",
+      "Are any allergies or reactions recorded in earlier entries? No allergy information appears in the record.",
+      "Are there earlier entries documenting renal function or other monitoring relevant to metformin? None are available in the record."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "a2dbd20d-3025-5770-9932-a42fc69eb4cf",
+          "start": 0,
+          "end": 51,
+          "quote": "Pharmacy list shows metformin 500 mg twice daily."
+        },
+        "risk_reason": "The pharmacy list name and dose (metformin 500 mg twice daily) differ from the clinician note (Glucophage 850 mg twice daily), indicating a possible medication reconciliation discrepancy.",
+        "suggested_action": "Clinician to reconcile the pharmacy list against the clinician note and confirm the current regimen.",
+        "clinical_entities": [
+          "metformin",
+          "Glucophage"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

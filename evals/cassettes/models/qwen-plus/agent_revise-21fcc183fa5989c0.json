@@ -1,0 +1,69 @@
+{
+  "fingerprint": "21fcc183fa5989c0f59889bcf5cc84f86862a65449bfb333e579ab054eceb965",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 6359,
+    "output_tokens": 621,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Apixaban was started on 2026-06-01 at a dose of 5 mg twice daily for new atrial fibrillation.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "c4b4cd3b-b499-5398-96b0-e52f5e24f111",
+            "start": 28,
+            "end": 67,
+            "quote": "New atrial fibrillation. Started apixaban 5 mg twice daily."
+          }
+        ]
+      },
+      {
+        "text": "The pharmacy label states apixaban 2.5 mg twice daily, conflicting with the clinician's initial order of 5 mg twice daily.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "1000bb7a-b576-5ce8-8763-51fb4dcd136a",
+            "start": 0,
+            "end": 54,
+            "quote": "The pharmacy label reads apixaban 2.5 mg twice daily; prescriber to confirm."
+          },
+          {
+            "entry_id": "c4b4cd3b-b499-5398-96b0-e52f5e24f111",
+            "start": 28,
+            "end": 67,
+            "quote": "New atrial fibrillation. Started apixaban 5 mg twice daily."
+          }
+        ]
+      },
+      {
+        "text": "A dose conflict exists for apixaban: 2.5 mg versus 5 mg.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "1000bb7a-b576-5ce8-8763-51fb4dcd136a",
+            "start": 0,
+            "end": 54,
+            "quote": "The pharmacy label reads apixaban 2.5 mg twice daily; prescriber to confirm."
+          },
+          {
+            "entry_id": "c4b4cd3b-b499-5398-96b0-e52f5e24f111",
+            "start": 28,
+            "end": 67,
+            "quote": "New atrial fibrillation. Started apixaban 5 mg twice daily."
+          }
+        ]
+      }
+    ],
+    "open_questions": [],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

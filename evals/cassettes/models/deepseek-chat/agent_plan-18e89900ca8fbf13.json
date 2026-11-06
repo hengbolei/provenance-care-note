@@ -1,0 +1,31 @@
+{
+  "fingerprint": "18e89900ca8fbf131c1603aaf890b057d695a5d5a2e837436b2a67638e7304ca",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 918,
+    "output_tokens": 119,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was the sulfa allergy first recorded, and what reaction was documented at that time?",
+        "query": "sulfa allergy reaction nausea"
+      },
+      {
+        "question": "What allergy history existed before the pharmacy record noted a sulfa allergy?",
+        "query": "sulfa allergy history pharmacy"
+      },
+      {
+        "question": "Was the sulfa allergy ever removed or corrected in earlier entries?",
+        "query": "sulfa allergy removed corrected"
+      },
+      {
+        "question": "What medications were started, stopped, or changed around the time of the sulfa documentation?",
+        "query": "medication started stopped changed"
+      }
+    ]
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "fingerprint": "b53fc83c2d8d460c7e782f1a65350dd8dcab8db845dd4934591ab6344f7c7f77",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2493,
+    "output_tokens": 596,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "The patient is recorded as allergic to amoxicillin.",
+        "category": "allergy",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "76296e90-c93b-5a47-b7fd-9ea8358e1ab5",
+            "start": 83,
+            "end": 107,
+            "quote": "allergic to amoxicillin"
+          }
+        ]
+      },
+      {
+        "text": "A rash developed on day three of a course of treatment.",
+        "category": "symptom",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "76296e90-c93b-5a47-b7fd-9ea8358e1ab5",
+            "start": 24,
+            "end": 65,
+            "quote": "developed a rash on day three of the course"
+          }
+        ]
+      },
+      {
+        "text": "A clinician note from 2026-05-02 states no known drug allergies.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "31a3b69d-9d48-512b-b44e-1762ebb44672",
+            "start": 0,
+            "end": 25,
+            "quote": "No known drug allergies."
+          }
+        ]
+      },
+      {
+        "text": "Blood pressure and weight were recorded, but no values are given in the note.",
+        "category": "other",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "31a3b69d-9d48-512b-b44e-1762ebb44672",
+            "start": 26,
+            "end": 63,
+            "quote": "Blood pressure and weight recorded."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Which medication course the rash on day three was attributed to, and whether it was stopped or completed, is not stated.",
+      "When the amoxicillin allergy was first recorded and the exact reaction documented beyond 'rash' is not stated.",
+      "When the rash first appeared in absolute dates and how it was treated or resolved is not documented.",
+      "Whether the earlier 'No known drug allergies' note was ever updated, and by whom, is not documented.",
+      "No antihistamines, steroids or other medications for the rash are recorded.",
+      "No follow-ups, referrals or tests are recorded as planned or outstanding.",
+      "The actual blood pressure and weight values, and any earlier measurements, are not in the record.",
+      "The record contains no medication start, stop, hold or change list to answer the medication-change question."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "76296e90-c93b-5a47-b7fd-9ea8358e1ab5",
+          "start": 83,
+          "end": 107,
+          "quote": "allergic to amoxicillin"
+        },
+        "risk_reason": "Amoxicillin allergy recorded, but an earlier clinician note states no known drug allergies.",
+        "suggested_action": "Review and reconcile the allergy list, confirming the amoxicillin reaction documentation.",
+        "clinical_entities": [
+          "amoxicillin",
+          "rash"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

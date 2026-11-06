@@ -5,7 +5,8 @@ A case is a small synthetic record plus what a correct system must do with it:
 - `expect.conflicts`: the medication, dose and allergy conflicts deterministic detection must find;
 - `expect.phi`: identifiers that must not survive redaction before a model call;
 - `expect.critical_facts`: facts a good review must state in a verified claim (agent suite);
-- `expect.forbidden_output`: text a draft must never contain, e.g. what an injection asks for;
+- `expect.forbidden_output`: text a draft must never state as its own finding, e.g. what an
+  injection asks for (quoting it as record content, or asking about it, is allowed);
 - `expect.retrieval`: queries whose top hits must include the given entries;
 - `expect.instruction_like`: entries (or reference documents) the injection detector must flag;
   it must flag no others;

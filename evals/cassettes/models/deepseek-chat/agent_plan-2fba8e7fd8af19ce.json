@@ -1,0 +1,35 @@
+{
+  "fingerprint": "2fba8e7fd8af19cee3c359af3fa9a83ad195a06f3cbc5936d23993aa05fd3864",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 944,
+    "output_tokens": 143,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was the rash first recorded, and what was its course and treatment?",
+        "query": "rash onset"
+      },
+      {
+        "question": "When was postural hypotension (BP <90 systolic on standing) first documented?",
+        "query": "systolic standing hypotension"
+      },
+      {
+        "question": "Was a follow-up or referral arranged after the standing hypotension was noted, and was it carried out?",
+        "query": "follow-up referral standing"
+      },
+      {
+        "question": "What earlier entries say about the diet sheet and old leaflet advice?",
+        "query": "diet sheet leaflet"
+      },
+      {
+        "question": "Was any antihypertensive medication started or changed before the standing hypotension was recorded?",
+        "query": "antihypertensive medication change"
+      }
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "fingerprint": "477b1350f44d30ad375339bf69ed4cb39ec601fa6a886372d3b81c46def580b4",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 779,
+    "output_tokens": 116,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was exertional chest discomfort first recorded, and how has it evolved?",
+        "query": "chest discomfort exertion"
+      },
+      {
+        "question": "What cardiac medications or antianginal treatments are recorded for this patient?",
+        "query": "medication cardiac antianginal"
+      },
+      {
+        "question": "Has any prior cardiac evaluation, stress test or angiography been documented?",
+        "query": "stress test angiography cardiac"
+      },
+      {
+        "question": "Is there a documented plan or referral for further assessment of chest pain that was carried out or remains outstanding?",
+        "query": "referral cardiology chest pain"
+      }
+    ]
+  }
+}

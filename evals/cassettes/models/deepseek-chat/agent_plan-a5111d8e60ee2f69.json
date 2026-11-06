@@ -1,0 +1,35 @@
+{
+  "fingerprint": "a5111d8e60ee2f69738bf62f261b78d3c7ab9f127bfc8a3652ef57274c70b5bd",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 870,
+    "output_tokens": 138,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was the penicillin allergy first recorded, and what reactions have been documented since?",
+        "query": "penicillin allergy rash"
+      },
+      {
+        "question": "Have any antibiotics been prescribed or tolerated since the 2019 penicillin reaction?",
+        "query": "antibiotic prescription cephalosporin"
+      },
+      {
+        "question": "Are there earlier entries describing other allergies or adverse drug reactions?",
+        "query": "allergy adverse reaction"
+      },
+      {
+        "question": "Which medications were started, stopped, or changed in earlier entries?",
+        "query": "medication started stopped changed"
+      },
+      {
+        "question": "What follow-ups, referrals, or tests were planned earlier, and were they completed?",
+        "query": "referral follow-up test planned"
+      }
+    ]
+  }
+}

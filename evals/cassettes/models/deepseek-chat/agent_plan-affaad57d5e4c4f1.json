@@ -1,0 +1,39 @@
+{
+  "fingerprint": "affaad57d5e4c4f17c3dad7286b6cdd39ae84d0068b7d77227a7b0f0030df238",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 763,
+    "output_tokens": 181,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was the patient's fatigue and poor sleep first recorded, and has it been documented before?",
+        "query": "fatigue sleep insomnia tired"
+      },
+      {
+        "question": "What recent or past entries mention sleep problems, and were any treatments tried?",
+        "query": "sleep insomnia sleep hygiene"
+      },
+      {
+        "question": "Were any tests or assessments done for fatigue, such as thyroid function, anemia or sleep studies?",
+        "query": "thyroid anemia fatigue blood test"
+      },
+      {
+        "question": "Which medications or substances could explain fatigue or poor sleep, and when were they started or changed?",
+        "query": "medication fatigue medication change"
+      },
+      {
+        "question": "Are there prior entries about mood, depression or anxiety that may relate to fatigue and sleep?",
+        "query": "mood depression anxiety"
+      },
+      {
+        "question": "Was any follow-up or referral planned for the sleep or fatigue complaints?",
+        "query": "referral sleep clinic follow-up"
+      }
+    ]
+  }
+}

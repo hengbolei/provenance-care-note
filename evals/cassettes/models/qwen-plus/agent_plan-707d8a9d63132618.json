@@ -1,0 +1,39 @@
+{
+  "fingerprint": "707d8a9d63132618f11868933a9e0e7373df7788afeefce2d9c4a0e949a9ce40",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 955,
+    "output_tokens": 287,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was levothyroxine first started, and at what dose?",
+        "query": "levothyroxine start dose"
+      },
+      {
+        "question": "What was the TSH level that prompted the dose increase to 75 mcg?",
+        "query": "TSH level"
+      },
+      {
+        "question": "Was the levothyroxine dose increased from 50 mcg to 75 mcg carried out as instructed on 2026-08-05?",
+        "query": "levothyroxine 75 mcg started"
+      },
+      {
+        "question": "Are there any recorded thyroid function test results between 2026-07-01 and 2026-08-05?",
+        "query": "TSH T4 thyroid test"
+      },
+      {
+        "question": "Has the patient reported any symptoms of hypothyroidism or adverse effects since the dose change?",
+        "query": "hypothyroidism symptom side effect"
+      },
+      {
+        "question": "Was there a prior dose adjustment or clinical review of levothyroxine before July 2026?",
+        "query": "levothyroxine dose change review"
+      }
+    ]
+  }
+}

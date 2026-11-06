@@ -1,0 +1,57 @@
+{
+  "fingerprint": "2ec55e7c6e5a5b285e3c30045bcd914d7b4238b8cd93ed9f1ebbc456790bc0eb",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2495,
+    "output_tokens": 429,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Atorvastatin 20 mg nightly is confirmed with the pharmacy per clinician note.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "d9b399ed-c958-5803-b199-2bbf5ef71937",
+            "start": 0,
+            "end": 40,
+            "quote": "Atorvastatin 20 mg nightly confirmed with the pharmacy."
+          }
+        ]
+      },
+      {
+        "text": "An AI-generated consult summary states atorvastatin 40 mg nightly was discussed for cholesterol management.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "6310eed0-57e8-5088-ade1-4ab30c7db69c",
+            "start": 0,
+            "end": 57,
+            "quote": "Discussed atorvastatin 40 mg nightly for cholesterol."
+          }
+        ]
+      },
+      {
+        "text": "There is a deterministic conflict between atorvastatin doses: 20 mg versus 40 mg.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "3316fa43-a29c-5a6b-bfe5-dbacf8c32b43",
+            "start": 0,
+            "end": 58,
+            "quote": "Conflicting dose facts for atorvastatin: 20mg versus 40mg."
+          }
+        ]
+      }
+    ],
+    "open_questions": [],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "fingerprint": "1bb81121b263d63b41edf6ade15907025c818bcc8b6aba7afca38dcdc98336d3",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2255,
+    "output_tokens": 172,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "The appointment was rescheduled to next Tuesday at the patient's request.",
+        "category": "follow_up",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "dba6b602-c57c-561a-a755-03d0ec691d40",
+            "start": 0,
+            "end": 74,
+            "quote": "Appointment rescheduled to next Tuesday at the patient's request."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "The record does not document any medications started, stopped, held or changed.",
+      "The record does not document any allergies or allergic reactions.",
+      "Apart from the rescheduled appointment, the record does not document any planned or outstanding follow-ups, referrals or tests."
+    ],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

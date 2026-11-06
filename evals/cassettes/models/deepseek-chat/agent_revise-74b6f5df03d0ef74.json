@@ -1,0 +1,79 @@
+{
+  "fingerprint": "74b6f5df03d0ef7442a6cc8c772f5d93a274df5e8047bbf660a96fe42ca6ade3",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2474,
+    "output_tokens": 606,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "The patient states they are not allergic to codeine and that they just felt sick once.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "f7c8bcd4-b828-5bcf-a73c-d6fa383670ea",
+            "start": 0,
+            "end": 52,
+            "quote": "I am not allergic to codeine, I just felt sick once."
+          }
+        ]
+      },
+      {
+        "text": "A staff note records that the patient is allergic to codeine per the pharmacy record.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "16749069-ad3c-5cef-b03b-7132d28750d6",
+            "start": 0,
+            "end": 48,
+            "quote": "Allergic to codeine per the pharmacy record."
+          }
+        ]
+      },
+      {
+        "text": "The record contains conflicting allergy facts for codeine: the patient reports not being allergic, while a staff note documents allergy to codeine per the pharmacy record.",
+        "category": "allergy",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "f7c8bcd4-b828-5bcf-a73c-d6fa383670ea",
+            "start": 0,
+            "end": 52,
+            "quote": "I am not allergic to codeine, I just felt sick once."
+          },
+          {
+            "entry_id": "16749069-ad3c-5cef-b03b-7132d28750d6",
+            "start": 0,
+            "end": 48,
+            "quote": "Allergic to codeine per the pharmacy record."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Which codeine allergy status is correct: the patient's report of no allergy, or the pharmacy record cited by staff?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "16749069-ad3c-5cef-b03b-7132d28750d6",
+          "start": 0,
+          "end": 48,
+          "quote": "Allergic to codeine per the pharmacy record."
+        },
+        "risk_reason": "Staff note documents a codeine allergy that conflicts with the patient's own report.",
+        "suggested_action": "Verify the allergy status against the pharmacy record before prescribing.",
+        "clinical_entities": [
+          "codeine"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

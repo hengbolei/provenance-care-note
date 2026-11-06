@@ -1,0 +1,35 @@
+{
+  "fingerprint": "507e0abcd487847507ad35c1290e58856fed73e0576cd2e970682e77ced24fc8",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 849,
+    "output_tokens": 145,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was metformin first recorded and at what dose, and was it ever changed to or from Glucophage 850 mg twice daily?",
+        "query": "metformin Glucophage dose"
+      },
+      {
+        "question": "What earlier entries document the HbA1c trend and prior values?",
+        "query": "HbA1c"
+      },
+      {
+        "question": "Was the pharmacy list metformin 500 mg discrepancy previously noted or reconciled?",
+        "query": "pharmacy list metformin discrepancy"
+      },
+      {
+        "question": "Are any allergies or reactions recorded in earlier entries?",
+        "query": "allergy reaction"
+      },
+      {
+        "question": "Are there earlier entries documenting renal function or other monitoring relevant to metformin?",
+        "query": "renal function metformin"
+      }
+    ]
+  }
+}

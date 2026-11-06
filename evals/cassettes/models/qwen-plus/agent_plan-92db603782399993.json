@@ -1,0 +1,39 @@
+{
+  "fingerprint": "92db6037823999931855a93cca51cce749e212f493c35f6fa7d8cc609457ec53",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 862,
+    "output_tokens": 251,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was metformin first prescribed, and what was the initial dose and timing?",
+        "query": "metformin 500 mg"
+      },
+      {
+        "question": "What other medications were the patient taking before starting metformin, and were any adjusted or discontinued?",
+        "query": "medication change"
+      },
+      {
+        "question": "Has the patient reported stomach upset or gastrointestinal side effects with metformin previously, and how was it managed?",
+        "query": "stomach upset metformin"
+      },
+      {
+        "question": "Was any baseline renal function testing performed before initiating metformin?",
+        "query": "eGFR creatinine metformin"
+      },
+      {
+        "question": "Was diabetes education or dietary counseling provided at the time of metformin initiation?",
+        "query": "diabetes education diet"
+      },
+      {
+        "question": "Are there documented instructions for managing mild GI side effects (e.g., dose titration, food timing) with this metformin start?",
+        "query": "metformin titration stomach"
+      }
+    ]
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "fingerprint": "37e41682aa7b7e4622d05b1b2cbfe3f63d085c93257764e572e6f1a1fe6ebe8c",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 955,
+    "output_tokens": 264,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was atorvastatin first prescribed, and at what dose?",
+        "query": "atorvastatin prescribed"
+      },
+      {
+        "question": "Was the dose change from 20 mg to 40 mg ever implemented or documented as ordered?",
+        "query": "atorvastatin 40 mg ordered"
+      },
+      {
+        "question": "What was the most recent cholesterol test result, and when was it performed?",
+        "query": "cholesterol lipid panel"
+      },
+      {
+        "question": "Has the patient reported any muscle symptoms or adverse effects since starting atorvastatin?",
+        "query": "atorvastatin muscle pain"
+      },
+      {
+        "question": "Was pharmacy confirmation of the 20 mg dose preceded by a clinician order or note about continuing or reducing the dose?",
+        "query": "atorvastatin 20 mg continue reduce"
+      },
+      {
+        "question": "Are there prior entries indicating rationale for choosing 20 mg over 40 mg (e.g., intolerance, renal function, age)?",
+        "query": "atorvastatin dose choice reason"
+      }
+    ]
+  }
+}

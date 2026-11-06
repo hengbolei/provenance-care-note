@@ -1,0 +1,85 @@
+{
+  "fingerprint": "36fac25a923beb027d002235f5dea0e422de0feab3eb6c12533a63dbdae6a249",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2446,
+    "output_tokens": 582,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Warfarin dose was changed to 4 mg each evening.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "87500383-9a47-5a94-af58-5a77fd348186",
+            "start": 0,
+            "end": 35,
+            "quote": "Warfarin dose changed to 4 mg each evening"
+          }
+        ]
+      },
+      {
+        "text": "The last INR recorded was 3.4, measured the week before this note.",
+        "category": "other",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "87500383-9a47-5a94-af58-5a77fd348186",
+            "start": 37,
+            "end": 53,
+            "quote": "INR 3.4 last week"
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "No allergy or adverse reaction information is recorded in the available entries.",
+      "No indication for warfarin anticoagulation is documented in the available entries.",
+      "When warfarin was first started and the full dose titration history are not recorded.",
+      "Prior INR values beyond 3.4 last week, and which value prompted the dose change, are not recorded.",
+      "No prior bleeding events or adverse reactions on warfarin are documented.",
+      "No follow-up INR test, referral or other planned test is explicitly recorded after the dose change."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "87500383-9a47-5a94-af58-5a77fd348186",
+          "start": 0,
+          "end": 53,
+          "quote": "Warfarin dose changed to 4 mg each evening. INR 3.4 last week."
+        },
+        "risk_reason": "Warfarin dose was changed and the most recent INR was 3.4; per clinic policy INR should be checked within one week of a dose change, and the record does not document a scheduled check.",
+        "suggested_action": "Confirm the date and result of the post-dose-change INR check and document it in the record.",
+        "clinical_entities": [
+          "Warfarin",
+          "INR"
+        ]
+      }
+    ],
+    "check_points": [
+      {
+        "text": "Check whether an INR has been documented within one week of the warfarin dose change to 4 mg each evening.",
+        "reference": {
+          "document_id": "f9fef278-52c5-57a3-afe8-68ee9ced2bcc",
+          "version": 1,
+          "start": 0,
+          "end": 61,
+          "quote": "Check the INR within one week of any warfarin dose change."
+        },
+        "citations": [
+          {
+            "entry_id": "87500383-9a47-5a94-af58-5a77fd348186",
+            "start": 0,
+            "end": 53,
+            "quote": "Warfarin dose changed to 4 mg each evening. INR 3.4 last week."
+          }
+        ]
+      }
+    ]
+  }
+}

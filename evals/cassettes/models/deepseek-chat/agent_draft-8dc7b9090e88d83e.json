@@ -1,0 +1,126 @@
+{
+  "fingerprint": "8dc7b9090e88d83e03fec6f51480919b736d38afb1bee379b0c66058e550ad8c",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 5687,
+    "output_tokens": 1044,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "The record contains no entries documenting any medication being started, stopped, held or changed.",
+        "category": "medication",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "aa1f02eb-e0ad-5e25-a9f9-4ec3a3c6018d",
+            "start": 0,
+            "end": 90,
+            "quote": "Nurse check 52. Patient comfortable and no concerns raised during the call."
+          }
+        ]
+      },
+      {
+        "text": "No allergies or allergic reactions are recorded anywhere in the timeline entries provided.",
+        "category": "allergy",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "4c968285-a416-5a68-bc6f-e4f144f049db",
+            "start": 0,
+            "end": 88,
+            "quote": "Colonoscopy referral has not been booked. AI-generated summary; clinician confirmation required."
+          }
+        ]
+      },
+      {
+        "text": "A clinician note records low haemoglobin and asks for a colonoscopy referral and a repeat blood count in four weeks.",
+        "category": "plan",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "a3590d83-0db4-5e46-ae05-fc20fcc20ddc",
+            "start": 0,
+            "end": 84,
+            "quote": "Low haemoglobin. Arrange a colonoscopy referral and repeat blood count in four weeks."
+          }
+        ]
+      },
+      {
+        "text": "An AI-generated summary states the colonoscopy referral has not been booked and that clinician confirmation is required.",
+        "category": "follow_up",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "4c968285-a416-5a68-bc6f-e4f144f049db",
+            "start": 0,
+            "end": 80,
+            "quote": "Colonoscopy referral has not been booked. AI-generated summary; clinician confirmation required."
+          }
+        ]
+      },
+      {
+        "text": "Serial nurse checks (checks 15 to 52) each record the patient as comfortable with no concerns raised during the call.",
+        "category": "symptom",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "92135178-849d-593f-9245-bb28428be598",
+            "start": 0,
+            "end": 90,
+            "quote": "Nurse check 15. Patient comfortable and no concerns raised during the call."
+          },
+          {
+            "entry_id": "aa1f02eb-e0ad-5e25-a9f9-4ec3a3c6018d",
+            "start": 0,
+            "end": 90,
+            "quote": "Nurse check 52. Patient comfortable and no concerns raised during the call."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Was the repeat blood count in four weeks after 2026-07-01 performed, and what did it show?",
+      "Has the colonoscopy referral recommended on 2026-07-01 been booked, declined or otherwise actioned since the 2026-08-26 summary?",
+      "Are there any medications to reconcile? None are documented in the available entries.",
+      "Are there any allergies to record? None are documented in the available entries.",
+      "What symptoms (e.g. bowel change or bleeding) prompted the low haemoglobin workup and colonoscopy recommendation? No symptom entries address this.",
+      "Was any earlier colonoscopy or bowel screening completed, and what did it show? The record does not answer this.",
+      "Was patient consent or preference regarding colonoscopy documented? The record does not answer this."
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "4c968285-a416-5a68-bc6f-e4f144f049db",
+          "start": 0,
+          "end": 80,
+          "quote": "Colonoscopy referral has not been booked. AI-generated summary; clinician confirmation required."
+        },
+        "risk_reason": "An outstanding colonoscopy referral recommended for low haemoglobin remains unbooked, and the summary itself notes clinician confirmation is required.",
+        "suggested_action": "Confirm referral status with the clinician and check whether the referral has been booked or declined.",
+        "clinical_entities": [
+          "colonoscopy referral",
+          "low haemoglobin"
+        ]
+      },
+      {
+        "citation": {
+          "entry_id": "a3590d83-0db4-5e46-ae05-fc20fcc20ddc",
+          "start": 0,
+          "end": 84,
+          "quote": "Low haemoglobin. Arrange a colonoscopy referral and repeat blood count in four weeks."
+        },
+        "risk_reason": "Low haemoglobin with a plan for repeat blood count; whether the repeat count was done is not documented in the available entries.",
+        "suggested_action": "Verify whether the repeat blood count was completed and review the result.",
+        "clinical_entities": [
+          "low haemoglobin",
+          "repeat blood count"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

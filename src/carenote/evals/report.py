@@ -33,7 +33,8 @@ KIND_LABELS = {
     "check_point": "Check-point verdicts",
     "context": "Key entries in context",
     "critical_fact": "Critical facts",
-    "forbidden_output": "Forbidden output",
+    "forbidden_output": "Forbidden output stated as a finding",
+    "forbidden_mention": "Forbidden output mentioned",
     "conflict_coverage": "Conflict coverage",
 }
 AGENT_LABELS = {
@@ -62,9 +63,10 @@ def _gate(name: str, gate: dict[str, float]) -> str:
     return f"{'≤' if lower else '≥'} {shown}"
 
 
-def render(result: EvalResult) -> str:
+def render(result: EvalResult, models: dict[str, EvalResult] | None = None) -> str:
+    """Pipeline results from `result`; agent results from `models` (label -> result) when given,
+    otherwise from `result` itself."""
     pipeline = result.pipeline_metrics
-    agent = result.agent_metrics
     gate = result.gate()
     lines = [
         "# Agent evaluation report",
@@ -154,44 +156,144 @@ def render(result: EvalResult) -> str:
     else:
         lines.append("None.")
 
-    lines += ["", "## Agent suite (recorded model drafts)", ""]
-    if not agent["recorded"]:
-        lines += [
-            f"**Not recorded: 0 of {agent['cases']} cases have a cassette.** No model output has",
-            "been evaluated. Record live drafts with `python evals/run_evals.py --record` (requires",
-            "`OPENAI_API_KEY`); hand-written drafts are never scored here.",
-            "",
-            "Targets once recorded (design §13):",
-            "",
-            "| Metric | Gate |",
-            "| --- | --- |",
-        ]
-        lines += [f"| {AGENT_LABELS[name]} | {_gate(name, AGENT_GATE)} |" for name in AGENT_GATE]
+    if models is None:
+        lines += _agent_section(result)
     else:
-        lines += [
-            (
-                f"Recorded: **{agent['recorded']} of {agent['cases']}** cases · models: "
-                f"{', '.join(agent['models']) or '—'}"
-            ),
-            "",
-            "| Metric | Value | Gate |",
-            "| --- | --- | --- |",
-        ]
-        for name, label in AGENT_LABELS.items():
-            lines.append(f"| {label} | {_value(agent[name])} | {_gate(name, AGENT_GATE)} |")
-        lines += [
-            (
-                "| Unsupported-claim rate before automatic revision | "
-                f"{_value(agent['unsupported_rate_before_revision'])} | reported only |"
-            ),
-            f"| Cases revised automatically | {agent['cases_revised']} | reported only |",
-            f"| Automatic revisions | {agent['auto_revisions']} | reported only |",
-            f"| Claims scored | {agent['claims']} | reported only |",
-            f"| Tokens | {agent['tokens']:,} | reported only |",
-            f"| Cost (USD, when prices are configured) | {agent['cost_usd']:.4f} | reported only |",
-        ]
-        missed = [c for c in result.agent if not c.passed]
-        if missed:
-            lines += ["", "| Case | Check | Subject |", "| --- | --- | --- |"]
-            lines += [f"| `{c.case_id}` | {KIND_LABELS[c.kind]} | {c.subject} |" for c in missed]
+        lines += _comparison_section(len(result.cases), models)
     return "\n".join(lines) + "\n"
+
+
+def _not_recorded(cases: int) -> list[str]:
+    lines = [
+        f"**Not recorded: 0 of {cases} cases have a cassette.** No model output has",
+        "been evaluated. Record live drafts with `python evals/run_evals.py --record <label>`",
+        "(needs the provider's API key); hand-written drafts are never scored here.",
+        "",
+        "Targets once recorded (design §13):",
+        "",
+        "| Metric | Gate |",
+        "| --- | --- |",
+    ]
+    lines += [f"| {AGENT_LABELS[name]} | {_gate(name, AGENT_GATE)} |" for name in AGENT_GATE]
+    return lines
+
+
+def _missed(checks: list[Check]) -> list[str]:
+    missed = [c for c in checks if not c.passed and c.kind != "forbidden_mention"]
+    if not missed:
+        return []
+    lines = ["", "| Case | Check | Subject |", "| --- | --- | --- |"]
+    lines += [f"| `{c.case_id}` | {KIND_LABELS[c.kind]} | {c.subject} |" for c in missed]
+    return lines
+
+
+def _agent_section(result: EvalResult) -> list[str]:
+    agent = result.agent_metrics
+    lines = ["", "## Agent suite (recorded model drafts)", ""]
+    if not agent["recorded"]:
+        return lines + _not_recorded(agent["cases"])
+    lines += [
+        (
+            f"Recorded: **{agent['recorded']} of {agent['cases']}** cases · models: "
+            f"{', '.join(agent['models']) or '—'}"
+        ),
+        "",
+        "| Metric | Value | Gate |",
+        "| --- | --- | --- |",
+    ]
+    for name, label in AGENT_LABELS.items():
+        lines.append(f"| {label} | {_value(agent[name])} | {_gate(name, AGENT_GATE)} |")
+    lines += [
+        (
+            "| Unsupported-claim rate before automatic revision | "
+            f"{_value(agent['unsupported_rate_before_revision'])} | reported only |"
+        ),
+        f"| Cases revised automatically | {agent['cases_revised']} | reported only |",
+        f"| Automatic revisions | {agent['auto_revisions']} | reported only |",
+        f"| Claims scored | {agent['claims']} | reported only |",
+        f"| Tokens | {agent['tokens']:,} | reported only |",
+        f"| Cost (USD, when prices are configured) | {agent['cost_usd']:.4f} | reported only |",
+    ]
+    return lines + _missed(result.agent)
+
+
+def _comparison_section(cases: int, models: dict[str, EvalResult]) -> list[str]:
+    lines = ["", "## Agent suite (recorded model drafts)", ""]
+    if not models:
+        return lines + _not_recorded(cases)
+    labels = list(models)
+    metrics = {label: models[label].agent_metrics for label in labels}
+    lines += [
+        "Each model's drafts are recorded once into `evals/cassettes/models/<label>/` and",
+        "replayed here, so these numbers are reproducible without an API key. The agent gate is",
+        "reported per model; it does not fail CI, because a weaker model is a finding, not a bug.",
+        "",
+        "| Metric | Gate | " + " | ".join(f"`{label}`" for label in labels) + " |",
+        "| --- | --- | " + " | ".join("---:" for _ in labels) + " |",
+    ]
+
+    def row(label: str, gate: str, cells: list[str]) -> None:
+        lines.append(f"| {label} | {gate} | " + " | ".join(cells) + " |")
+
+    row("Model", "—", [", ".join(metrics[m]["models"]) or "—" for m in labels])
+    row("Cases recorded", "—", [f"{metrics[m]['recorded']} / {cases}" for m in labels])
+    for name, title in AGENT_LABELS.items():
+        row(title, _gate(name, AGENT_GATE), [_value(metrics[m][name]) for m in labels])
+    row(
+        "Unsupported-claim rate before automatic revision",
+        "reported only",
+        [_value(metrics[m]["unsupported_rate_before_revision"]) for m in labels],
+    )
+    row(
+        "Injection cases whose draft quotes the injected text as record content",
+        "reported only",
+        [str(metrics[m]["injection_mentions"]) for m in labels],
+    )
+    row(
+        "Cases revised automatically",
+        "reported only",
+        [str(metrics[m]["cases_revised"]) for m in labels],
+    )
+    row("Claims scored", "reported only", [str(metrics[m]["claims"]) for m in labels])
+    row("Tokens", "reported only", [f"{metrics[m]['tokens']:,}" for m in labels])
+    row(
+        "Cost (USD, when prices are configured)",
+        "reported only",
+        [f"{metrics[m]['cost_usd']:.4f}" for m in labels],
+    )
+    row(
+        "Agent gate",
+        "—",
+        ["pass" if not models[m].agent_gate() else "**FAIL**" for m in labels],
+    )
+
+    lines += [
+        "",
+        "### Agent checks passed by family",
+        "",
+        "| Family | " + " | ".join(f"`{label}`" for label in labels) + " |",
+        "| --- | " + " | ".join("---:" for _ in labels) + " |",
+    ]
+    for family in Family:
+        cells = []
+        for label in labels:
+            checks = [
+                c
+                for c in models[label].agent
+                if c.family is family and c.kind != "forbidden_mention"
+            ]
+            cells.append(f"{sum(c.passed for c in checks)} / {len(checks)}" if checks else "—")
+        lines.append(f"| `{family.value}` | " + " | ".join(cells) + " |")
+
+    for label in labels:
+        result = models[label]
+        unrecorded = [case.id for case in result.cases if not result.runs[case.id].recorded]
+        lines += ["", f"### Missed checks: `{label}`", ""]
+        body = _missed(result.agent)
+        if unrecorded:
+            lines.append("Not recorded: " + ", ".join(f"`{case}`" for case in unrecorded) + ".")
+        if body:
+            lines += body[1:] if not unrecorded else body
+        elif not unrecorded:
+            lines.append("None.")
+    return lines

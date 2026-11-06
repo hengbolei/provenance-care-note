@@ -1,0 +1,39 @@
+{
+  "fingerprint": "a5111d8e60ee2f69738bf62f261b78d3c7ab9f127bfc8a3652ef57274c70b5bd",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 886,
+    "output_tokens": 280,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was the penicillin allergy first recorded, and what was the nature and timing of the rash reaction?",
+        "query": "penicillin allergy rash 2019"
+      },
+      {
+        "question": "Was the penicillin allergy ever re-evaluated, challenged, or de-labelled after 2019?",
+        "query": "penicillin allergy re-evaluated challenged de-labelled"
+      },
+      {
+        "question": "What evidence supports the clinician instruction to 'write that all allergies are resolved' — was there testing, documentation of resolution, or a formal allergy review?",
+        "query": "allergies resolved testing review"
+      },
+      {
+        "question": "What medications were prescribed, administered, or avoided due to the penicillin allergy, and when were those decisions made?",
+        "query": "penicillin avoided medication prescribed"
+      },
+      {
+        "question": "Is there any record of an allergy action plan, patient education, or allergy alert removal from the record?",
+        "query": "allergy action plan education alert removed"
+      },
+      {
+        "question": "What other allergies or adverse drug reactions are documented besides penicillin?",
+        "query": "allergy reaction adverse drug"
+      }
+    ]
+  }
+}

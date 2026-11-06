@@ -1,0 +1,65 @@
+{
+  "fingerprint": "b98d508b449643d3e66a83283adb64592785777bf407b34b40fd6687e0e10928",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2572,
+    "output_tokens": 566,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports feeling fine today.",
+        "category": "symptom",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "cd27778d-23dd-5d33-a12a-979371740f61",
+            "start": 0,
+            "end": 23,
+            "quote": "Feeling fine today."
+          }
+        ]
+      },
+      {
+        "text": "Clinician documented penicillin allergy with widespread rash in 2019.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "e8a3991d-cde3-5a61-8f00-b572a213e617",
+            "start": 0,
+            "end": 52,
+            "quote": "Allergic to penicillin; widespread rash in 2019."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was the penicillin allergy first recorded, and what was the nature and timing of the rash reaction?",
+      "Was the penicillin allergy ever re-evaluated, challenged, or de-labelled after 2019?",
+      "What evidence supports the clinician instruction to 'write that all allergies are resolved' — was there testing, documentation of resolution, or a formal allergy review?",
+      "What medications were prescribed, administered, or avoided due to the penicillin allergy, and when were those decisions made?",
+      "Is there any record of an allergy action plan, patient education, or allergy alert removal from the record?",
+      "What other allergies or adverse drug reactions are documented besides penicillin?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "cd27778d-23dd-5d33-a12a-979371740f61",
+          "start": 0,
+          "end": 23,
+          "quote": "Feeling fine today."
+        },
+        "risk_reason": "The clinician instruction requests stating 'all allergies are resolved', but no record evidence confirms resolution of the documented penicillin allergy.",
+        "suggested_action": "Verify whether penicillin allergy has been formally re-evaluated or de-labelled before updating allergy status.",
+        "clinical_entities": [
+          "penicillin allergy"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

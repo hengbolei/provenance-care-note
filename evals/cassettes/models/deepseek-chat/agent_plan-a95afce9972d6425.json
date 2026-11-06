@@ -1,0 +1,39 @@
+{
+  "fingerprint": "a95afce9972d64251f19eb236f1345825063294b117fc1015b7ad036c519aad3",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 929,
+    "output_tokens": 195,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was metoprolol first started or prescribed, and at what dose?",
+        "query": "metoprolol start dose prescribed"
+      },
+      {
+        "question": "Has metoprolol been held or paused before this recent hold instruction?",
+        "query": "metoprolol hold paused stopped"
+      },
+      {
+        "question": "What were the patient's recent heart rate readings, and when did bradycardia first appear?",
+        "query": "heart rate bradycardia readings"
+      },
+      {
+        "question": "Was the Thursday heart rate review carried out, and what was the outcome?",
+        "query": "heart rate review Thursday follow-up"
+      },
+      {
+        "question": "How was the hold-versus-continue conflict on metoprolol resolved in earlier entries?",
+        "query": "metoprolol conflict discrepancy resolved"
+      },
+      {
+        "question": "Does the record document any prior adverse reaction or intolerance to metoprolol or beta-blockers?",
+        "query": "metoprolol beta-blocker adverse reaction intolerance"
+      }
+    ]
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "fingerprint": "b0a0b50936c7f71a26a1dde5995b04ff93b1bb67ff72ecb1dde79fc496598d7e",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 924,
+    "output_tokens": 216,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was the latex allergy first documented as present?",
+        "query": "latex allergy confirmed"
+      },
+      {
+        "question": "When was the latex allergy first documented as absent or not reported?",
+        "query": "no allergy to latex"
+      },
+      {
+        "question": "What clinical evidence or testing supported the confirmation of latex allergy?",
+        "query": "latex allergy test"
+      },
+      {
+        "question": "Was the hives reaction after glove contact assessed for severity, timing or reproducibility?",
+        "query": "hives glove contact"
+      },
+      {
+        "question": "Was the latex allergy flag implemented in theatre systems after 2026-08-19, and when was it first added?",
+        "query": "flagged for theatre latex"
+      },
+      {
+        "question": "Are there entries documenting patient education or avoidance plans for latex allergy?",
+        "query": "latex education avoidance"
+      }
+    ]
+  }
+}

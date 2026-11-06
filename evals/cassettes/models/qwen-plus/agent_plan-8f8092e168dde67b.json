@@ -1,0 +1,39 @@
+{
+  "fingerprint": "8f8092e168dde67b04fcbba00f2e8df2cf08b98c9a3de2839ae0908a6aa7f0f8",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 760,
+    "output_tokens": 212,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "Which medications are currently prescribed, and when were they first started?",
+        "query": "medication start"
+      },
+      {
+        "question": "Were any medications stopped, held or changed recently, and what was the reason?",
+        "query": "stopped held changed"
+      },
+      {
+        "question": "What allergies or adverse reactions are documented, and when were they first recorded?",
+        "query": "allergy reaction"
+      },
+      {
+        "question": "Are there any outstanding follow-ups, referrals or tests mentioned in earlier entries?",
+        "query": "follow-up referral test"
+      },
+      {
+        "question": "What was the clinical rationale for continuing current medications, and was it based on recent assessment?",
+        "query": "continue rationale assessment"
+      },
+      {
+        "question": "Was a three-month review previously scheduled or discussed, and has it been done before?",
+        "query": "review three months"
+      }
+    ]
+  }
+}

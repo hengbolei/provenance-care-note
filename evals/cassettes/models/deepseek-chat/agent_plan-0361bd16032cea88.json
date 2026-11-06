@@ -1,0 +1,31 @@
+{
+  "fingerprint": "0361bd16032cea883187fa83cfc43e8a94e2e8947a5137d19298474f5f5329f0",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 3952,
+    "output_tokens": 120,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was the cefalexin allergy first recorded, and what was the initial reaction?",
+        "query": "cefalexin allergy lip swelling"
+      },
+      {
+        "question": "Was cefalexin started before the reaction, and what was the indication and dose?",
+        "query": "cefalexin dose start indication"
+      },
+      {
+        "question": "What earlier entries document prior antibiotic use or antibiotic reactions?",
+        "query": "antibiotic reaction allergy"
+      },
+      {
+        "question": "What did earlier entries say before the daily check-ins became unremarkable?",
+        "query": "symptom medication change"
+      }
+    ]
+  }
+}

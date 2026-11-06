@@ -1,0 +1,131 @@
+{
+  "fingerprint": "324ad7e13641dd089d17847bcc1fd058ea409126d944d3cc1ab47308e7461e29",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2631,
+    "output_tokens": 1363,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports continuing warfarin 5 mg nightly as of 2026-08-16.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "30d178a0-f3f0-54af-af4c-e85ff96b79c0",
+            "start": 27,
+            "end": 56,
+            "quote": "I am still taking warfarin 5 mg every night like before."
+          }
+        ]
+      },
+      {
+        "text": "Clinician instructed on 2026-08-14 to reduce warfarin to 2.5 mg nightly following INR 3.8.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "8c71a5c0-4cf5-5451-b643-adf7280fe836",
+            "start": 0,
+            "end": 64,
+            "quote": "INR 3.8. Reduce warfarin 2.5 mg nightly and recheck INR on Friday."
+          }
+        ]
+      },
+      {
+        "text": "Conflict exists between documented warfarin doses: 5 mg (patient-reported) and 2.5 mg (clinician instruction).",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "30d178a0-f3f0-54af-af4c-e85ff96b79c0",
+            "start": 27,
+            "end": 56,
+            "quote": "I am still taking warfarin 5 mg every night like before."
+          },
+          {
+            "entry_id": "8c71a5c0-4cf5-5451-b643-adf7280fe836",
+            "start": 14,
+            "end": 39,
+            "quote": "Reduce warfarin 2.5 mg nightly"
+          },
+          {
+            "entry_id": "ec89606e-9273-5928-b201-b9d6c7a8ad0d",
+            "start": 0,
+            "end": 59,
+            "quote": "Conflicting dose facts for warfarin: 2.5mg versus 5mg."
+          }
+        ]
+      },
+      {
+        "text": "INR was 3.8 on 2026-08-14.",
+        "category": "follow_up",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "8c71a5c0-4cf5-5451-b643-adf7280fe836",
+            "start": 0,
+            "end": 7,
+            "quote": "INR 3.8."
+          }
+        ]
+      },
+      {
+        "text": "Clinician instructed recheck of INR on Friday (2026-08-16).",
+        "category": "follow_up",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "8c71a5c0-4cf5-5451-b643-adf7280fe836",
+            "start": 43,
+            "end": 64,
+            "quote": "recheck INR on Friday."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was warfarin first prescribed and at what dose?",
+      "What was the INR value before the most recent one of 3.8?",
+      "Was the warfarin dose reduction to 2.5 mg implemented as instructed on 2026-08-14?",
+      "Has the follow-up INR test scheduled for Friday (2026-08-16) been performed or reported?",
+      "Are there any documented reasons for continuing warfarin long-term, such as atrial fibrillation or mechanical valve?",
+      "Have there been any bleeding events or adverse effects related to warfarin documented in earlier entries?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "ec89606e-9273-5928-b201-b9d6c7a8ad0d",
+          "start": 0,
+          "end": 59,
+          "quote": "Conflicting dose facts for warfarin: 2.5mg versus 5mg."
+        },
+        "risk_reason": "Warfarin dosing discrepancy places patient at risk for under-anticoagulation (if still on 5 mg) or over-anticoagulation (if reduced but unverified), especially with recent INR 3.8.",
+        "suggested_action": "Confirm current warfarin dose via pharmacy refill data or direct patient clarification; verify adherence to 2.5 mg dose change.",
+        "clinical_entities": [
+          "warfarin",
+          "INR"
+        ]
+      },
+      {
+        "citation": {
+          "entry_id": "8c71a5c0-4cf5-5451-b643-adf7280fe836",
+          "start": 43,
+          "end": 64,
+          "quote": "recheck INR on Friday."
+        },
+        "risk_reason": "Follow-up INR test due on 2026-08-16 is time-sensitive for anticoagulation safety; result not yet documented.",
+        "suggested_action": "Check lab system for INR result from 2026-08-16; if missing, order repeat INR promptly.",
+        "clinical_entities": [
+          "INR",
+          "warfarin"
+        ]
+      }
+    ],
+    "check_points": []
+  }
+}

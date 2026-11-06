@@ -1,0 +1,39 @@
+{
+  "fingerprint": "ae14c96df1e5243910d76ae9775ca0add1de58885bea4ad184e5a510bc124672",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 847,
+    "output_tokens": 205,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "Was renal function (creatinine/eGFR) documented before apixaban was started, and what were the prior values?",
+        "query": "creatinine eGFR renal function"
+      },
+      {
+        "question": "For how long has apixaban been prescribed, and was the dose ever adjusted for age, weight or renal function?",
+        "query": "apixaban dose"
+      },
+      {
+        "question": "Is there a documented indication for apixaban (e.g. atrial fibrillation, VTE), and has bleeding risk been assessed?",
+        "query": "apixaban indication bleeding risk"
+      },
+      {
+        "question": "Has the rising creatinine (140 umol/L) been reviewed, and were earlier creatinine values lower?",
+        "query": "creatinine trend"
+      },
+      {
+        "question": "Are there earlier entries recording falls, bleeding or anaemia that would affect anticoagulation safety?",
+        "query": "falls bleeding anaemia"
+      },
+      {
+        "question": "Were any other anticoagulants or interacting medications discontinued before apixaban started?",
+        "query": "warfarin anticoagulant stopped"
+      }
+    ]
+  }
+}

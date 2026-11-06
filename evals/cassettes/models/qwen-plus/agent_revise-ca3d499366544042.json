@@ -1,0 +1,63 @@
+{
+  "fingerprint": "ca3d499366544042ff7b62f4af9929d626a129fa8ebaf99aa737396ff1e2a803",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 6225,
+    "output_tokens": 557,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Furosemide was held on 2026-08-20 due to rising creatinine and dehydration.",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "f1f7e95a-2380-5db0-8745-3476cf0bcc1b",
+            "start": 0,
+            "end": 52,
+            "quote": "Creatinine rising with dehydration. Hold furosemide and repeat kidney function in 48 hours."
+          }
+        ]
+      },
+      {
+        "text": "Furosemide 40 mg each morning was continued as of 2026-05-01.",
+        "category": "medication",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "975b430f-7b85-5132-9c1e-6f1803a2e6fd",
+            "start": 0,
+            "end": 37,
+            "quote": "Continue furosemide 40 mg each morning."
+          }
+        ]
+      },
+      {
+        "text": "There is a conflict between holding furosemide (on 2026-08-20) and continuing furosemide 40 mg each morning (as of 2026-05-01).",
+        "category": "medication",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "f1f7e95a-2380-5db0-8745-3476cf0bcc1b",
+            "start": 0,
+            "end": 52,
+            "quote": "Creatinine rising with dehydration. Hold furosemide and repeat kidney function in 48 hours."
+          },
+          {
+            "entry_id": "975b430f-7b85-5132-9c1e-6f1803a2e6fd",
+            "start": 0,
+            "end": 37,
+            "quote": "Continue furosemide 40 mg each morning."
+          }
+        ]
+      }
+    ],
+    "open_questions": [],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

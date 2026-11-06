@@ -1,0 +1,137 @@
+{
+  "fingerprint": "537857041b072706762519f6df20082966b2132bddd68e98bb3e8c1771c676cc",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2708,
+    "output_tokens": 1185,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Clinician note records apixaban 5 mg twice daily started on 2026-08-01, with age 84 and weight 58 kg noted.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "458cc1de-e388-5852-8772-96a5cbcd7fde",
+            "start": 0,
+            "end": 29,
+            "quote": "Started apixaban 5 mg twice daily."
+          }
+        ]
+      },
+      {
+        "text": "Creatinine was 140 umol/L on today's sample (2026-08-20).",
+        "category": "other",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "2029d558-21c1-5cbb-9957-deeb8159949a",
+            "start": 0,
+            "end": 32,
+            "quote": "Creatinine 140 umol/L on today's sample."
+          }
+        ]
+      },
+      {
+        "text": "Age 84 and weight 58 kg are recorded alongside the apixaban start, both below the thresholds mentioned in the dosing reference.",
+        "category": "medication",
+        "risk_level": "high",
+        "citations": [
+          {
+            "entry_id": "458cc1de-e388-5852-8772-96a5cbcd7fde",
+            "start": 41,
+            "end": 60,
+            "quote": "Age 84; weight 58 kg."
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "Was renal function (creatinine/eGFR) documented before apixaban was started, and what were the prior values? Only a current creatinine of 140 umol/L is recorded.",
+      "For how long has apixaban been prescribed, and was the dose ever adjusted for age, weight or renal function? The record shows one start entry only.",
+      "Is there a documented indication for apixaban (e.g. atrial fibrillation, VTE), and has bleeding risk been assessed? No indication or bleeding-risk assessment is recorded.",
+      "Has the rising creatinine (140 umol/L) been reviewed, and were earlier creatinine values lower? No prior creatinine values appear in the record.",
+      "Are there earlier entries recording falls, bleeding or anaemia that would affect anticoagulation safety? None are present in the supplied record.",
+      "Were any other anticoagulants or interacting medications discontinued before apixaban started? No such entries are present.",
+      "Which allergies or reactions are recorded? No allergy entries appear in the supplied record.",
+      "Which follow-ups, referrals or tests are planned or outstanding? No follow-up or monitoring entries appear in the supplied record.",
+      "Given age 84, weight 58 kg and creatinine 140 umol/L, does the apixaban 5 mg twice daily dose match the product label's dose-reduction criteria?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "458cc1de-e388-5852-8772-96a5cbcd7fde",
+          "start": 0,
+          "end": 60,
+          "quote": "Started apixaban 5 mg twice daily. Age 84; weight 58 kg."
+        },
+        "risk_reason": "Age 84, weight 58 kg and creatinine 140 umol/L each meet a criterion in the apixaban label for considering a reduced dose, but the record shows 5 mg twice daily.",
+        "suggested_action": "Ask the prescriber to confirm the apixaban dose against the label's dose-reduction criteria.",
+        "clinical_entities": [
+          "apixaban 5 mg twice daily"
+        ]
+      },
+      {
+        "citation": {
+          "entry_id": "2029d558-21c1-5cbb-9957-deeb8159949a",
+          "start": 0,
+          "end": 32,
+          "quote": "Creatinine 140 umol/L on today's sample."
+        },
+        "risk_reason": "Creatinine 140 umol/L meets the renal criterion in the apixaban label, and no earlier creatinine values are recorded for comparison.",
+        "suggested_action": "Review the creatinine result with the clinician and confirm whether renal function has been documented previously.",
+        "clinical_entities": [
+          "creatinine 140 umol/L"
+        ]
+      }
+    ],
+    "check_points": [
+      {
+        "text": "Check whether age 80 or over, weight 60 kg or less, and creatinine 133 umol/L or more have been applied to the apixaban dosing decision.",
+        "reference": {
+          "document_id": "6b5338ea-9d16-5086-b73f-b42d98951cb6",
+          "version": 2,
+          "start": 51,
+          "end": 170,
+          "quote": "Reduce the dose to 2.5 mg twice daily when two of the following apply: age 80 or over, weight 60 kg or less, creatinine 133 umol/L or more."
+        },
+        "citations": [
+          {
+            "entry_id": "458cc1de-e388-5852-8772-96a5cbcd7fde",
+            "start": 0,
+            "end": 60,
+            "quote": "Started apixaban 5 mg twice daily. Age 84; weight 58 kg."
+          },
+          {
+            "entry_id": "2029d558-21c1-5cbb-9957-deeb8159949a",
+            "start": 0,
+            "end": 32,
+            "quote": "Creatinine 140 umol/L on today's sample."
+          }
+        ]
+      },
+      {
+        "text": "Confirm whether renal function has been checked within the past year for this patient.",
+        "reference": {
+          "document_id": "6b5338ea-9d16-5086-b73f-b42d98951cb6",
+          "version": 2,
+          "start": 191,
+          "end": 229,
+          "quote": "Check renal function at least once a year."
+        },
+        "citations": [
+          {
+            "entry_id": "2029d558-21c1-5cbb-9957-deeb8159949a",
+            "start": 0,
+            "end": 32,
+            "quote": "Creatinine 140 umol/L on today's sample."
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "fingerprint": "96eb8ee68cd0314245a22a29b7c75cc9637da22dcbb9827833b95b409ad7ffad",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 952,
+    "output_tokens": 252,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was warfarin first prescribed and at what dose?",
+        "query": "warfarin prescribed"
+      },
+      {
+        "question": "What was the INR value before the most recent one of 3.8?",
+        "query": "INR"
+      },
+      {
+        "question": "Was the warfarin dose reduction to 2.5 mg implemented as instructed on 2026-08-14?",
+        "query": "warfarin 2.5 mg"
+      },
+      {
+        "question": "Has the follow-up INR test scheduled for Friday (2026-08-16) been performed or reported?",
+        "query": "INR Friday"
+      },
+      {
+        "question": "Are there any documented reasons for continuing warfarin long-term, such as atrial fibrillation or mechanical valve?",
+        "query": "warfarin indication"
+      },
+      {
+        "question": "Have there been any bleeding events or adverse effects related to warfarin documented in earlier entries?",
+        "query": "bleeding warfarin"
+      }
+    ]
+  }
+}

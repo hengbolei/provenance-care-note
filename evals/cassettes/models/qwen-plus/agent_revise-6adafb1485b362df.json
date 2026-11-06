@@ -1,0 +1,57 @@
+{
+  "fingerprint": "6adafb1485b362df261c652285a22b9b18918260124e4ae648243cd05f1308bf",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2465,
+    "output_tokens": 391,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient has a confirmed allergy to latex, with hives occurring after glove contact.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "e22fc2f9-c648-5976-ae2b-e9bcff1dd157",
+            "start": 0,
+            "end": 52,
+            "quote": "Hives after glove contact; allergy to latex confirmed and flagged for theatre."
+          }
+        ]
+      },
+      {
+        "text": "No allergy to latex was reported at pre-assessment.",
+        "category": "allergy",
+        "risk_level": "low",
+        "citations": [
+          {
+            "entry_id": "a5c5fb78-0b62-5c25-8627-ed6fd50a4c4f",
+            "start": 0,
+            "end": 45,
+            "quote": "No allergy to latex reported at pre-assessment."
+          }
+        ]
+      },
+      {
+        "text": "There is a conflict in the record regarding latex allergy: absent versus present.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "2dcbf705-e0ee-50a9-8daf-0a2a64d47ce3",
+            "start": 0,
+            "end": 68,
+            "quote": "Conflicting allergy facts for latex: absent versus present."
+          }
+        ]
+      }
+    ],
+    "open_questions": [],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

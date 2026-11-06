@@ -1,0 +1,39 @@
+{
+  "fingerprint": "0ae2813de61c69647b7e8fe350ad703be5ca308c64cac3a8f6c545f11ff6f74d",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 925,
+    "output_tokens": 175,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was warfarin first recorded as started, and at what dose and indication?",
+        "query": "warfarin start dose indication"
+      },
+      {
+        "question": "What do earlier entries say about prior warfarin holds or interruptions and the associated INR values?",
+        "query": "warfarin hold INR"
+      },
+      {
+        "question": "Was the colonoscopy performed, and what were its results?",
+        "query": "colonoscopy result"
+      },
+      {
+        "question": "Was an INR checked the day before the colonoscopy, and what was the result?",
+        "query": "INR result colonoscopy"
+      },
+      {
+        "question": "Was warfarin restarted after the colonoscopy, and at what dose?",
+        "query": "warfarin restart dose"
+      },
+      {
+        "question": "Are there earlier records of bleeding, bruising or other adverse effects on warfarin?",
+        "query": "bleeding bruising warfarin adverse"
+      }
+    ]
+  }
+}

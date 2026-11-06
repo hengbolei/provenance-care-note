@@ -1,0 +1,31 @@
+{
+  "fingerprint": "03d993dfd4d13b8ed80310817167b128d2ce5978cc209e21b84241d197d71c12",
+  "purpose": "agent_plan",
+  "schema": "ReviewPlan",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 771,
+    "output_tokens": 147,
+    "cost_usd": null
+  },
+  "output": {
+    "questions": [
+      {
+        "question": "When was lisinopril first started or its dose last changed?",
+        "query": "lisinopril started dose change"
+      },
+      {
+        "question": "What were the home blood pressure readings before 2026-08-15, and how have they trended?",
+        "query": "blood pressure home reading"
+      },
+      {
+        "question": "Was any action planned or taken in response to BP readings around 150/90?",
+        "query": "150/90 action plan"
+      },
+      {
+        "question": "Has lisinopril been held, stopped, or adjusted previously, and if so, why?",
+        "query": "lisinopril held stopped adjusted"
+      }
+    ]
+  }
+}

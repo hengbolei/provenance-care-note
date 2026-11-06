@@ -1,0 +1,57 @@
+{
+  "fingerprint": "db2861160f80063c950caa7b62957435b3355026bec71a2ef7c1557f9223c4a7",
+  "purpose": "agent_revise",
+  "schema": "DraftReview",
+  "model": "qwen-plus",
+  "usage": {
+    "input_tokens": 2444,
+    "output_tokens": 409,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "Patient reports no allergy to codeine, stating they 'just felt sick once'.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "f7c8bcd4-b828-5bcf-a73c-d6fa383670ea",
+            "start": 0,
+            "end": 49,
+            "quote": "I am not allergic to codeine, I just felt sick once."
+          }
+        ]
+      },
+      {
+        "text": "Staff note states patient is 'Allergic to codeine per the pharmacy record.'",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "16749069-ad3c-5cef-b03b-7132d28750d6",
+            "start": 0,
+            "end": 45,
+            "quote": "Allergic to codeine per the pharmacy record."
+          }
+        ]
+      },
+      {
+        "text": "There is a documented conflict regarding codeine allergy: 'Conflicting allergy facts for codeine: absent versus present.'",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "e13de048-6507-542c-869b-06e7bedd590c",
+            "start": 0,
+            "end": 65,
+            "quote": "Conflicting allergy facts for codeine: absent versus present."
+          }
+        ]
+      }
+    ],
+    "open_questions": [],
+    "candidate_highlights": [],
+    "check_points": []
+  }
+}

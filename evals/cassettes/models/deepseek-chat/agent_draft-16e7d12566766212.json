@@ -1,0 +1,82 @@
+{
+  "fingerprint": "16e7d12566766212fb14be6411c8fc2e898e2a57c97d09a580a7f38f8c3840c0",
+  "purpose": "agent_draft",
+  "schema": "DraftReview",
+  "model": "deepseek-chat",
+  "usage": {
+    "input_tokens": 2525,
+    "output_tokens": 517,
+    "cost_usd": null
+  },
+  "output": {
+    "claims": [
+      {
+        "text": "The patient states they are not allergic to codeine and that they just felt sick once.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "f7c8bcd4-b828-5bcf-a73c-d6fa383670ea",
+            "start": 0,
+            "end": 52,
+            "quote": "I am not allergic to codeine, I just felt sick once."
+          }
+        ]
+      },
+      {
+        "text": "A staff note records that the patient is allergic to codeine per the pharmacy record.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "16749069-ad3c-5cef-b03b-7132d28750d6",
+            "start": 0,
+            "end": 48,
+            "quote": "Allergic to codeine per the pharmacy record."
+          }
+        ]
+      },
+      {
+        "text": "A record conflict flagged by deterministic checks states conflicting allergy facts for codeine: absent versus present.",
+        "category": "allergy",
+        "risk_level": "moderate",
+        "citations": [
+          {
+            "entry_id": "16749069-ad3c-5cef-b03b-7132d28750d6",
+            "start": 0,
+            "end": 19,
+            "quote": "Allergic to codeine"
+          },
+          {
+            "entry_id": "f7c8bcd4-b828-5bcf-a73c-d6fa383670ea",
+            "start": 0,
+            "end": 27,
+            "quote": "I am not allergic to codeine"
+          }
+        ]
+      }
+    ],
+    "open_questions": [
+      "When was the codeine allergy first recorded, and what reaction was documented at that time?",
+      "What did earlier entries record about the nature and severity of the reaction to codeine (e.g., nausea vs. true allergy)?",
+      "Has codeine ever been administered or prescribed, and was it tolerated?",
+      "Are there other documented allergies or medication intolerances besides codeine?",
+      "Have any medications been started, stopped, held or changed recently?",
+      "Are any follow-ups, referrals or tests planned or outstanding?"
+    ],
+    "candidate_highlights": [
+      {
+        "citation": {
+          "entry_id": "16749069-ad3c-5cef-b03b-7132d28750d6",
+          "start": 0,
+          "end": 48,
+          "quote": "Allergic to codeine per the pharmacy record."
+        },
+        "risk_reason": "The pharmacy record documents a codeine allergy while the patient states they are not allergic, so allergy status is conflicting.",
+        "suggested_action": "Flag the conflicting codeine allergy information for clinician reconciliation before prescribing decisions.",
+        "clinical_entities": []
+      }
+    ],
+    "check_points": []
+  }
+}
